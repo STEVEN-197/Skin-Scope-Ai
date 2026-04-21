@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2 class="text-xl font-semibold mb-4">Reports History</h2>
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {% for r in reports %}
+    <a class="border rounded-xl p-4 hover:shadow" href="{{ url_for('main.report_detail', report_id=r.id) }}">
+      <p class="text-xs text-slate-500">{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+      <h3 class="font-semibold mt-1">{{ r.condition }}</h3>
+      <p class="text-sm">Severity: <span class="font-medium">{{ r.severity }}</span></p>
+      <p class="text-sm">Confidence: {{ '%.2f'|format(r.confidence) }}</p>
+    </a>
+    {% else %}
+    <p class="text-slate-500">No reports available yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

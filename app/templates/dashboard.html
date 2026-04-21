@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid gap-5 lg:grid-cols-3">
+  <div class="card lg:col-span-2">
+    <h2 class="text-lg font-semibold">Severity Trend</h2>
+    <p class="text-sm text-slate-500 mb-4">Weighted score over recent analyses</p>
+    <canvas id="trendChart" height="120"></canvas>
+  </div>
+  <div class="card">
+    <h2 class="text-lg font-semibold">Overview</h2>
+    <div class="mt-4 space-y-3 text-sm">
+      <p><span class="font-semibold">Total Reports:</span> {{ reports|length }}</p>
+      <p><span class="font-semibold">Latest Severity:</span> {{ reports[0].severity if reports else 'N/A' }}</p>
+      <p><span class="font-semibold">Latest Condition:</span> {{ reports[0].condition if reports else 'N/A' }}</p>
+    </div>
+    <a href="{{ url_for('main.upload_analysis') }}" class="btn-primary inline-block mt-6">Analyze New Image</a>
+  </div>
+</div>
+
+<div class="card mt-5">
+  <h2 class="text-lg font-semibold mb-4">Recent Reports</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+      <tr class="text-left text-slate-500 border-b">
+        <th class="py-2">Date</th><th>Region</th><th>Condition</th><th>Severity</th><th>Confidence</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for r in reports %}
+      <tr class="border-b last:border-0">
+        <td class="py-2">{{ r.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>{{ r.region.title() }}</td><td>{{ r.condition }}</td><td>{{ r.severity }}</td><td>{{ '%.2f'|format(r.confidence) }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="py-4 text-slate-500" colspan="5">No reports yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+new Chart(document.getElementById('trendChart'), {
+  type: 'line',
+  data: {
+    labels: {{ trend_labels|tojson }},
+    datasets: [{
+      label: 'Severity Score',
+      data: {{ trend_values|tojson }},
+      borderColor: '#0d9488',
+      backgroundColor: 'rgba(13,148,136,0.2)',
+      fill: true,
+      tension: 0.35,
+    }]
+  },
+  options: { scales: { y: { min: 0, max: 1 } } }
+});
+</script>
+{% endblock %}

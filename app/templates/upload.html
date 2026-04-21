@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card max-w-3xl">
+  <h2 class="text-xl font-semibold">Upload New Image</h2>
+  <p class="text-sm text-slate-500 mb-6">Analyze skin, eye, or palm images with hybrid AI + color logic.</p>
+  <form method="post" enctype="multipart/form-data" class="space-y-4" onsubmit="document.getElementById('loading').classList.remove('hidden')">
+    <div>
+      <label class="label">Region</label>
+      <select name="region" class="input" required>
+        <option value="eye">Eye</option>
+        <option value="skin" selected>Skin</option>
+        <option value="palm">Palm</option>
+      </select>
+    </div>
+    <div>
+      <label class="label">Image</label>
+      <input type="file" name="image" accept="image/*" class="input" onchange="previewImage(event)" required />
+    </div>
+    <img id="preview" class="rounded-xl max-h-72 hidden border" alt="Image preview" />
+    <button class="btn-primary">Run Analysis</button>
+  </form>
+  <div id="loading" class="hidden mt-4 text-teal-700 animate-pulse">Analyzing image and generating report...</div>
+</div>
+
+<script>
+function previewImage(event) {
+  const img = document.getElementById('preview');
+  img.src = URL.createObjectURL(event.target.files[0]);
+  img.classList.remove('hidden');
+}
+</script>
+{% endblock %}

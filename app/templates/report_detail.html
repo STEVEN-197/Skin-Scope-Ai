@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid gap-5 lg:grid-cols-3">
+  <div class="card lg:col-span-2">
+    <h2 class="text-xl font-semibold mb-4">Diagnostic Report #{{ report.id }}</h2>
+    <dl class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+      <div><dt class="font-semibold">Condition</dt><dd>{{ report.condition }}</dd></div>
+      <div><dt class="font-semibold">Severity</dt><dd>{{ report.severity }}</dd></div>
+      <div><dt class="font-semibold">Confidence</dt><dd>{{ '%.2f'|format(report.confidence) }}</dd></div>
+      <div><dt class="font-semibold">Trend Analysis</dt><dd>{{ report.trend_analysis }}</dd></div>
+      <div class="md:col-span-2"><dt class="font-semibold">Observations</dt><dd>{{ report.observations }}</dd></div>
+      <div class="md:col-span-2"><dt class="font-semibold">Recommendation</dt><dd>{{ report.recommendation }}</dd></div>
+    </dl>
+  </div>
+  <div class="card">
+    <img class="rounded-xl border mb-4" src="{{ url_for('main.uploaded_file', filename=report.image_path.split('/',1)[1]) }}" alt="Uploaded image">
+    <h3 class="font-semibold">Actions</h3>
+    <a class="btn-primary inline-block mt-4" href="{{ url_for('main.download_report_pdf', report_id=report.id) }}">Download PDF</a>
+    <a class="inline-block mt-3 text-teal-700" href="{{ url_for('main.reports_history') }}">Back to history</a>
+  </div>
+</div>
+{% endblock %}

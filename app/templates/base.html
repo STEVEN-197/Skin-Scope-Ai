@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkinScope AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  {% if current_user.is_authenticated %}
+  <div class="flex min-h-screen">
+    <aside class="w-72 bg-white border-r border-slate-200 p-6 hidden md:block">
+      <h1 class="text-2xl font-bold text-teal-700">SkinScope AI</h1>
+      <p class="text-sm text-slate-500 mt-2">Non-invasive AI monitoring</p>
+      <nav class="mt-8 space-y-3">
+        <a class="sidebar-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+        <a class="sidebar-link" href="{{ url_for('main.upload_analysis') }}">Upload Analysis</a>
+        <a class="sidebar-link" href="{{ url_for('main.reports_history') }}">Reports History</a>
+        <a class="sidebar-link text-rose-600" href="{{ url_for('auth.logout') }}">Logout</a>
+      </nav>
+    </aside>
+    <main class="flex-1 p-4 md:p-8">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="space-y-2 mb-5">
+        {% for category, msg in messages %}
+          <div class="rounded-lg px-4 py-3 text-sm bg-white border {{ 'border-red-200 text-red-700' if category == 'danger' else 'border-teal-200 text-teal-700' }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  {% else %}
+  <main class="max-w-xl mx-auto py-16 px-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="space-y-2 mb-5">
+      {% for category, msg in messages %}
+        <div class="rounded-lg px-4 py-3 text-sm bg-white border {{ 'border-red-200 text-red-700' if category == 'danger' else 'border-teal-200 text-teal-700' }}">{{ msg }}</div>
+      {% endfor %}
+      </div>
+    {% endif %}
+    {% endwith %}
+    {% block auth_content %}{% endblock %}
+  </main>
+  {% endif %}
+</body>
+</html>
