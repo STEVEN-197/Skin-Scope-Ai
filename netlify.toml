@@ -1,0 +1,4 @@
+[dev]
+  command = "npm run dev"
+  targetPort = 8080
+  port = 8888

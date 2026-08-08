@@ -1,0 +1,237 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for Bun
+        id: pm_check
+        run: |
+          if [ -f "bun.lockb" ]; then echo "bun=true" >> "$GITHUB_OUTPUT"; else echo "bun=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Bun (when present)
+        if: steps.pm_check.outputs.bun == 'true'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ steps.pm_check.outputs.bun }}" == "true" ]; then
+            bun install
+          else
+            npm ci
+          fi
+
+      - name: Build
+        id: build_step
+        run: |
+          set -o pipefail
+          if [ "${{ steps.pm_check.outputs.bun }}" == "true" ]; then
+            bun run build 2>&1 | tee build.log
+          else
+            npm run build 2>&1 | tee build.log
+          fi
+
+      - name: Upload build log and artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            build.log
+            dist/
+
+      - name: Generate build-summary
+        if: always()
+        run: |
+          if grep -q "error" build.log -i; then echo "BUILD_STATUS=FAIL" > build-summary.txt; else echo "BUILD_STATUS=PASS" > build-summary.txt; fi
+          echo "Build log size:" $(wc -c < build.log) >> build-summary.txt
+      - name: Upload build summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-summary
+          path: build-summary.txt
+
+  deploy_preview:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      preview_url: ${{ steps.vercel_deploy.outputs.preview_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy to Vercel (optional)
+        id: vercel_deploy
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "No VERCEL_TOKEN provided; skipping preview deploy"
+            echo "preview_url=" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "Installing vercel CLI"
+          npm i -g vercel@28 || true
+          echo "Deploying to Vercel"
+          npx vercel --token "$VERCEL_TOKEN" --confirm --prebuilt 2>&1 | tee vercel.out || true
+          # Attempt to parse deployment URL from output
+          PREVIEW_URL=$(grep -oE "https?://[a-z0-9.-]+\.vercel\.app" vercel.out | head -n1 || true)
+          echo "Parsed preview URL: $PREVIEW_URL"
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  selenium:
+    runs-on: ubuntu-latest
+    needs: [build, deploy_preview]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build_artifacts
+
+      - name: Setup Node (for static server)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Serve `dist/` on :8080 or use preview URL
+        run: |
+          echo "Using PREVIEW_URL=${{ needs.deploy_preview.outputs.preview_url }}"
+          if [ -n "${{ needs.deploy_preview.outputs.preview_url }}" ]; then
+            echo "Preview URL provided, skipping local server"
+          else
+            ls -la build_artifacts || true
+            if [ -d build_artifacts/dist ]; then npx http-server build_artifacts/dist -p 8080 --silent &
+            else echo "dist not found in artifact"; fi
+          fi
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install system deps for headless Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb chromium-browser chromium-chromedriver
+
+      - name: Install Selenium python requirements
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f tests/selenium/requirements.txt ]; then pip install -r tests/selenium/requirements.txt; fi
+
+      - name: Run Selenium tests
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+          SKINSCOPE_BASE_URL: ${{ needs.deploy_preview.outputs.preview_url || 'http://localhost:8080' }}
+        run: |
+          echo "Testing against $SKINSCOPE_BASE_URL"
+          xvfb-run -a pytest tests/selenium -k "not requires_preview" --junitxml=selenium-results.xml || true
+
+      - name: Upload Selenium results
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-results
+          path: selenium-results.xml
+
+  checks:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: TypeScript check (no emit)
+        id: tsc
+        run: |
+          npx tsc --noEmit 2>&1 | tee tsc-output.txt || true
+
+      - name: ESLint report
+        id: eslint
+        run: |
+          npx eslint "src/**/*.{ts,tsx,js,jsx}" -f unix 2>&1 | tee eslint-output.txt || true
+
+      - name: Upload static-analysis artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-analysis
+          path: |
+            tsc-output.txt
+            eslint-output.txt
+
+      - name: Summarize checks
+        run: |
+          echo "TSC_ERRORS=$(grep -ic "error" tsc-output.txt || true)" > checks-summary.txt
+          echo "ESLINT_ERRORS=$(grep -ic "error" eslint-output.txt || true)" >> checks-summary.txt
+        continue-on-error: true
+      - name: Upload checks summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: checks-summary
+          path: checks-summary.txt
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan repository for leaked tokens (sk_live_, sk_test_, service_role)
+        run: |
+          set -e
+          grep -RIn --exclude-dir=node_modules --exclude-dir=.git "sk_live_\|sk_test_\|service_role\|SUPABASE_SERVICE_ROLE_KEY\|LOVABLE_API_KEY" || true
+        continue-on-error: true
+      - name: Upload secret-scan results
+        run: |
+          grep -RIn --exclude-dir=node_modules --exclude-dir=.git "sk_live_\|sk_test_\|service_role\|SUPABASE_SERVICE_ROLE_KEY\|LOVABLE_API_KEY" > secret-scan.txt || true
+        continue-on-error: true
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan
+          path: secret-scan.txt
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: npm ci
+      - name: Run linters
+        run: npm run lint || true

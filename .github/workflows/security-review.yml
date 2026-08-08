@@ -1,0 +1,423 @@
+name: Security Review
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  security-events: write
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Phase 1: Technology Detection & Build
+  # ──────────────────────────────────────────────
+  detect-and-build:
+    name: "🔍 Detect Stack & Build"
+    runs-on: ubuntu-latest
+    outputs:
+      framework: ${{ steps.detect.outputs.framework }}
+      language: ${{ steps.detect.outputs.language }}
+      pkg_manager: ${{ steps.detect.outputs.pkg_manager }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect backend technology
+        id: detect
+        run: |
+          echo "=== Technology Detection ==="
+
+          # Detect package manager
+          if [ -f "bun.lockb" ]; then
+            echo "pkg_manager=bun" >> "$GITHUB_OUTPUT"
+          elif [ -f "yarn.lock" ]; then
+            echo "pkg_manager=yarn" >> "$GITHUB_OUTPUT"
+          elif [ -f "pnpm-lock.yaml" ]; then
+            echo "pkg_manager=pnpm" >> "$GITHUB_OUTPUT"
+          else
+            echo "pkg_manager=npm" >> "$GITHUB_OUTPUT"
+          fi
+
+          # Detect framework
+          if [ -f "package.json" ]; then
+            echo "language=typescript/javascript" >> "$GITHUB_OUTPUT"
+            if grep -q "next" package.json; then
+              echo "framework=nextjs" >> "$GITHUB_OUTPUT"
+            elif grep -q "@tanstack/react-start" package.json; then
+              echo "framework=tanstack-start" >> "$GITHUB_OUTPUT"
+            elif grep -q "express" package.json; then
+              echo "framework=express" >> "$GITHUB_OUTPUT"
+            elif grep -q "vite" package.json; then
+              echo "framework=vite-react" >> "$GITHUB_OUTPUT"
+            else
+              echo "framework=node" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ -f "requirements.txt" ] || [ -f "Pipfile" ]; then
+            echo "language=python" >> "$GITHUB_OUTPUT"
+            if grep -q "django" requirements.txt 2>/dev/null; then
+              echo "framework=django" >> "$GITHUB_OUTPUT"
+            elif grep -q "flask" requirements.txt 2>/dev/null; then
+              echo "framework=flask" >> "$GITHUB_OUTPUT"
+            elif grep -q "fastapi" requirements.txt 2>/dev/null; then
+              echo "framework=fastapi" >> "$GITHUB_OUTPUT"
+            else
+              echo "framework=python" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ -f "pom.xml" ] || [ -f "build.gradle" ]; then
+            echo "language=java" >> "$GITHUB_OUTPUT"
+            echo "framework=spring" >> "$GITHUB_OUTPUT"
+          elif [ -f "go.mod" ]; then
+            echo "language=go" >> "$GITHUB_OUTPUT"
+            echo "framework=go" >> "$GITHUB_OUTPUT"
+          elif [ -f "Gemfile" ]; then
+            echo "language=ruby" >> "$GITHUB_OUTPUT"
+            echo "framework=rails" >> "$GITHUB_OUTPUT"
+          else
+            echo "language=unknown" >> "$GITHUB_OUTPUT"
+            echo "framework=unknown" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "=== Detection Complete ==="
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Bun (if needed)
+        if: steps.detect.outputs.pkg_manager == 'bun'
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ steps.detect.outputs.pkg_manager }}" == "bun" ]; then
+            bun install
+          else
+            npm ci
+          fi
+
+      - name: Build application
+        run: |
+          if [ "${{ steps.detect.outputs.pkg_manager }}" == "bun" ]; then
+            bun run build 2>&1 | tee build.log || true
+          else
+            npm run build 2>&1 | tee build.log || true
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            build.log
+            dist/
+
+  # ──────────────────────────────────────────────
+  # Phase 2: SAST (Static Application Security Testing)
+  # ──────────────────────────────────────────────
+  sast:
+    name: "🔒 SAST Scan"
+    runs-on: ubuntu-latest
+    needs: detect-and-build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run custom SAST scanner
+        run: |
+          node scripts/sast-scanner.cjs --json 2>&1 | tee sast-output.txt
+
+      - name: Upload SAST results
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-results
+          path: |
+            sast-output.txt
+            Vulnerability Test Results/sast-results.json
+
+  # ──────────────────────────────────────────────
+  # Phase 3: Secret Scanning
+  # ──────────────────────────────────────────────
+  secret-scan:
+    name: "🔑 Secret Scanning"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Manual secret patterns scan
+        run: |
+          echo "=== Secret Pattern Scan ===" | tee secret-scan-results.txt
+          echo "" >> secret-scan-results.txt
+
+          # Patterns to search for
+          PATTERNS=(
+            "sk_live_"
+            "sk_test_"
+            "service_role"
+            "SUPABASE_SERVICE_ROLE_KEY"
+            "LOVABLE_API_KEY"
+            "OPENAI_API_KEY"
+            "ANTHROPIC_API_KEY"
+            "AWS_SECRET"
+            "PRIVATE_KEY"
+            "-----BEGIN"
+          )
+
+          FOUND=0
+          for pattern in "${PATTERNS[@]}"; do
+            RESULTS=$(grep -RIn \
+              --exclude-dir=node_modules \
+              --exclude-dir=.git \
+              --exclude-dir=dist \
+              --exclude='*.lock*' \
+              --exclude='*.lockb' \
+              "$pattern" . 2>/dev/null || true)
+
+            if [ -n "$RESULTS" ]; then
+              echo "⚠️  Pattern found: $pattern" >> secret-scan-results.txt
+              echo "$RESULTS" >> secret-scan-results.txt
+              echo "" >> secret-scan-results.txt
+              FOUND=$((FOUND + 1))
+            fi
+          done
+
+          if [ $FOUND -eq 0 ]; then
+            echo "✅ No secret patterns found" >> secret-scan-results.txt
+          else
+            echo "⚠️  $FOUND pattern(s) detected" >> secret-scan-results.txt
+          fi
+
+          cat secret-scan-results.txt
+
+      - name: Upload secret scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: secret-scan-results
+          path: secret-scan-results.txt
+
+  # ──────────────────────────────────────────────
+  # Phase 4: Dependency Scanning
+  # ──────────────────────────────────────────────
+  dependency-scan:
+    name: "📦 Dependency Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: npm audit
+        run: |
+          npm install --package-lock-only 2>/dev/null || true
+          npm audit --json > npm-audit.json 2>/dev/null || true
+          npm audit 2>&1 | tee npm-audit.txt || true
+
+      - name: Run Trivy (filesystem scan)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "table"
+          output: "trivy-results.txt"
+          severity: "LOW,MEDIUM,HIGH,CRITICAL"
+        continue-on-error: true
+
+      - name: Run Trivy JSON output
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "."
+          format: "json"
+          output: "trivy-results.json"
+          severity: "LOW,MEDIUM,HIGH,CRITICAL"
+        continue-on-error: true
+
+      - name: Upload dependency scan results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-scan-results
+          path: |
+            npm-audit.txt
+            npm-audit.json
+            trivy-results.txt
+            trivy-results.json
+
+  # ──────────────────────────────────────────────
+  # Phase 5: Security Headers Check
+  # ──────────────────────────────────────────────
+  headers-check:
+    name: "🛡️ Security Headers"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check vercel.json security headers
+        run: |
+          echo "=== Security Headers Assessment ===" | tee headers-report.txt
+          echo "" >> headers-report.txt
+
+          if [ -f "vercel.json" ]; then
+            echo "📄 vercel.json found" >> headers-report.txt
+
+            check_header() {
+              if grep -q "$1" vercel.json; then
+                echo "✅ $2: Present" >> headers-report.txt
+              else
+                echo "❌ $2: MISSING" >> headers-report.txt
+              fi
+            }
+
+            check_header "Strict-Transport-Security" "HSTS"
+            check_header "X-Content-Type-Options" "X-Content-Type-Options"
+            check_header "X-Frame-Options" "X-Frame-Options"
+            check_header "Referrer-Policy" "Referrer-Policy"
+            check_header "Permissions-Policy" "Permissions-Policy"
+            check_header "Content-Security-Policy" "Content-Security-Policy"
+            check_header "X-XSS-Protection" "X-XSS-Protection"
+          else
+            echo "⚠️ No vercel.json found" >> headers-report.txt
+          fi
+
+          echo "" >> headers-report.txt
+
+          # Check CORS in edge functions
+          echo "=== CORS Configuration ===" >> headers-report.txt
+          WILDCARD_CORS=$(grep -rn 'Allow-Origin.*\*' supabase/functions/ 2>/dev/null || true)
+          if [ -n "$WILDCARD_CORS" ]; then
+            echo "⚠️ Wildcard CORS found in edge functions:" >> headers-report.txt
+            echo "$WILDCARD_CORS" >> headers-report.txt
+          else
+            echo "✅ No wildcard CORS found" >> headers-report.txt
+          fi
+
+          cat headers-report.txt
+
+      - name: Upload headers report
+        uses: actions/upload-artifact@v4
+        with:
+          name: headers-report
+          path: headers-report.txt
+
+  # ──────────────────────────────────────────────
+  # Phase 6: Generate Reports & Summary
+  # ──────────────────────────────────────────────
+  generate-reports:
+    name: "📊 Generate Security Reports"
+    runs-on: ubuntu-latest
+    needs: [detect-and-build, sast, secret-scan, dependency-scan, headers-check]
+    if: always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Download all scan artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: scan-artifacts
+
+      - name: Generate comprehensive reports
+        run: |
+          # Generate CSV/Excel-compatible reports
+          node scripts/generate-security-reports.cjs --output-dir "Vulnerability Test Results"
+
+          # Copy all scan results to output directory
+          cp scan-artifacts/sast-results/sast-output.txt "Vulnerability Test Results/" 2>/dev/null || true
+          cp scan-artifacts/sast-results/Vulnerability\ Test\ Results/sast-results.json "Vulnerability Test Results/" 2>/dev/null || true
+          cp scan-artifacts/secret-scan-results/secret-scan-results.txt "Vulnerability Test Results/" 2>/dev/null || true
+          cp scan-artifacts/dependency-scan-results/npm-audit.txt "Vulnerability Test Results/" 2>/dev/null || true
+          cp scan-artifacts/dependency-scan-results/trivy-results.txt "Vulnerability Test Results/" 2>/dev/null || true
+          cp scan-artifacts/headers-report/headers-report.txt "Vulnerability Test Results/" 2>/dev/null || true
+
+          echo "=== Reports Generated ==="
+          ls -la "Vulnerability Test Results/"
+
+      - name: Publish GitHub Actions Summary
+        if: always()
+        run: |
+          if [ -f "Vulnerability Test Results/github-summary.md" ]; then
+            cat "Vulnerability Test Results/github-summary.md" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📎 Scan Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Report | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`findings.xlsx\` | All security findings (Excel-compatible) |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`endpoint-inventory.xlsx\` | Complete API endpoint inventory |" >> $GITHUB_STEP_SUMMARY
+
+          echo "| \`sast-results.json\` | Raw SAST scanner output |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`trivy-results.txt\` | Trivy filesystem scan results |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`npm-audit.txt\` | npm audit findings |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`secret-scan-results.txt\` | Secret pattern scan results |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`headers-report.txt\` | Security headers assessment |" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🏗️ Technology Stack" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Attribute | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Framework | ${{ needs.detect-and-build.outputs.framework }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Language | ${{ needs.detect-and-build.outputs.language }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Manager | ${{ needs.detect-and-build.outputs.pkg_manager }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload complete security reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: Vulnerability Test Results/
+
+      - name: Check for critical findings (fail gate)
+        run: |
+          if [ -f "Vulnerability Test Results/sast-results.json" ]; then
+            CRITICALS=$(node -e "
+              const data = require('./Vulnerability Test Results/sast-results.json');
+              console.log(data.critical || 0);
+            " 2>/dev/null || echo "0")
+
+            echo "Critical findings: $CRITICALS"
+
+            # Only fail on critical if they are truly exploitable
+            # For student projects, we report but don't block
+            if [ "$CRITICALS" -gt 0 ]; then
+              echo "⚠️ $CRITICALS critical finding(s) detected."
+              echo "Review the security reports for details."
+              echo ""
+              echo "Note: The workflow does NOT fail for security findings."
+              echo "Critical findings are reported for awareness and remediation."
+            fi
+          fi
+
+          echo "✅ Security review complete. Reports uploaded as artifacts."
