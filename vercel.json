@@ -8,6 +8,19 @@
     }
   ],
   "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-ancestors 'none';",
+        "X-XSS-Protection": "1; mode=block"
+      },
+      "continue": true
+    },
     { "handle": "filesystem" },
     {
       "src": "/(.*)\\.(js|css|png|jpg|jpeg|svg|ico|json|webmanifest)",
@@ -23,16 +36,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "Referrer-Policy": "strict-origin-when-cross-origin",
-        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-ancestors 'none';",
-        "X-XSS-Protection": "1; mode=block"
-      }
+      "dest": "/index.html"
     }
   ]
 }
