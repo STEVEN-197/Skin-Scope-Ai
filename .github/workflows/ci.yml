@@ -156,6 +156,11 @@ jobs:
           echo "Testing against $SKINSCOPE_BASE_URL"
           xvfb-run -a pytest tests/selenium -k "not requires_preview" --junitxml=selenium-results.xml || true
 
+      - name: Render test charts in GitHub Summary
+        if: always()
+        run: |
+          python scripts/generate-test-summary.py || true
+
       - name: Upload Selenium results
         uses: actions/upload-artifact@v4
         with:

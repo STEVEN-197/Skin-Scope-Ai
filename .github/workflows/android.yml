@@ -74,6 +74,34 @@ jobs:
         run: |
           python tests/appium/run_and_report.py || true
 
+      - name: Render Appium charts in GitHub Summary
+        if: always()
+        run: |
+          python -c "
+          import xml.etree.ElementTree as ET, os
+          sf = os.getenv('GITHUB_STEP_SUMMARY')
+          junit = 'tests/mobile-reports/appium_junit.xml'
+          if sf and os.path.exists(junit):
+              tree = ET.parse(junit)
+              t = p = f = s = 0
+              for tc in tree.iter('testcase'):
+                  t += 1
+                  if tc.find('failure') is not None or tc.find('error') is not None: f += 1
+                  elif tc.find('skipped') is not None: s += 1
+                  else: p += 1
+              with open(sf, 'a', encoding='utf-8') as out:
+                  out.write(f'''
+          ## 📱 Appium Android Mobile Flow Results
+
+          \`\`\`mermaid
+          pie title Mobile Automation Results (Total: {t})
+              \"Passed ({p})\" : {p}
+              \"Failed ({f})\" : {f}
+              \"Skipped ({s})\" : {s}
+          \`\`\`
+          ''')
+          " || true
+
       - name: Upload Appium reports
         if: always()
         uses: actions/upload-artifact@v4
