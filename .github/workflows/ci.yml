@@ -93,9 +93,9 @@ jobs:
           echo "Installing vercel CLI"
           npm i -g vercel@28 || true
           echo "Deploying to Vercel"
-          npx vercel --token "$VERCEL_TOKEN" --confirm --prebuilt 2>&1 | tee vercel.out || true
+          npx vercel --token "$VERCEL_TOKEN" --yes --build-env DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 2>&1 | tee vercel.out || true
           # Attempt to parse deployment URL from output
-          PREVIEW_URL=$(grep -oE "https?://[a-z0-9.-]+\.vercel\.app" vercel.out | head -n1 || true)
+          PREVIEW_URL=$(grep -oE "https?://[a-zA-Z0-9.-]+\.vercel\.app" vercel.out | head -n1 || true)
           echo "Parsed preview URL: $PREVIEW_URL"
           echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
         env:

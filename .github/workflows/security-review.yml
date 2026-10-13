@@ -345,6 +345,9 @@ jobs:
         with:
           path: scan-artifacts
 
+      - name: Install dependencies for report generation
+        run: npm ci
+
       - name: Generate comprehensive reports
         run: |
           # Generate CSV/Excel-compatible reports
