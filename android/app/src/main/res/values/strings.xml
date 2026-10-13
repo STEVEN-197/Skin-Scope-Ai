@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SkinScope AI</string>
+    <string name="title_activity_main">SkinScope AI</string>
+    <string name="package_name">app.lovable.skinscopeai</string>
+    <string name="custom_url_scheme">app.lovable.skinscopeai</string>
+</resources>

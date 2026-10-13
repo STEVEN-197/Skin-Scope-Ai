@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'app.lovable.skinscopeai',
   appName: 'SkinScope AI',
-  webDir: 'dist',
+  webDir: 'dist/client',
   bundledWebRuntime: false,
   server: {
     androidScheme: 'https',

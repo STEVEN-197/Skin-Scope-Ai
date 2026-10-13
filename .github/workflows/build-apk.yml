@@ -1,0 +1,89 @@
+name: Build Native Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    name: 📱 Build Native Android APK (SkinScope AI)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: 🟩 Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install NPM Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Web Application & Prerender
+        run: npm run build
+
+      - name: 🔄 Sync Web Assets to Android Platform
+        run: npx cap sync android
+
+      - name: 🔑 Grant Execute Permissions for gradlew
+        working-directory: ./android
+        run: chmod +x gradlew
+
+      - name: 🔨 Compile Native Android APK (assembleDebug)
+        working-directory: ./android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 📦 Prepare APK Output
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/SkinScopeAI-v1.0.0-debug.apk
+          ls -lh release-apk/
+
+      - name: 📊 Embed APK Build Summary into GitHub Summary
+        run: |
+          APK_SIZE=$(ls -lh release-apk/SkinScopeAI-v1.0.0-debug.apk | awk '{print $5}')
+          echo "## 📱 SkinScope AI — Native Android APK Build" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Application Name** | SkinScope AI |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Package ID** | \`app.lovable.skinscopeai\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target SDK** | Android 14 (API 34) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Min SDK** | Android 7.0 (API 24) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Binary Format** | Native Android APK (\`.apk\`) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **File Name** | \`SkinScopeAI-v1.0.0-debug.apk\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **File Size** | $APK_SIZE |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Status** | SUCCESS ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Application Architecture" >> $GITHUB_STEP_SUMMARY
+          echo '```mermaid' >> $GITHUB_STEP_SUMMARY
+          echo 'graph TD' >> $GITHUB_STEP_SUMMARY
+          echo '    APK["📱 SkinScopeAI-v1.0.0-debug.apk"]' >> $GITHUB_STEP_SUMMARY
+          echo '    APK --> CORE["Native Android Layer (Java/Kotlin)"]' >> $GITHUB_STEP_SUMMARY
+          echo '    CORE --> BRIDGE["Capacitor Native Bridge"]' >> $GITHUB_STEP_SUMMARY
+          echo '    BRIDGE --> WEB["Lovable TanStack React UI"]' >> $GITHUB_STEP_SUMMARY
+          echo '    BRIDGE --> CAM["Native Hardware Camera Access"]' >> $GITHUB_STEP_SUMMARY
+          echo '    BRIDGE --> SEC["Secure Local Storage & Biometrics"]' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "💡 **How to Download:** Go to the **Artifacts** section at the bottom of this run and download \`SkinScope-AI-Native-APK\`." >> $GITHUB_STEP_SUMMARY
+
+      - name: 🚀 Upload Native APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SkinScope-AI-Native-APK
+          path: release-apk/SkinScopeAI-v1.0.0-debug.apk
+          if-no-files-found: error
