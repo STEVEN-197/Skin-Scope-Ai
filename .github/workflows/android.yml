@@ -57,6 +57,32 @@ jobs:
           echo "ANDROID_BUILD_ATTEMPTED=true" > android-readiness.txt
           if [ -d android/app/build/outputs/apk/debug ]; then echo "APK_DEBUG_PRESENT=true" >> android-readiness.txt; else echo "APK_DEBUG_PRESENT=false" >> android-readiness.txt; fi
         continue-on-error: true
+      - name: Setup Python for Appium
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Appium test requirements
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f tests/appium/requirements.txt ]; then pip install -r tests/appium/requirements.txt; fi
+
+      - name: Run Appium test suite & generate reports
+        continue-on-error: true
+        env:
+          PYTHONPATH: .
+        run: |
+          python tests/appium/run_and_report.py || true
+
+      - name: Upload Appium reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appium-reports
+          path: |
+            tests/mobile-reports/
+            tests/mobile-screenshots/
+
       - name: Upload android readiness report
         uses: actions/upload-artifact@v4
         with:
