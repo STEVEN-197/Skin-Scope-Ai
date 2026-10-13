@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     };
 
-    if (typeof window !== "undefined" && localStorage.getItem("mock-user-logged-in") === "true") {
+    if (import.meta.env.DEV && typeof window !== "undefined" && localStorage.getItem("mock-user-logged-in") === "true") {
       syncSession({
         access_token: "mock-token",
         token_type: "bearer",

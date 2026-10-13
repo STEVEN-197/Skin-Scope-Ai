@@ -11,6 +11,11 @@ const corsHeaders = {
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return j({ error: "Missing authorization header" }, 401);
+    }
+
     // @ts-ignore
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) return j({ error: "AI not configured" }, 500);

@@ -33,8 +33,12 @@ function SignupPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      toast.error("Password must contain at least one uppercase letter and one number");
       return;
     }
     setSubmitting(true);
