@@ -1,28 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Network Security Config for SkinScope AI -->
-<!-- Allows HTTPS to Supabase and all well-known CAs -->
-<!-- No cleartext (HTTP) traffic allowed — all API calls go over HTTPS -->
+<!-- All traffic is HTTPS only — no cleartext HTTP allowed -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
-            <!-- Trust system CA certificates (covers Supabase, Google, etc.) -->
             <certificates src="system" />
         </trust-anchors>
     </base-config>
 
-    <!-- Supabase domain — explicitly allowed with HTTPS -->
+    <!-- Vercel deployment — primary app source for native WebView -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">supabase.co</domain>
-        <domain includeSubdomains="true">supabase.in</domain>
-        <domain includeSubdomains="true">nrvptzzddpenyvcndcph.supabase.co</domain>
+        <domain includeSubdomains="true">vercel.app</domain>
+        <domain>skinscopeai-main.vercel.app</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>
     </domain-config>
 
-    <!-- Capacitor local server — uses https://skinscopeai.app scheme -->
+    <!-- Supabase backend — auth, database, storage -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain>skinscopeai.app</domain>
+        <domain includeSubdomains="true">supabase.co</domain>
+        <domain includeSubdomains="true">supabase.in</domain>
+        <domain>nrvptzzddpenyvcndcph.supabase.co</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>

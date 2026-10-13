@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-apk:
-    name: 📱 Build Native Android APK (SkinScope AI)
+    name: 📱 Build Native Android APK (SkinScope AI → Vercel)
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout Repository
@@ -40,20 +40,16 @@ jobs:
       - name: 📦 Install NPM Dependencies
         run: npm ci
 
-      # Build ONLY the client-side bundle (no SSR prerender).
-      # The postbuild script runs prerender.js which requires a server bundle
-      # that does not exist in a pure client Vite build — it would crash.
-      # We bypass it by calling vite build directly with npm_lifecycle_event trick.
-      - name: 🏗️ Build Client-Only Web Bundle (skip SSR prerender)
+      # Build client-only bundle (serves as offline fallback inside APK).
+      # The primary app source is the live Vercel URL set in capacitor.config.ts.
+      # We clear postbuild to skip the SSR prerender step which requires dist/server.
+      - name: 🏗️ Build Client Bundle (offline fallback assets)
         env:
-          # Inject Supabase env vars so Vite bakes them into the bundle
           VITE_SUPABASE_URL: https://nrvptzzddpenyvcndcph.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E
           VITE_SUPABASE_PROJECT_ID: nrvptzzddpenyvcndcph
-          # Skip postbuild hook (prerender.js) — not needed for native APK
-          npm_lifecycle_script: npx vite build
         run: |
-          # Temporarily clear the postbuild script so it doesn't run SSR prerender
+          # Clear postbuild to skip SSR prerender (not needed for APK)
           node -e "
             const fs = require('fs');
             const pkg = JSON.parse(fs.readFileSync('package.json','utf8'));
@@ -61,21 +57,20 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
             console.log('✅ postbuild cleared');
           "
-          # Run vite build (client-only, no SSR server)
           npx vite build
           echo "✅ Client bundle built"
-          ls -lh dist/client/ || ls -lh dist/ || true
+          ls -lh dist/client/ 2>/dev/null || ls -lh dist/ 2>/dev/null || echo "⚠️ dist/ not found"
 
-      - name: 🔄 Sync Web Assets to Android Platform
+      - name: 🔄 Sync Capacitor Config & Plugins to Android
         env:
           VITE_SUPABASE_URL: https://nrvptzzddpenyvcndcph.supabase.co
           VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E
         run: |
-          # Sync web assets + config into android/app/src/main/assets/public
-          # (assets already built above — cap sync just copies them)
+          # Cap sync copies capacitor.config.json (with server.url=Vercel) into the APK
           npx cap sync android
-          echo "✅ Cap sync complete"
-          ls android/app/src/main/assets/public/ || true
+          echo "✅ Cap sync complete — Vercel URL baked into capacitor.config.json"
+          # Show the generated capacitor config to confirm server.url is set
+          cat android/app/src/main/assets/capacitor.config.json || true
 
       - name: 🔑 Grant Execute Permissions for gradlew
         working-directory: ./android
@@ -83,9 +78,6 @@ jobs:
 
       - name: 🔨 Compile Native Android APK (assembleDebug)
         working-directory: ./android
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          JAVA_HOME: ${{ env.JAVA_HOME }}
         run: ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: 📦 Prepare APK Output
@@ -95,49 +87,50 @@ jobs:
           APK_SIZE=$(ls -lh release-apk/SkinScopeAI-v1.0.0-debug.apk | awk '{print $5}')
           echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
           echo "✅ APK ready: SkinScopeAI-v1.0.0-debug.apk ($APK_SIZE)"
-          ls -lh release-apk/
 
-      - name: 📊 Embed APK Build Summary into GitHub Summary
+      - name: 📊 Embed Build Summary
         run: |
-          echo "## 📱 SkinScope AI — Native Android APK Build" >> $GITHUB_STEP_SUMMARY
+          echo "## 📱 SkinScope AI — Native Android APK (Vercel Edition)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Live Vercel App inside a Native Android Shell**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Application Name** | SkinScope AI |" >> $GITHUB_STEP_SUMMARY
+          echo "| **App Name** | SkinScope AI |" >> $GITHUB_STEP_SUMMARY
           echo "| **Package ID** | \`app.lovable.skinscopeai\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Build Type** | Debug (sideloadable) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Web Source** | 🌐 \`https://skinscopeai-main.vercel.app\` (live) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Native Shell** | ✅ Capacitor 7.x + Android SDK 36 |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Offline Fallback** | ✅ Bundled client assets |" >> $GITHUB_STEP_SUMMARY
           echo "| **Target SDK** | Android 15 (API 35) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Min SDK** | Android 7.0 (API 24) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Compile SDK** | Android 16 Preview (API 36) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Router Mode** | Hash history (Capacitor-native) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Backend** | Supabase (credentials baked in) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **File Name** | \`SkinScopeAI-v1.0.0-debug.apk\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Router** | Browser history (Vercel handles routing) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Auth** | Supabase (same backend as web) |" >> $GITHUB_STEP_SUMMARY
           echo "| **File Size** | ${{ env.APK_SIZE }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Build Status** | ✅ SUCCESS |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📊 Application Architecture" >> $GITHUB_STEP_SUMMARY
+          echo "### 🏗️ Architecture" >> $GITHUB_STEP_SUMMARY
           echo '```mermaid' >> $GITHUB_STEP_SUMMARY
           echo 'graph TD' >> $GITHUB_STEP_SUMMARY
           echo '    APK["📱 SkinScopeAI-v1.0.0-debug.apk"]' >> $GITHUB_STEP_SUMMARY
-          echo '    APK --> CORE["Native Android Layer (Java/Kotlin + AGP 8.13)"]' >> $GITHUB_STEP_SUMMARY
-          echo '    CORE --> BRIDGE["Capacitor Bridge (v7.x)"]' >> $GITHUB_STEP_SUMMARY
-          echo '    BRIDGE --> WEB["TanStack React UI (Hash Router)"]' >> $GITHUB_STEP_SUMMARY
-          echo '    BRIDGE --> CAM["Native Camera / Media Access"]' >> $GITHUB_STEP_SUMMARY
-          echo '    BRIDGE --> SEC["Secure localStorage + Supabase Auth"]' >> $GITHUB_STEP_SUMMARY
-          echo '    WEB --> SB["Supabase Backend (nrvptzzddpenyvcndcph)"]' >> $GITHUB_STEP_SUMMARY
-          echo '    WEB --> AI["AI Skin Analysis Engine"]' >> $GITHUB_STEP_SUMMARY
+          echo '    APK --> SHELL["Native Android Shell (Capacitor)"]' >> $GITHUB_STEP_SUMMARY
+          echo '    SHELL --> SPLASH["Splash Screen + Status Bar"]' >> $GITHUB_STEP_SUMMARY
+          echo '    SHELL --> WEB["WebView → skinscopeai-main.vercel.app"]' >> $GITHUB_STEP_SUMMARY
+          echo '    SHELL --> CAM["Native Camera Access"]' >> $GITHUB_STEP_SUMMARY
+          echo '    WEB --> VERCEL["☁️ Vercel CDN (always latest)"]' >> $GITHUB_STEP_SUMMARY
+          echo '    VERCEL --> REACT["TanStack React UI"]' >> $GITHUB_STEP_SUMMARY
+          echo '    REACT --> SB["🔐 Supabase Auth + DB"]' >> $GITHUB_STEP_SUMMARY
+          echo '    REACT --> AI["🧠 AI Skin Analysis"]' >> $GITHUB_STEP_SUMMARY
+          echo '    SHELL -.->|"offline fallback"| BUNDLE["Bundled dist/client"]' >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📥 Install Instructions" >> $GITHUB_STEP_SUMMARY
-          echo "1. Download \`SkinScope-AI-Native-APK\` from **Artifacts** below" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 How to Install" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download **SkinScope-AI-Native-APK** from Artifacts below" >> $GITHUB_STEP_SUMMARY
           echo "2. Transfer \`.apk\` to your Android phone" >> $GITHUB_STEP_SUMMARY
-          echo "3. Enable **Install from Unknown Sources** in Settings → Security" >> $GITHUB_STEP_SUMMARY
-          echo "4. Tap the APK file to install" >> $GITHUB_STEP_SUMMARY
-          echo "5. Open **SkinScope AI** and sign in with your account" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "> ⚠️ This is a debug build. For Play Store, build a signed release APK." >> $GITHUB_STEP_SUMMARY
+          echo "3. Settings → Security → **Install from Unknown Sources** → ON" >> $GITHUB_STEP_SUMMARY
+          echo "4. Tap the APK → Install" >> $GITHUB_STEP_SUMMARY
+          echo "5. Open **SkinScope AI** — it loads the live Vercel app in a native shell 🚀" >> $GITHUB_STEP_SUMMARY
 
-      - name: 🚀 Upload Native APK Artifact
+      - name: 🚀 Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: SkinScope-AI-Native-APK

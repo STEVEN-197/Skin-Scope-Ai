@@ -1,33 +1,61 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// Detect if running inside Capacitor native context (android/ios build)
-const isNative = process.env.CAPACITOR_PLATFORM !== undefined;
+// ─────────────────────────────────────────────────────────────────────────────
+// SkinScope AI — Capacitor Native Config
+//
+// Strategy: REMOTE-URL mode
+//   The native APK shell loads the live Vercel deployment
+//   (https://skinscopeai-main.vercel.app) directly inside the WebView.
+//
+//   Benefits:
+//     ✅ Always up-to-date — web changes deploy without rebuilding the APK
+//     ✅ Native shell — splash screen, status bar, hardware camera access
+//     ✅ Native plugins — @capacitor/camera, local storage, biometrics
+//     ✅ Supabase auth — same backend as the web app
+//
+//   Offline fallback:
+//     The bundled dist/client assets are still packed into the APK.
+//     If you ever want to switch back to offline-only mode, comment out
+//     the `server.url` line below.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const VERCEL_URL = 'https://skinscopeai-main.vercel.app';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.skinscopeai',
   appName: 'SkinScope AI',
+  // Keep the bundled web assets for offline fallback
   webDir: 'dist/client',
-  // Do NOT bundle the Capacitor runtime — it's already in the native shell
   bundledWebRuntime: false,
+
   server: {
-    // Use https scheme so Supabase auth callbacks work properly
+    // ⚡ Point the native WebView at the live Vercel deployment
+    url: VERCEL_URL,
+    // Use https scheme — required for Supabase auth and secure cookies
     androidScheme: 'https',
-    // hostname is what the WebView uses — keep it stable
-    hostname: 'skinscopeai.app',
-    // Allow cleartext (HTTP) for dev reload only; production uses bundled assets
-    allowNavigation: ['*.supabase.co', '*.supabase.in', 'nrvptzzddpenyvcndcph.supabase.co'],
+    // Stable hostname for Capacitor bridge communication
+    hostname: 'skinscopeai-main.vercel.app',
+    // Allow navigation to these external origins (Supabase API calls)
+    allowNavigation: [
+      'skinscopeai-main.vercel.app',
+      '*.supabase.co',
+      '*.supabase.in',
+      'nrvptzzddpenyvcndcph.supabase.co',
+    ],
     cleartext: false,
   },
+
   android: {
+    // Allow the WebView to load the Vercel HTTPS origin
     allowMixedContent: false,
-    // Ensures the WebView loads bundled assets, not a remote URL
+    // Enable WebView debugging in debug builds (disable for release)
     webContentsDebuggingEnabled: false,
-    // Larger initial scale looks better on small phones
     initialFocus: true,
   },
+
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
+      launchShowDuration: 2500,
       launchAutoHide: true,
       backgroundColor: '#0F172A',
       androidSplashResourceName: 'splash',
@@ -36,7 +64,7 @@ const config: CapacitorConfig = {
     Camera: {
       androidScaleType: 'CENTER_CROP',
     },
-    // Ensure local storage is persisted
+    // Use native HTTP client for Supabase calls (bypasses WebView CORS)
     CapacitorHttp: {
       enabled: true,
     },

@@ -43,7 +43,7 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
             Try again
           </button>
           <a
-            href="#/"
+            href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
             Go home
@@ -54,20 +54,41 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
   );
 }
 
-// Detect Capacitor native environment
-// In a native APK, window.Capacitor is defined by the bridge
-const isCapacitorNative =
-  typeof window !== "undefined" &&
-  !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+// ─────────────────────────────────────────────────────────────────────────────
+// Router History Strategy
+//
+// When running inside the native APK (server.url = Vercel):
+//   → The WebView loads https://skinscopeai-main.vercel.app
+//   → Vercel handles all routing server-side → browser history works perfectly
+//
+// When running locally (bundled assets, file:// URLs or dev):
+//   → Use hash history as fallback so navigation still works
+// ─────────────────────────────────────────────────────────────────────────────
+
+function getHistory() {
+  if (typeof window === 'undefined') {
+    // SSR context — browser history placeholder
+    return createBrowserHistory();
+  }
+
+  // Check if loaded from a real HTTP/HTTPS origin (Vercel or dev server)
+  const isHttpOrigin =
+    window.location.protocol === 'https:' || window.location.protocol === 'http:';
+
+  // Use browser history when loaded from Vercel (native APK with server.url)
+  // or from a dev server — Vercel handles 404 → index.html rewrites correctly
+  if (isHttpOrigin) {
+    return createBrowserHistory();
+  }
+
+  // Fallback: hash history for file:// or capacitor:// schemes (offline bundle)
+  return createHashHistory();
+}
 
 export const getRouter = () => {
-  // Use hash history in native (Capacitor) context so file:// URLs work properly
-  // Use browser history on the web (Vercel / Netlify)
-  const history = isCapacitorNative ? createHashHistory() : createBrowserHistory();
-
   const router = createRouter({
     routeTree,
-    history,
+    history: getHistory(),
     context: {},
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
