@@ -6,13 +6,14 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
+    "postbuild": "node scripts/prerender.js",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "serve:dist": "http-server dist -p 8080 --silent",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check:ts": "tsc --noEmit",
-    "prebuild": "npm run check:ts || true",
+    "prebuild": "",
     "format": "prettier --write ."
   },
   "dependencies": {
