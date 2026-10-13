@@ -125,7 +125,8 @@ jobs:
             echo "Preview URL provided, skipping local server"
           else
             ls -la build_artifacts || true
-            if [ -d build_artifacts/dist ]; then npx http-server build_artifacts/dist -p 8080 --silent &
+            if [ -d build_artifacts/dist/client ]; then npx http-server build_artifacts/dist/client -p 8080 --silent &
+            elif [ -d build_artifacts/dist ]; then npx http-server build_artifacts/dist -p 8080 --silent &
             else echo "dist not found in artifact"; fi
           fi
 
@@ -150,6 +151,7 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
           SKINSCOPE_BASE_URL: ${{ needs.deploy_preview.outputs.preview_url || 'http://localhost:8080' }}
+          PYTHONPATH: .
         run: |
           echo "Testing against $SKINSCOPE_BASE_URL"
           xvfb-run -a pytest tests/selenium -k "not requires_preview" --junitxml=selenium-results.xml || true
