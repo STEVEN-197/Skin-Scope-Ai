@@ -20,7 +20,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, setSession } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,25 +28,49 @@ function LoginPage() {
   const [resending, setResending] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
+    if (!loading && user) {
+      navigate({ to: "/dashboard" });
+    }
   }, [user, loading, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-    setSubmitting(false);
-    if (error) {
-      const message = error.message.toLowerCase().includes("invalid login credentials")
-        ? "Couldn’t sign in. Check your email/password, and if you just signed up, confirm your email first."
-        : error.message;
-      toast.error(message);
-      return;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      setSubmitting(false);
+
+      if (error) {
+        console.error("Sign in error:", error);
+        const message = error.message.toLowerCase().includes("invalid login credentials")
+          ? "Couldn’t sign in. Check your email/password, and if you just signed up, confirm your email first."
+          : error.message;
+        toast.error(message);
+        return;
+      }
+
+      toast.success("Signed in — taking you to your dashboard.");
+
+      if (data?.session) {
+        // Immediately synchronize state so dashboard layout doesn't bounce back
+        setSession(data.session);
+        navigate({ to: "/dashboard" });
+
+        // Fallback navigation in case client router doesn't change window URL in WebViews
+        setTimeout(() => {
+          if (!window.location.pathname.startsWith("/dashboard")) {
+            window.location.href = "/dashboard";
+          }
+        }, 200);
+      }
+    } catch (err: any) {
+      setSubmitting(false);
+      console.error("Sign in unexpected error:", err);
+      toast.error(err?.message || "An unexpected error occurred during sign in.");
     }
-    toast.success("Signed in — taking you to your dashboard.");
   };
 
   const handleResendConfirmation = async () => {

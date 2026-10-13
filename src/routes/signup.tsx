@@ -20,7 +20,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, setSession } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -58,7 +58,14 @@ function SignupPage() {
       return;
     }
     if (data.session) {
+      setSession(data.session);
       toast.success("Account created — taking you to your dashboard.");
+      navigate({ to: "/dashboard" });
+      setTimeout(() => {
+        if (!window.location.pathname.startsWith("/dashboard")) {
+          window.location.href = "/dashboard";
+        }
+      }, 200);
       return;
     }
     toast.success("Account created — check your email to confirm your account.");

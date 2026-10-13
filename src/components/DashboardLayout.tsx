@@ -36,12 +36,20 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  if (loading) {
+  // Check if a session exists in localStorage (e.g. while auth is hydrating)
+  const hasStoredSession =
+    typeof window !== "undefined" &&
+    (localStorage.getItem("mock-user-logged-in") === "true" ||
+      Object.keys(localStorage).some(
+        (k) => k.startsWith("sb-") && k.endsWith("-auth-token"),
+      ));
+
+  if (loading || (hasStoredSession && !user)) {
     return (
       <div className="grid min-h-screen place-items-center bg-gradient-subtle">
         <div className="flex items-center gap-3 text-muted-foreground">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading…
+          Loading dashboard…
         </div>
       </div>
     );
