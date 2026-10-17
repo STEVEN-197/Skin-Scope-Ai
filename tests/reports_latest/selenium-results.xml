@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="59" tests="91" time="173.918" timestamp="2026-10-13T09:12:32.290390+00:00" hostname="runnervmmprz5"><testcase classname="scripts.test_auth" name="test_login_page_loads" time="29.726"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x55e29ad8daaa &lt;unknown&gt;&#10;#1 0x55e29a6bbaa9 &lt;unknown&gt;&#10;#2 0x55e29a7123ff &lt;unknown&gt;&#10;#3 0x55e29a712671 &lt;unknown&gt;&#10;#4 0x55e29a75ef74 &lt;unknown&gt;&#10;#5 0x55e29a75c1df &lt;unknown&gt;&#10;#6 0x55e29a705148 &lt;unknown&gt;&#10;#7 0x55e29a705f11 &lt;unknown&gt;&#10;#8 0x55e29ad505ac &lt;unknown&gt;&#10;#9 0x55e29ad4edc5 &lt;unknown&gt;&#10;#10 0x55e29ad39e95 &lt;unknown&gt;&#10;#11 0x55e29ad4fa1a &lt;unknown&gt;&#10;#12 0x55e29ad225c9 &lt;unknown&gt;&#10;#13 0x55e29ad780f8 &lt;unknown&gt;&#10;#14 0x55e29ad78295 &lt;unknown&gt;&#10;#15 0x55e29ad8c3f3 &lt;unknown&gt;&#10;#16 0x7f404449cb84 &lt;unknown&gt;&#10;#17 0x7f4044529ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:10: in test_login_page_loads
+    assert wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x55e29ad8daaa &lt;unknown&gt;
+E   #1 0x55e29a6bbaa9 &lt;unknown&gt;
+E   #2 0x55e29a7123ff &lt;unknown&gt;
+E   #3 0x55e29a712671 &lt;unknown&gt;
+E   #4 0x55e29a75ef74 &lt;unknown&gt;
+E   #5 0x55e29a75c1df &lt;unknown&gt;
+E   #6 0x55e29a705148 &lt;unknown&gt;
+E   #7 0x55e29a705f11 &lt;unknown&gt;
+E   #8 0x55e29ad505ac &lt;unknown&gt;
+E   #9 0x55e29ad4edc5 &lt;unknown&gt;
+E   #10 0x55e29ad39e95 &lt;unknown&gt;
+E   #11 0x55e29ad4fa1a &lt;unknown&gt;
+E   #12 0x55e29ad225c9 &lt;unknown&gt;
+E   #13 0x55e29ad780f8 &lt;unknown&gt;
+E   #14 0x55e29ad78295 &lt;unknown&gt;
+E   #15 0x55e29ad8c3f3 &lt;unknown&gt;
+E   #16 0x7f404449cb84 &lt;unknown&gt;
+E   #17 0x7f4044529ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_invalid_email_format" time="11.167"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x55f12b835aaa &lt;unknown&gt;&#10;#1 0x55f12b163aa9 &lt;unknown&gt;&#10;#2 0x55f12b1ba3ff &lt;unknown&gt;&#10;#3 0x55f12b1ba671 &lt;unknown&gt;&#10;#4 0x55f12b206f74 &lt;unknown&gt;&#10;#5 0x55f12b2041df &lt;unknown&gt;&#10;#6 0x55f12b1ad148 &lt;unknown&gt;&#10;#7 0x55f12b1adf11 &lt;unknown&gt;&#10;#8 0x55f12b7f85ac &lt;unknown&gt;&#10;#9 0x55f12b7f6dc5 &lt;unknown&gt;&#10;#10 0x55f12b7e1e95 &lt;unknown&gt;&#10;#11 0x55f12b7f7a1a &lt;unknown&gt;&#10;#12 0x55f12b7ca5c9 &lt;unknown&gt;&#10;#13 0x55f12b8200f8 &lt;unknown&gt;&#10;#14 0x55f12b820295 &lt;unknown&gt;&#10;#15 0x55f12b8343f3 &lt;unknown&gt;&#10;#16 0x7f817849cb84 &lt;unknown&gt;&#10;#17 0x7f8178529ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:15: in test_invalid_email_format
+    email = wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x55f12b835aaa &lt;unknown&gt;
+E   #1 0x55f12b163aa9 &lt;unknown&gt;
+E   #2 0x55f12b1ba3ff &lt;unknown&gt;
+E   #3 0x55f12b1ba671 &lt;unknown&gt;
+E   #4 0x55f12b206f74 &lt;unknown&gt;
+E   #5 0x55f12b2041df &lt;unknown&gt;
+E   #6 0x55f12b1ad148 &lt;unknown&gt;
+E   #7 0x55f12b1adf11 &lt;unknown&gt;
+E   #8 0x55f12b7f85ac &lt;unknown&gt;
+E   #9 0x55f12b7f6dc5 &lt;unknown&gt;
+E   #10 0x55f12b7e1e95 &lt;unknown&gt;
+E   #11 0x55f12b7f7a1a &lt;unknown&gt;
+E   #12 0x55f12b7ca5c9 &lt;unknown&gt;
+E   #13 0x55f12b8200f8 &lt;unknown&gt;
+E   #14 0x55f12b820295 &lt;unknown&gt;
+E   #15 0x55f12b8343f3 &lt;unknown&gt;
+E   #16 0x7f817849cb84 &lt;unknown&gt;
+E   #17 0x7f8178529ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_protected_route_redirects" time="5.644"><failure message="assert ('/login' in 'http://localhost:8080/dashboard' or [])&#10; +  where 'http://localhost:8080/dashboard' = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&quot;b415f36aaf3a0f5cc7ee8b3cadd463a4&quot;)&gt;.current_url&#10; +  and   [] = find_elements('css selector', &quot;input[type='email']&quot;)&#10; +    where find_elements = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session=&quot;b415f36aaf3a0f5cc7ee8b3cadd463a4&quot;)&gt;.find_elements&#10; +    and   'css selector' = By.CSS_SELECTOR">tests/selenium/scripts/test_auth.py:25: in test_protected_route_redirects
+    assert "/login" in driver.current_url or driver.find_elements(By.CSS_SELECTOR, "input[type='email']")
+E   assert ('/login' in 'http://localhost:8080/dashboard' or [])
+E    +  where 'http://localhost:8080/dashboard' = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session="b415f36aaf3a0f5cc7ee8b3cadd463a4")&gt;.current_url
+E    +  and   [] = find_elements('css selector', "input[type='email']")
+E    +    where find_elements = &lt;selenium.webdriver.chrome.webdriver.WebDriver (session="b415f36aaf3a0f5cc7ee8b3cadd463a4")&gt;.find_elements
+E    +    and   'css selector' = By.CSS_SELECTOR</failure></testcase><testcase classname="scripts.test_auth" name="test_signup_page_loads" time="11.128"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x561aa24afaaa &lt;unknown&gt;&#10;#1 0x561aa1dddaa9 &lt;unknown&gt;&#10;#2 0x561aa1e343ff &lt;unknown&gt;&#10;#3 0x561aa1e34671 &lt;unknown&gt;&#10;#4 0x561aa1e80f74 &lt;unknown&gt;&#10;#5 0x561aa1e7e1df &lt;unknown&gt;&#10;#6 0x561aa1e27148 &lt;unknown&gt;&#10;#7 0x561aa1e27f11 &lt;unknown&gt;&#10;#8 0x561aa24725ac &lt;unknown&gt;&#10;#9 0x561aa2470dc5 &lt;unknown&gt;&#10;#10 0x561aa245be95 &lt;unknown&gt;&#10;#11 0x561aa2471a1a &lt;unknown&gt;&#10;#12 0x561aa24445c9 &lt;unknown&gt;&#10;#13 0x561aa249a0f8 &lt;unknown&gt;&#10;#14 0x561aa249a295 &lt;unknown&gt;&#10;#15 0x561aa24ae3f3 &lt;unknown&gt;&#10;#16 0x7f01da49cb84 &lt;unknown&gt;&#10;#17 0x7f01da529ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:30: in test_signup_page_loads
+    assert wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x561aa24afaaa &lt;unknown&gt;
+E   #1 0x561aa1dddaa9 &lt;unknown&gt;
+E   #2 0x561aa1e343ff &lt;unknown&gt;
+E   #3 0x561aa1e34671 &lt;unknown&gt;
+E   #4 0x561aa1e80f74 &lt;unknown&gt;
+E   #5 0x561aa1e7e1df &lt;unknown&gt;
+E   #6 0x561aa1e27148 &lt;unknown&gt;
+E   #7 0x561aa1e27f11 &lt;unknown&gt;
+E   #8 0x561aa24725ac &lt;unknown&gt;
+E   #9 0x561aa2470dc5 &lt;unknown&gt;
+E   #10 0x561aa245be95 &lt;unknown&gt;
+E   #11 0x561aa2471a1a &lt;unknown&gt;
+E   #12 0x561aa24445c9 &lt;unknown&gt;
+E   #13 0x561aa249a0f8 &lt;unknown&gt;
+E   #14 0x561aa249a295 &lt;unknown&gt;
+E   #15 0x561aa24ae3f3 &lt;unknown&gt;
+E   #16 0x7f01da49cb84 &lt;unknown&gt;
+E   #17 0x7f01da529ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_valid_login" time="0.541"><skipped type="pytest.skip" message="Test account not provisioned">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_auth.py:39: Test account not provisioned</skipped></testcase><testcase classname="scripts.test_auth" name="test_empty_login_credentials" time="11.065"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x55b302735aaa &lt;unknown&gt;&#10;#1 0x55b302063aa9 &lt;unknown&gt;&#10;#2 0x55b3020ba3ff &lt;unknown&gt;&#10;#3 0x55b3020ba671 &lt;unknown&gt;&#10;#4 0x55b302106f74 &lt;unknown&gt;&#10;#5 0x55b3021041df &lt;unknown&gt;&#10;#6 0x55b3020ad148 &lt;unknown&gt;&#10;#7 0x55b3020adf11 &lt;unknown&gt;&#10;#8 0x55b3026f85ac &lt;unknown&gt;&#10;#9 0x55b3026f6dc5 &lt;unknown&gt;&#10;#10 0x55b3026e1e95 &lt;unknown&gt;&#10;#11 0x55b3026f7a1a &lt;unknown&gt;&#10;#12 0x55b3026ca5c9 &lt;unknown&gt;&#10;#13 0x55b3027200f8 &lt;unknown&gt;&#10;#14 0x55b302720295 &lt;unknown&gt;&#10;#15 0x55b3027343f3 &lt;unknown&gt;&#10;#16 0x7f62afc9cb84 &lt;unknown&gt;&#10;#17 0x7f62afd29ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:45: in test_empty_login_credentials
+    wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x55b302735aaa &lt;unknown&gt;
+E   #1 0x55b302063aa9 &lt;unknown&gt;
+E   #2 0x55b3020ba3ff &lt;unknown&gt;
+E   #3 0x55b3020ba671 &lt;unknown&gt;
+E   #4 0x55b302106f74 &lt;unknown&gt;
+E   #5 0x55b3021041df &lt;unknown&gt;
+E   #6 0x55b3020ad148 &lt;unknown&gt;
+E   #7 0x55b3020adf11 &lt;unknown&gt;
+E   #8 0x55b3026f85ac &lt;unknown&gt;
+E   #9 0x55b3026f6dc5 &lt;unknown&gt;
+E   #10 0x55b3026e1e95 &lt;unknown&gt;
+E   #11 0x55b3026f7a1a &lt;unknown&gt;
+E   #12 0x55b3026ca5c9 &lt;unknown&gt;
+E   #13 0x55b3027200f8 &lt;unknown&gt;
+E   #14 0x55b302720295 &lt;unknown&gt;
+E   #15 0x55b3027343f3 &lt;unknown&gt;
+E   #16 0x7f62afc9cb84 &lt;unknown&gt;
+E   #17 0x7f62afd29ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_login_page_links" time="11.111"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x562d6a4deaaa &lt;unknown&gt;&#10;#1 0x562d69e0caa9 &lt;unknown&gt;&#10;#2 0x562d69e633ff &lt;unknown&gt;&#10;#3 0x562d69e63671 &lt;unknown&gt;&#10;#4 0x562d69eaff74 &lt;unknown&gt;&#10;#5 0x562d69ead1df &lt;unknown&gt;&#10;#6 0x562d69e56148 &lt;unknown&gt;&#10;#7 0x562d69e56f11 &lt;unknown&gt;&#10;#8 0x562d6a4a15ac &lt;unknown&gt;&#10;#9 0x562d6a49fdc5 &lt;unknown&gt;&#10;#10 0x562d6a48ae95 &lt;unknown&gt;&#10;#11 0x562d6a4a0a1a &lt;unknown&gt;&#10;#12 0x562d6a4735c9 &lt;unknown&gt;&#10;#13 0x562d6a4c90f8 &lt;unknown&gt;&#10;#14 0x562d6a4c9295 &lt;unknown&gt;&#10;#15 0x562d6a4dd3f3 &lt;unknown&gt;&#10;#16 0x7fb93249cb84 &lt;unknown&gt;&#10;#17 0x7fb932529ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:52: in test_login_page_links
+    wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x562d6a4deaaa &lt;unknown&gt;
+E   #1 0x562d69e0caa9 &lt;unknown&gt;
+E   #2 0x562d69e633ff &lt;unknown&gt;
+E   #3 0x562d69e63671 &lt;unknown&gt;
+E   #4 0x562d69eaff74 &lt;unknown&gt;
+E   #5 0x562d69ead1df &lt;unknown&gt;
+E   #6 0x562d69e56148 &lt;unknown&gt;
+E   #7 0x562d69e56f11 &lt;unknown&gt;
+E   #8 0x562d6a4a15ac &lt;unknown&gt;
+E   #9 0x562d6a49fdc5 &lt;unknown&gt;
+E   #10 0x562d6a48ae95 &lt;unknown&gt;
+E   #11 0x562d6a4a0a1a &lt;unknown&gt;
+E   #12 0x562d6a4735c9 &lt;unknown&gt;
+E   #13 0x562d6a4c90f8 &lt;unknown&gt;
+E   #14 0x562d6a4c9295 &lt;unknown&gt;
+E   #15 0x562d6a4dd3f3 &lt;unknown&gt;
+E   #16 0x7fb93249cb84 &lt;unknown&gt;
+E   #17 0x7fb932529ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_signup_invalid_email" time="11.134"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x562e35ae2aaa &lt;unknown&gt;&#10;#1 0x562e35410aa9 &lt;unknown&gt;&#10;#2 0x562e354673ff &lt;unknown&gt;&#10;#3 0x562e35467671 &lt;unknown&gt;&#10;#4 0x562e354b3f74 &lt;unknown&gt;&#10;#5 0x562e354b11df &lt;unknown&gt;&#10;#6 0x562e3545a148 &lt;unknown&gt;&#10;#7 0x562e3545af11 &lt;unknown&gt;&#10;#8 0x562e35aa55ac &lt;unknown&gt;&#10;#9 0x562e35aa3dc5 &lt;unknown&gt;&#10;#10 0x562e35a8ee95 &lt;unknown&gt;&#10;#11 0x562e35aa4a1a &lt;unknown&gt;&#10;#12 0x562e35a775c9 &lt;unknown&gt;&#10;#13 0x562e35acd0f8 &lt;unknown&gt;&#10;#14 0x562e35acd295 &lt;unknown&gt;&#10;#15 0x562e35ae13f3 &lt;unknown&gt;&#10;#16 0x7f26b2c9cb84 &lt;unknown&gt;&#10;#17 0x7f26b2d29ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:60: in test_signup_invalid_email
+    name = wait_for(driver, (By.ID, "name"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x562e35ae2aaa &lt;unknown&gt;
+E   #1 0x562e35410aa9 &lt;unknown&gt;
+E   #2 0x562e354673ff &lt;unknown&gt;
+E   #3 0x562e35467671 &lt;unknown&gt;
+E   #4 0x562e354b3f74 &lt;unknown&gt;
+E   #5 0x562e354b11df &lt;unknown&gt;
+E   #6 0x562e3545a148 &lt;unknown&gt;
+E   #7 0x562e3545af11 &lt;unknown&gt;
+E   #8 0x562e35aa55ac &lt;unknown&gt;
+E   #9 0x562e35aa3dc5 &lt;unknown&gt;
+E   #10 0x562e35a8ee95 &lt;unknown&gt;
+E   #11 0x562e35aa4a1a &lt;unknown&gt;
+E   #12 0x562e35a775c9 &lt;unknown&gt;
+E   #13 0x562e35acd0f8 &lt;unknown&gt;
+E   #14 0x562e35acd295 &lt;unknown&gt;
+E   #15 0x562e35ae13f3 &lt;unknown&gt;
+E   #16 0x7f26b2c9cb84 &lt;unknown&gt;
+E   #17 0x7f26b2d29ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_signup_password_too_short" time="11.110"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x55b0db715aaa &lt;unknown&gt;&#10;#1 0x55b0db043aa9 &lt;unknown&gt;&#10;#2 0x55b0db09a3ff &lt;unknown&gt;&#10;#3 0x55b0db09a671 &lt;unknown&gt;&#10;#4 0x55b0db0e6f74 &lt;unknown&gt;&#10;#5 0x55b0db0e41df &lt;unknown&gt;&#10;#6 0x55b0db08d148 &lt;unknown&gt;&#10;#7 0x55b0db08df11 &lt;unknown&gt;&#10;#8 0x55b0db6d85ac &lt;unknown&gt;&#10;#9 0x55b0db6d6dc5 &lt;unknown&gt;&#10;#10 0x55b0db6c1e95 &lt;unknown&gt;&#10;#11 0x55b0db6d7a1a &lt;unknown&gt;&#10;#12 0x55b0db6aa5c9 &lt;unknown&gt;&#10;#13 0x55b0db7000f8 &lt;unknown&gt;&#10;#14 0x55b0db700295 &lt;unknown&gt;&#10;#15 0x55b0db7143f3 &lt;unknown&gt;&#10;#16 0x7f6de9a9cb84 &lt;unknown&gt;&#10;#17 0x7f6de9b29ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:70: in test_signup_password_too_short
+    name = wait_for(driver, (By.ID, "name"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x55b0db715aaa &lt;unknown&gt;
+E   #1 0x55b0db043aa9 &lt;unknown&gt;
+E   #2 0x55b0db09a3ff &lt;unknown&gt;
+E   #3 0x55b0db09a671 &lt;unknown&gt;
+E   #4 0x55b0db0e6f74 &lt;unknown&gt;
+E   #5 0x55b0db0e41df &lt;unknown&gt;
+E   #6 0x55b0db08d148 &lt;unknown&gt;
+E   #7 0x55b0db08df11 &lt;unknown&gt;
+E   #8 0x55b0db6d85ac &lt;unknown&gt;
+E   #9 0x55b0db6d6dc5 &lt;unknown&gt;
+E   #10 0x55b0db6c1e95 &lt;unknown&gt;
+E   #11 0x55b0db6d7a1a &lt;unknown&gt;
+E   #12 0x55b0db6aa5c9 &lt;unknown&gt;
+E   #13 0x55b0db7000f8 &lt;unknown&gt;
+E   #14 0x55b0db700295 &lt;unknown&gt;
+E   #15 0x55b0db7143f3 &lt;unknown&gt;
+E   #16 0x7f6de9a9cb84 &lt;unknown&gt;
+E   #17 0x7f6de9b29ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_login_incorrect_password" time="11.094"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x5616a0725aaa &lt;unknown&gt;&#10;#1 0x5616a0053aa9 &lt;unknown&gt;&#10;#2 0x5616a00aa3ff &lt;unknown&gt;&#10;#3 0x5616a00aa671 &lt;unknown&gt;&#10;#4 0x5616a00f6f74 &lt;unknown&gt;&#10;#5 0x5616a00f41df &lt;unknown&gt;&#10;#6 0x5616a009d148 &lt;unknown&gt;&#10;#7 0x5616a009df11 &lt;unknown&gt;&#10;#8 0x5616a06e85ac &lt;unknown&gt;&#10;#9 0x5616a06e6dc5 &lt;unknown&gt;&#10;#10 0x5616a06d1e95 &lt;unknown&gt;&#10;#11 0x5616a06e7a1a &lt;unknown&gt;&#10;#12 0x5616a06ba5c9 &lt;unknown&gt;&#10;#13 0x5616a07100f8 &lt;unknown&gt;&#10;#14 0x5616a0710295 &lt;unknown&gt;&#10;#15 0x5616a07243f3 &lt;unknown&gt;&#10;#16 0x7f5b2129cb84 &lt;unknown&gt;&#10;#17 0x7f5b21329ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:80: in test_login_incorrect_password
+    email = wait_for(driver, (By.CSS_SELECTOR, "input[type='email']"))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x5616a0725aaa &lt;unknown&gt;
+E   #1 0x5616a0053aa9 &lt;unknown&gt;
+E   #2 0x5616a00aa3ff &lt;unknown&gt;
+E   #3 0x5616a00aa671 &lt;unknown&gt;
+E   #4 0x5616a00f6f74 &lt;unknown&gt;
+E   #5 0x5616a00f41df &lt;unknown&gt;
+E   #6 0x5616a009d148 &lt;unknown&gt;
+E   #7 0x5616a009df11 &lt;unknown&gt;
+E   #8 0x5616a06e85ac &lt;unknown&gt;
+E   #9 0x5616a06e6dc5 &lt;unknown&gt;
+E   #10 0x5616a06d1e95 &lt;unknown&gt;
+E   #11 0x5616a06e7a1a &lt;unknown&gt;
+E   #12 0x5616a06ba5c9 &lt;unknown&gt;
+E   #13 0x5616a07100f8 &lt;unknown&gt;
+E   #14 0x5616a0710295 &lt;unknown&gt;
+E   #15 0x5616a07243f3 &lt;unknown&gt;
+E   #16 0x7f5b2129cb84 &lt;unknown&gt;
+E   #17 0x7f5b21329ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_signup_blank_password" time="11.111"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x559d15291aaa &lt;unknown&gt;&#10;#1 0x559d14bbfaa9 &lt;unknown&gt;&#10;#2 0x559d14c163ff &lt;unknown&gt;&#10;#3 0x559d14c16671 &lt;unknown&gt;&#10;#4 0x559d14c62f74 &lt;unknown&gt;&#10;#5 0x559d14c601df &lt;unknown&gt;&#10;#6 0x559d14c09148 &lt;unknown&gt;&#10;#7 0x559d14c09f11 &lt;unknown&gt;&#10;#8 0x559d152545ac &lt;unknown&gt;&#10;#9 0x559d15252dc5 &lt;unknown&gt;&#10;#10 0x559d1523de95 &lt;unknown&gt;&#10;#11 0x559d15253a1a &lt;unknown&gt;&#10;#12 0x559d152265c9 &lt;unknown&gt;&#10;#13 0x559d1527c0f8 &lt;unknown&gt;&#10;#14 0x559d1527c295 &lt;unknown&gt;&#10;#15 0x559d152903f3 &lt;unknown&gt;&#10;#16 0x7f201889cb84 &lt;unknown&gt;&#10;#17 0x7f2018929ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:89: in test_signup_blank_password
+    name = wait_for(driver, (By.ID, "name"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x559d15291aaa &lt;unknown&gt;
+E   #1 0x559d14bbfaa9 &lt;unknown&gt;
+E   #2 0x559d14c163ff &lt;unknown&gt;
+E   #3 0x559d14c16671 &lt;unknown&gt;
+E   #4 0x559d14c62f74 &lt;unknown&gt;
+E   #5 0x559d14c601df &lt;unknown&gt;
+E   #6 0x559d14c09148 &lt;unknown&gt;
+E   #7 0x559d14c09f11 &lt;unknown&gt;
+E   #8 0x559d152545ac &lt;unknown&gt;
+E   #9 0x559d15252dc5 &lt;unknown&gt;
+E   #10 0x559d1523de95 &lt;unknown&gt;
+E   #11 0x559d15253a1a &lt;unknown&gt;
+E   #12 0x559d152265c9 &lt;unknown&gt;
+E   #13 0x559d1527c0f8 &lt;unknown&gt;
+E   #14 0x559d1527c295 &lt;unknown&gt;
+E   #15 0x559d152903f3 &lt;unknown&gt;
+E   #16 0x7f201889cb84 &lt;unknown&gt;
+E   #17 0x7f2018929ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_auth" name="test_signup_blank_name" time="11.079"><failure message="selenium.common.exceptions.TimeoutException: Message: &#10;Stacktrace:&#10;#0 0x55f1cba82aaa &lt;unknown&gt;&#10;#1 0x55f1cb3b0aa9 &lt;unknown&gt;&#10;#2 0x55f1cb4073ff &lt;unknown&gt;&#10;#3 0x55f1cb407671 &lt;unknown&gt;&#10;#4 0x55f1cb453f74 &lt;unknown&gt;&#10;#5 0x55f1cb4511df &lt;unknown&gt;&#10;#6 0x55f1cb3fa148 &lt;unknown&gt;&#10;#7 0x55f1cb3faf11 &lt;unknown&gt;&#10;#8 0x55f1cba455ac &lt;unknown&gt;&#10;#9 0x55f1cba43dc5 &lt;unknown&gt;&#10;#10 0x55f1cba2ee95 &lt;unknown&gt;&#10;#11 0x55f1cba44a1a &lt;unknown&gt;&#10;#12 0x55f1cba175c9 &lt;unknown&gt;&#10;#13 0x55f1cba6d0f8 &lt;unknown&gt;&#10;#14 0x55f1cba6d295 &lt;unknown&gt;&#10;#15 0x55f1cba813f3 &lt;unknown&gt;&#10;#16 0x7f2057c9cb84 &lt;unknown&gt;&#10;#17 0x7f2057d29ecc &lt;unknown&gt;">tests/selenium/scripts/test_auth.py:98: in test_signup_blank_name
+    email = wait_for(driver, (By.ID, "email"))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/selenium/utils/helpers.py:8: in wait_for
+    return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/hostedtoolcache/Python/3.11.17/x64/lib/python3.11/site-packages/selenium/webdriver/support/wait.py:121: in until
+    raise TimeoutException(message, screen, stacktrace)
+E   selenium.common.exceptions.TimeoutException: Message: 
+E   Stacktrace:
+E   #0 0x55f1cba82aaa &lt;unknown&gt;
+E   #1 0x55f1cb3b0aa9 &lt;unknown&gt;
+E   #2 0x55f1cb4073ff &lt;unknown&gt;
+E   #3 0x55f1cb407671 &lt;unknown&gt;
+E   #4 0x55f1cb453f74 &lt;unknown&gt;
+E   #5 0x55f1cb4511df &lt;unknown&gt;
+E   #6 0x55f1cb3fa148 &lt;unknown&gt;
+E   #7 0x55f1cb3faf11 &lt;unknown&gt;
+E   #8 0x55f1cba455ac &lt;unknown&gt;
+E   #9 0x55f1cba43dc5 &lt;unknown&gt;
+E   #10 0x55f1cba2ee95 &lt;unknown&gt;
+E   #11 0x55f1cba44a1a &lt;unknown&gt;
+E   #12 0x55f1cba175c9 &lt;unknown&gt;
+E   #13 0x55f1cba6d0f8 &lt;unknown&gt;
+E   #14 0x55f1cba6d295 &lt;unknown&gt;
+E   #15 0x55f1cba813f3 &lt;unknown&gt;
+E   #16 0x7f2057c9cb84 &lt;unknown&gt;
+E   #17 0x7f2057d29ecc &lt;unknown&gt;</failure></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard-size0]" time="0.563"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard-size1]" time="0.539"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard-size2]" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/analyze-size0]" time="0.533"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/analyze-size1]" time="0.529"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/analyze-size2]" time="0.515"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reports-size0]" time="0.512"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reports-size1]" time="0.539"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reports-size2]" time="0.536"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/medical-reports-size0]" time="0.503"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/medical-reports-size1]" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/medical-reports-size2]" time="0.522"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/prescriptions-size0]" time="0.550"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/prescriptions-size1]" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/prescriptions-size2]" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/jarvis-size0]" time="0.520"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/jarvis-size1]" time="0.505"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/jarvis-size2]" time="0.519"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/family-size0]" time="0.545"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/family-size1]" time="0.524"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/family-size2]" time="0.545"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/timeline-size0]" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/timeline-size1]" time="0.520"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/timeline-size2]" time="0.537"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/appointments-size0]" time="0.520"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/appointments-size1]" time="0.519"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/appointments-size2]" time="0.518"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/twin-size0]" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/twin-size1]" time="0.539"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/twin-size2]" time="0.543"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/compare-size0]" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/compare-size1]" time="0.549"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/compare-size2]" time="0.518"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/share-size0]" time="0.507"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/share-size1]" time="0.508"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/share-size2]" time="0.544"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/lifestyle-size0]" time="0.520"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/lifestyle-size1]" time="0.557"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/lifestyle-size2]" time="0.541"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/insights-size0]" time="0.570"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/insights-size1]" time="0.507"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/insights-size2]" time="0.536"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/intelligence-size0]" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/intelligence-size1]" time="0.545"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/intelligence-size2]" time="0.550"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/diary-size0]" time="0.526"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/diary-size1]" time="0.524"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/diary-size2]" time="0.548"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reminders-size0]" time="0.500"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reminders-size1]" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_route_renders[/dashboard/reminders-size2]" time="0.549"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:15: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_sidebar_navigation" time="0.533"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:31: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_jarvis_interaction" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:37: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_analyze_upload_area" time="0.518"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:43: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_medical_reports_page" time="0.530"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:49: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_appointments_dialog" time="0.506"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:55: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_lifestyle_insights" time="0.525"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:61: Login unavailable</skipped></testcase><testcase classname="scripts.test_dashboard" name="test_timeline_cards" time="0.527"><skipped type="pytest.skip" message="Login unavailable">/home/runner/work/Skin-Scope-Ai/Skin-Scope-Ai/tests/selenium/scripts/test_dashboard.py:67: Login unavailable</skipped></testcase><testcase classname="scripts.test_pwa_deployment" name="test_pwa_assets_reachable[/manifest.webmanifest]" time="0.006" /><testcase classname="scripts.test_pwa_deployment" name="test_pwa_assets_reachable[/icon-192.png]" time="0.003" /><testcase classname="scripts.test_pwa_deployment" name="test_pwa_assets_reachable[/icon-512.png]" time="0.006" /><testcase classname="scripts.test_pwa_deployment" name="test_pwa_assets_reachable[/apple-touch-icon.png]" time="0.003" /><testcase classname="scripts.test_pwa_deployment" name="test_pwa_assets_reachable[/favicon.ico]" time="0.003" /><testcase classname="scripts.test_pwa_deployment" name="test_manifest_valid" time="0.003" /><testcase classname="scripts.test_pwa_deployment" name="test_index_has_theme_color" time="0.021"><failure message="assert 'theme-color' in '&lt;!doctype html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n    &lt;meta charset=&quot;utf-8&quot;&gt;\n    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;\n    &lt;title&gt;Index of /&lt;/title&gt;\n    &lt;style type=&quot;text/css&quot;&gt;i.icon { display: block; height: 16px; width: 16px; }\ntable tr { white-space: nowrap; }\ntd.perms {}\ntd.file-size { text-align: right; padding-left: 1em; }\ntd.display-name { padding-left: 1em; }\ni.icon-_blank {\n  background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAWBJREFUeNqEUj1LxEAQnd1MVA4lyIEWx6UIKEGUExGsbC3tLfwJ/hT/g7VlCnubqxXBwg/Q4hQP/LhKL5nZuBsvuGfW5MGyuzM7jzdvVuR5DgYnZ+f99ai7Vt5t9K9unu4HLweI3qWYxI6PDosdy0fhcntxO44CcOBzPA7mfEyuHwf7ntQk4jcnywOxIlfxOCNYaLVgb6cXbkTdhJXq2SIlNMC0xIqhHczDbi8OVzpLSUa0WebRfmigLHqj1EcPZnwf7gbDIrYVRyEinurj6jTBHyI7pqVrFQqEbt6TEmZ9v1NRAJNC1xTYxIQh/MmRUlmFQE3qWOW1nqB2TWk1/3tgJV0waVvkFIEeZbHq4ElyKzAmEXOx6gnEVJuWBzmkRJBRPYGZBDsVaOlpSgVJE2yVaAe/0kx/3azBRO0VsbMFZE3CDSZKweZfYIVg+DZ6v7h9GDVOwZPw/PoxKu/fAgwALbDAXf7DdQkAAAAASUVORK5CYII=&quot;);\n}\n\ni.icon-_page {\n  background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR...age&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;31.3k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./favicon.ico&quot;&gt;favicon.ico&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-png&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;32.2k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./icon-192.png&quot;&gt;icon-192.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-png&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;976.6k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./icon-512.png&quot;&gt;icon-512.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-_page&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;1.1k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./manifest.webmanifest&quot;&gt;manifest.webmanifest&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;\n&lt;br&gt;&lt;address&gt;Node.js v20.20.2/ &lt;a href=&quot;https://github.com/http-party/http-server&quot;&gt;http-server&lt;/a&gt; server running @ localhost:8080&lt;/address&gt;\n&lt;/body&gt;&lt;/html&gt;'&#10; +  where '&lt;!doctype html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n    &lt;meta charset=&quot;utf-8&quot;&gt;\n    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width&quot;&gt;\n    &lt;title&gt;Index of /&lt;/title&gt;\n    &lt;style type=&quot;text/css&quot;&gt;i.icon { display: block; height: 16px; width: 16px; }\ntable tr { white-space: nowrap; }\ntd.perms {}\ntd.file-size { text-align: right; padding-left: 1em; }\ntd.display-name { padding-left: 1em; }\ni.icon-_blank {\n  background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAWBJREFUeNqEUj1LxEAQnd1MVA4lyIEWx6UIKEGUExGsbC3tLfwJ/hT/g7VlCnubqxXBwg/Q4hQP/LhKL5nZuBsvuGfW5MGyuzM7jzdvVuR5DgYnZ+f99ai7Vt5t9K9unu4HLweI3qWYxI6PDosdy0fhcntxO44CcOBzPA7mfEyuHwf7ntQk4jcnywOxIlfxOCNYaLVgb6cXbkTdhJXq2SIlNMC0xIqhHczDbi8OVzpLSUa0WebRfmigLHqj1EcPZnwf7gbDIrYVRyEinurj6jTBHyI7pqVrFQqEbt6TEmZ9v1NRAJNC1xTYxIQh/MmRUlmFQE3qWOW1nqB2TWk1/3tgJV0waVvkFIEeZbHq4ElyKzAmEXOx6gnEVJuWBzmkRJBRPYGZBDsVaOlpSgVJE2yVaAe/0kx/3azBRO0VsbMFZE3CDSZKweZfYIVg+DZ6v7h9GDVOwZPw/PoxKu/fAgwALbDAXf7DdQkAAAAASUVORK5CYII=&quot;);\n}\n\ni.icon-_page {\n  background-image: url(&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR...age&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;31.3k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./favicon.ico&quot;&gt;favicon.ico&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-png&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;32.2k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./icon-192.png&quot;&gt;icon-192.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-png&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;976.6k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./icon-512.png&quot;&gt;icon-512.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class=&quot;icon icon-_page&quot;&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class=&quot;perms&quot;&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;last-modified&quot;&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class=&quot;file-size&quot;&gt;&lt;code&gt;1.1k&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;display-name&quot;&gt;&lt;a href=&quot;./manifest.webmanifest&quot;&gt;manifest.webmanifest&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;\n&lt;br&gt;&lt;address&gt;Node.js v20.20.2/ &lt;a href=&quot;https://github.com/http-party/http-server&quot;&gt;http-server&lt;/a&gt; server running @ localhost:8080&lt;/address&gt;\n&lt;/body&gt;&lt;/html&gt;' = &lt;Response [200]&gt;.text">tests/selenium/scripts/test_pwa_deployment.py:25: in test_index_has_theme_color
+    assert "theme-color" in r.text
+E   assert 'theme-color' in '&lt;!doctype html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n    &lt;meta charset="utf-8"&gt;\n    &lt;meta name="viewport" content="width=device-width"&gt;\n    &lt;title&gt;Index of /&lt;/title&gt;\n    &lt;style type="text/css"&gt;i.icon { display: block; height: 16px; width: 16px; }\ntable tr { white-space: nowrap; }\ntd.perms {}\ntd.file-size { text-align: right; padding-left: 1em; }\ntd.display-name { padding-left: 1em; }\ni.icon-_blank {\n  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAWBJREFUeNqEUj1LxEAQnd1MVA4lyIEWx6UIKEGUExGsbC3tLfwJ/hT/g7VlCnubqxXBwg/Q4hQP/LhKL5nZuBsvuGfW5MGyuzM7jzdvVuR5DgYnZ+f99ai7Vt5t9K9unu4HLweI3qWYxI6PDosdy0fhcntxO44CcOBzPA7mfEyuHwf7ntQk4jcnywOxIlfxOCNYaLVgb6cXbkTdhJXq2SIlNMC0xIqhHczDbi8OVzpLSUa0WebRfmigLHqj1EcPZnwf7gbDIrYVRyEinurj6jTBHyI7pqVrFQqEbt6TEmZ9v1NRAJNC1xTYxIQh/MmRUlmFQE3qWOW1nqB2TWk1/3tgJV0waVvkFIEeZbHq4ElyKzAmEXOx6gnEVJuWBzmkRJBRPYGZBDsVaOlpSgVJE2yVaAe/0kx/3azBRO0VsbMFZE3CDSZKweZfYIVg+DZ6v7h9GDVOwZPw/PoxKu/fAgwALbDAXf7DdQkAAAAASUVORK5CYII=");\n}\n\ni.icon-_page {\n  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR...age"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;31.3k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./favicon.ico"&gt;favicon.ico&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-png"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;32.2k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./icon-192.png"&gt;icon-192.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-png"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;976.6k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./icon-512.png"&gt;icon-512.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-_page"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;1.1k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./manifest.webmanifest"&gt;manifest.webmanifest&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;\n&lt;br&gt;&lt;address&gt;Node.js v20.20.2/ &lt;a href="https://github.com/http-party/http-server"&gt;http-server&lt;/a&gt; server running @ localhost:8080&lt;/address&gt;\n&lt;/body&gt;&lt;/html&gt;'
+E    +  where '&lt;!doctype html&gt;\n&lt;html&gt;\n  &lt;head&gt;\n    &lt;meta charset="utf-8"&gt;\n    &lt;meta name="viewport" content="width=device-width"&gt;\n    &lt;title&gt;Index of /&lt;/title&gt;\n    &lt;style type="text/css"&gt;i.icon { display: block; height: 16px; width: 16px; }\ntable tr { white-space: nowrap; }\ntd.perms {}\ntd.file-size { text-align: right; padding-left: 1em; }\ntd.display-name { padding-left: 1em; }\ni.icon-_blank {\n  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAWBJREFUeNqEUj1LxEAQnd1MVA4lyIEWx6UIKEGUExGsbC3tLfwJ/hT/g7VlCnubqxXBwg/Q4hQP/LhKL5nZuBsvuGfW5MGyuzM7jzdvVuR5DgYnZ+f99ai7Vt5t9K9unu4HLweI3qWYxI6PDosdy0fhcntxO44CcOBzPA7mfEyuHwf7ntQk4jcnywOxIlfxOCNYaLVgb6cXbkTdhJXq2SIlNMC0xIqhHczDbi8OVzpLSUa0WebRfmigLHqj1EcPZnwf7gbDIrYVRyEinurj6jTBHyI7pqVrFQqEbt6TEmZ9v1NRAJNC1xTYxIQh/MmRUlmFQE3qWOW1nqB2TWk1/3tgJV0waVvkFIEeZbHq4ElyKzAmEXOx6gnEVJuWBzmkRJBRPYGZBDsVaOlpSgVJE2yVaAe/0kx/3azBRO0VsbMFZE3CDSZKweZfYIVg+DZ6v7h9GDVOwZPw/PoxKu/fAgwALbDAXf7DdQkAAAAASUVORK5CYII=");\n}\n\ni.icon-_page {\n  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR...age"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;31.3k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./favicon.ico"&gt;favicon.ico&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-png"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;32.2k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./icon-192.png"&gt;icon-192.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-png"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;976.6k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./icon-512.png"&gt;icon-512.png&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;tr&gt;&lt;td&gt;&lt;i class="icon icon-_page"&gt;&lt;/i&gt;&lt;/td&gt;&lt;td class="perms"&gt;&lt;code&gt;(-rw-r--r--)&lt;/code&gt;&lt;/td&gt;&lt;td class="last-modified"&gt;13-Oct-2026 09:11&lt;/td&gt;&lt;td class="file-size"&gt;&lt;code&gt;1.1k&lt;/code&gt;&lt;/td&gt;&lt;td class="display-name"&gt;&lt;a href="./manifest.webmanifest"&gt;manifest.webmanifest&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;\n&lt;/table&gt;\n&lt;br&gt;&lt;address&gt;Node.js v20.20.2/ &lt;a href="https://github.com/http-party/http-server"&gt;http-server&lt;/a&gt; server running @ localhost:8080&lt;/address&gt;\n&lt;/body&gt;&lt;/html&gt;' = &lt;Response [200]&gt;.text</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size0]" time="0.703"><failure message="AssertionError: Horizontal overflow at (320, 568): 479&gt;320&#10;assert (479 - 320) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (320, 568): 479&gt;320
+E   assert (479 - 320) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size1]" time="0.603"><failure message="AssertionError: Horizontal overflow at (360, 640): 479&gt;360&#10;assert (479 - 360) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (360, 640): 479&gt;360
+E   assert (479 - 360) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size2]" time="0.578"><failure message="AssertionError: Horizontal overflow at (360, 800): 479&gt;360&#10;assert (479 - 360) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (360, 800): 479&gt;360
+E   assert (479 - 360) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size3]" time="0.586"><failure message="AssertionError: Horizontal overflow at (375, 812): 479&gt;375&#10;assert (479 - 375) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (375, 812): 479&gt;375
+E   assert (479 - 375) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size4]" time="0.600"><failure message="AssertionError: Horizontal overflow at (390, 844): 479&gt;390&#10;assert (479 - 390) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (390, 844): 479&gt;390
+E   assert (479 - 390) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size5]" time="0.609"><failure message="AssertionError: Horizontal overflow at (414, 896): 479&gt;414&#10;assert (479 - 414) &lt;= 5">tests/selenium/scripts/test_responsive.py:18: in test_viewport
+    assert scroll_w - client_w &lt;= 5, f"Horizontal overflow at {size}: {scroll_w}&gt;{client_w}"
+E   AssertionError: Horizontal overflow at (414, 896): 479&gt;414
+E   assert (479 - 414) &lt;= 5</failure></testcase><testcase classname="scripts.test_responsive" name="test_viewport[size6]" time="0.546" /><testcase classname="scripts.test_responsive" name="test_viewport[size7]" time="0.540" /><testcase classname="scripts.test_responsive" name="test_viewport[size8]" time="0.530" /><testcase classname="scripts.test_responsive" name="test_viewport[size9]" time="0.523" /><testcase classname="scripts.test_responsive" name="test_viewport[size10]" time="0.524" /><testcase classname="scripts.test_responsive" name="test_viewport[size11]" time="0.525" /><testcase classname="scripts.test_security" name="test_https_redirect_when_published" time="0.000" /><testcase classname="scripts.test_security" name="test_no_secrets_in_index" time="0.004" /></testsuite></testsuites>

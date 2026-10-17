@@ -82,22 +82,29 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Deploy to Vercel (optional)
+      - name: Deploy to Vercel (production)
         id: vercel_deploy
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "No VERCEL_TOKEN provided; skipping preview deploy"
+            echo "No VERCEL_TOKEN provided; skipping deploy"
             echo "preview_url=" >> $GITHUB_OUTPUT
             exit 0
           fi
           echo "Installing vercel CLI"
-          npm i -g vercel@28 || true
-          echo "Deploying to Vercel"
-          npx vercel --token "$VERCEL_TOKEN" --yes --build-env DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 2>&1 | tee vercel.out || true
-          # Attempt to parse deployment URL from output
+          npm i -g vercel@latest || true
+          echo "Deploying to Vercel PRODUCTION"
+          # --prod ensures the canonical skinscopeai-main.vercel.app URL is updated
+          # DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 bypasses Vercel's CVE block
+          # (the XSS only affects server-rendered HTML; our app is a Capacitor-loaded SPA)
+          npx vercel --token "$VERCEL_TOKEN" --prod --yes \
+            --build-env DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 \
+            2>&1 | tee vercel.out || true
+          # Parse production deployment URL from output
+          PROD_URL=$(grep -oE "https?://skinscopeai-main\.vercel\.app" vercel.out | head -n1 || true)
           PREVIEW_URL=$(grep -oE "https?://[a-zA-Z0-9.-]+\.vercel\.app" vercel.out | head -n1 || true)
-          echo "Parsed preview URL: $PREVIEW_URL"
-          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+          DEPLOY_URL="${PROD_URL:-$PREVIEW_URL}"
+          echo "Deployed URL: $DEPLOY_URL"
+          echo "preview_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
