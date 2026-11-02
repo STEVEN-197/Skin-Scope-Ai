@@ -18,7 +18,7 @@ jobs:
   # ──────────────────────────────────────────────
   detect-and-build:
     name: "🔍 Detect Stack & Build"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       framework: ${{ steps.detect.outputs.framework }}
       language: ${{ steps.detect.outputs.language }}
@@ -87,7 +87,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Setup Bun (if needed)
         if: steps.detect.outputs.pkg_manager == 'bun'
@@ -122,7 +122,7 @@ jobs:
   # ──────────────────────────────────────────────
   sast:
     name: "🔒 SAST Scan"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: detect-and-build
     steps:
       - name: Checkout
@@ -131,7 +131,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Run custom SAST scanner
         run: |
@@ -150,7 +150,7 @@ jobs:
   # ──────────────────────────────────────────────
   secret-scan:
     name: "🔑 Secret Scanning"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -220,7 +220,7 @@ jobs:
   # ──────────────────────────────────────────────
   dependency-scan:
     name: "📦 Dependency Scan"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -228,7 +228,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: npm audit
         run: |
@@ -271,7 +271,7 @@ jobs:
   # ──────────────────────────────────────────────
   headers-check:
     name: "🛡️ Security Headers"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -328,7 +328,7 @@ jobs:
   # ──────────────────────────────────────────────
   generate-reports:
     name: "📊 Generate Security Reports"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [detect-and-build, sast, secret-scan, dependency-scan, headers-check]
     if: always()
     steps:
@@ -338,7 +338,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Download all scan artifacts
         uses: actions/download-artifact@v4

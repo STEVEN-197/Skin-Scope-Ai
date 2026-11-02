@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Loader2, Send, Sparkles, AlertTriangle } from "lucide-react";
+import { Loader2, Send, Sparkles, AlertTriangle, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -18,6 +20,7 @@ const STARTER_PROMPTS = [
 ];
 
 export function JarvisChat({ compact = false }: { compact?: boolean }) {
+  const { session } = useAuth();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,7 +31,8 @@ export function JarvisChat({ compact = false }: { compact?: boolean }) {
   }, [messages]);
 
   const send = async (text: string) => {
-    const trimmed = text.trim();
+    // SECURITY FIX (FINDING-009): Validate and sanitize input before sending.
+    const trimmed = text.trim().slice(0, 4000); // cap message length
     if (!trimmed || loading) return;
     const userMsg: Msg = { role: "user", content: trimmed };
     const next = [...messages, userMsg];
@@ -158,28 +162,42 @@ export function JarvisChat({ compact = false }: { compact?: boolean }) {
         </AlertDescription>
       </Alert>
 
-      <form
-        onSubmit={(e) => { e.preventDefault(); send(input); }}
-        className="mt-3 flex items-end gap-2"
-      >
-        <Textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask JARVIS about your health…"
-          rows={2}
-          disabled={loading}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              send(input);
-            }
-          }}
-          className="min-h-[60px] resize-none"
-        />
-        <Button type="submit" disabled={loading || !input.trim()} className="bg-gradient-hero text-primary-foreground hover:opacity-95">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </Button>
-      </form>
+      {!session ? (
+        <div className="mt-3 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Lock className="h-4 w-4 text-primary" />
+            <span>Please sign in to chat with JARVIS AI.</span>
+          </div>
+          <Link to="/login">
+            <Button size="sm" className="bg-gradient-hero text-primary-foreground">
+              Sign in
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <form
+          onSubmit={(e) => { e.preventDefault(); send(input); }}
+          className="mt-3 flex items-end gap-2"
+        >
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask JARVIS about your health…"
+            rows={2}
+            disabled={loading}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send(input);
+              }
+            }}
+            className="min-h-[60px] resize-none"
+          />
+          <Button type="submit" disabled={loading || !input.trim()} className="bg-gradient-hero text-primary-foreground hover:opacity-95">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        </form>
+      )}
     </div>
   );
 }

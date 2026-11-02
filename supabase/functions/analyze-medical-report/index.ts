@@ -3,17 +3,32 @@
 // produce a plain-language summary + comparison vs the user's previous reports.
 
 // @ts-ignore - Deno
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore - Deno ESM
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// SECURITY FIX (FINDING-004): Restrict CORS to known production origins only.
+const ALLOWED_ORIGINS = [
+  "https://skinscopeai-main.vercel.app",
+  "https://skinscopeai.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "capacitor://localhost",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
@@ -57,7 +72,21 @@ serve(async (req: Request) => {
       reportDate?: string;
     } = body;
 
-    if (!mode) return json({ error: "Missing mode" }, 400);
+    // SECURITY FIX (FINDING-010): Validate mode and file-specific fields.
+    const VALID_MODES = ["file", "manual"];
+    if (!mode || !VALID_MODES.includes(mode)) return json({ error: "Invalid or missing mode. Must be 'file' or 'manual'." }, 400);
+    if (mode === "file") {
+      if (!fileBase64 || typeof fileBase64 !== "string" || fileBase64.length > 10_000_000) {
+        return json({ error: "Invalid or missing fileBase64 for file mode." }, 400);
+      }
+      const VALID_MIME = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+      if (!mimeType || !VALID_MIME.includes(mimeType)) {
+        return json({ error: `Invalid mimeType. Allowed: ${VALID_MIME.join(", ")}` }, 400);
+      }
+    }
+    if (mode === "manual" && (!manualValues || typeof manualValues !== "object")) {
+      return json({ error: "manualValues object is required for manual mode." }, 400);
+    }
 
     // Pull last 5 medical reports for trend context
     const { data: history } = await supabase
@@ -192,10 +221,10 @@ Tasks:
     return json({ error: e instanceof Error ? e.message : "Unknown error" }, 500);
   }
 
-  function json(obj: unknown, status = 200) {
+  function json(obj: unknown, status = 200, hdrs: Record<string, string> = corsHeaders) {
     return new Response(JSON.stringify(obj), {
       status,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...hdrs, "Content-Type": "application/json" },
     });
   }
 });

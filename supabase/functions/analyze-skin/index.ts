@@ -3,15 +3,29 @@
 // color features and historical reports to produce a structured assessment.
 
 // @ts-ignore - Deno
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore - Deno ESM import
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// SECURITY FIX (FINDING-004): Restrict CORS to known production origins only.
+const ALLOWED_ORIGINS = [
+  "https://skinscopeai-main.vercel.app",
+  "https://skinscopeai.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "capacitor://localhost",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
 
 interface ColorFeatures {
   yellowRatio: number;
@@ -51,6 +65,7 @@ function severityFromScore(s: number): "none" | "mild" | "moderate" | "severe" {
 }
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -103,8 +118,28 @@ serve(async (req: Request) => {
       ruleResult: RuleResult;
     } = body;
 
-    if (!imageBase64 || !region || !colorFeatures || !ruleResult) {
-      return new Response(JSON.stringify({ error: "Missing fields" }), {
+    // SECURITY FIX (FINDING-010): Strict input validation.
+    const VALID_REGIONS = ["eye", "skin", "palm"];
+    if (!imageBase64 || typeof imageBase64 !== "string" || imageBase64.length > 5_000_000) {
+      return new Response(JSON.stringify({ error: "Invalid or missing imageBase64" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!region || !VALID_REGIONS.includes(region)) {
+      return new Response(JSON.stringify({ error: `Invalid region. Must be one of: ${VALID_REGIONS.join(", ")}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!colorFeatures || typeof colorFeatures !== "object") {
+      return new Response(JSON.stringify({ error: "Invalid colorFeatures" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (!ruleResult || typeof ruleResult !== "object") {
+      return new Response(JSON.stringify({ error: "Invalid ruleResult" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -36,13 +36,14 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // Check if a session exists in localStorage (e.g. while auth is hydrating)
+  // SECURITY FIX (FINDING-002): Removed mock user authentication bypass.
+  // Only check for a real Supabase auth token (sb-*-auth-token) to determine
+  // if the session is still hydrating, preventing premature redirect to login.
   const hasStoredSession =
     typeof window !== "undefined" &&
-    (localStorage.getItem("mock-user-logged-in") === "true" ||
       Object.keys(localStorage).some(
         (k) => k.startsWith("sb-") && k.endsWith("-auth-token"),
-      ));
+      );
 
   if (loading || (hasStoredSession && !user)) {
     return (

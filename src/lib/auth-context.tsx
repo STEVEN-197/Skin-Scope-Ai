@@ -31,27 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncSession(nextSession);
     };
 
-    if (
-      typeof window !== "undefined" &&
-      localStorage.getItem("mock-user-logged-in") === "true"
-    ) {
-      safeSync({
-        access_token: "mock-token",
-        token_type: "bearer",
-        expires_in: 3600,
-        refresh_token: "mock-refresh",
-        user: {
-          id: "mock-user-id",
-          email: "test@example.com",
-          created_at: new Date().toISOString(),
-          app_metadata: {},
-          user_metadata: {},
-          aud: "authenticated",
-          role: "authenticated",
-        },
-      });
-      return;
-    }
+    // SECURITY FIX (FINDING-002): Removed mock authentication bypass.
+    // Previously a localStorage flag could be set to bypass real authentication,
+    // allowing unauthenticated access to protected routes. All auth must now
+    // go through Supabase's verified session flow.
 
     const {
       data: { subscription },
@@ -77,9 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("mock-user-logged-in");
-    }
     syncSession(null);
     await supabase.auth.signOut();
   };

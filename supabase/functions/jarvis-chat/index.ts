@@ -1,16 +1,32 @@
 // JARVIS health assistant — streaming chat with personal health context.
 // @ts-ignore
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// SECURITY FIX (FINDING-004): Restrict CORS to known production origins only.
+const ALLOWED_ORIGINS = [
+  "https://skinscopeai-main.vercel.app",
+  "https://skinscopeai.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "capacitor://localhost",
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Vary": "Origin",
+  };
+}
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
@@ -45,6 +61,18 @@ serve(async (req: Request) => {
     }
 
     const { messages } = await req.json();
+    // SECURITY FIX (FINDING-010): Validate messages array.
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      return new Response(JSON.stringify({ error: "Invalid messages: must be a non-empty array with at most 50 items." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // Sanitize each message: only allow role/content, truncate long content.
+    const sanitizedMessages = messages.map((m: any) => ({
+      role: ["user", "assistant", "system"].includes(m?.role) ? m.role : "user",
+      content: typeof m?.content === "string" ? m.content.slice(0, 8000) : "",
+    }));
     const userId = u.user.id;
 
     // Pull personal health context (small slice)
@@ -82,7 +110,7 @@ ${context}`;
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         stream: true,
-        messages: [{ role: "system", content: systemPrompt }, ...messages],
+        messages: [{ role: "system", content: systemPrompt }, ...sanitizedMessages],
       }),
     });
 

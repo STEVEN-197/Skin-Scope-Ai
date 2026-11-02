@@ -183,10 +183,11 @@ function AnalyzePage() {
       const colorFeatures = await analyzeImageFile(file);
       const ruleResult = applyRegionRules(region, colorFeatures);
 
-      // 3. Upload image to private storage
+      // 3. Upload image to private storage (cryptographically secure path naming)
       setStage("Uploading image securely…");
       const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const fileId = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`;
+      const path = `${user.id}/${fileId}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("skin-images")
         .upload(path, file, { contentType: file.type });

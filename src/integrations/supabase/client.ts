@@ -2,23 +2,29 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Hardcoded fallback values for the native APK build
-// These are the public anon keys — safe to embed in client code
-const FALLBACK_URL = 'https://nrvptzzddpenyvcndcph.supabase.co';
-const FALLBACK_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E';
+// SECURITY FIX (FINDING-006): Removed hardcoded fallback credentials from source code.
+// Keys must be provided via environment variables. For Capacitor/native builds,
+// use a build-time injection script or a runtime config fetch from a secure endpoint.
+// Public anon keys must never be hard-coded in tracked source files.
 
 function createSupabaseClient() {
   // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR, then to hardcoded values for native APK
+  // Fall back to process.env for SSR contexts
   const SUPABASE_URL =
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
     (typeof process !== 'undefined' && process.env?.SUPABASE_URL) ||
-    FALLBACK_URL;
+    '';
   const SUPABASE_PUBLISHABLE_KEY =
     (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY) ||
     (typeof process !== 'undefined' && process.env?.SUPABASE_PUBLISHABLE_KEY) ||
-    FALLBACK_KEY;
+    '';
+
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    console.error(
+      '[SkinScope] Missing Supabase configuration. ' +
+      'Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY environment variables.'
+    );
+  }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {

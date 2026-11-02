@@ -116,11 +116,11 @@ function SignupPage() {
                 type="password"
                 required
                 autoComplete="new-password"
-                minLength={6}
+                minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">At least 6 characters</p>
+              <p className="text-xs text-muted-foreground">At least 8 characters, one uppercase letter and one number</p>
             </div>
             <Button
               type="submit"

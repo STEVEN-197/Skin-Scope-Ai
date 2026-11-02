@@ -18,7 +18,7 @@ jobs:
   # ========================================================
   selenium-web-e2e:
     name: "🌐 Selenium Web Tests (300 Cases)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
@@ -72,7 +72,7 @@ jobs:
   # ========================================================
   appium-mobile-e2e:
     name: "📱 Appium Mobile Tests (300 Cases)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci
@@ -117,7 +117,7 @@ jobs:
   # ========================================================
   baseline-load-testing:
     name: "⚡ Baseline / Load Testing (100 Users)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -173,7 +173,7 @@ jobs:
   # ========================================================
   security-assessment:
     name: "🔒 DevSecOps Security Review & Excel Artifacts"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -181,7 +181,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci

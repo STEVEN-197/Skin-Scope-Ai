@@ -2,7 +2,7 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import { AuthProvider } from "@/lib/auth-context";
 import { InstallPrompt } from "@/components/InstallPrompt";
 
-import appCss from "../styles.css?url";
+import appCss from "@/styles.css?url";
 
 function NotFoundComponent() {
   return (

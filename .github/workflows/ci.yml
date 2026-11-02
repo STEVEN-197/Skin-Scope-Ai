@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       actions: write
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Setup Bun (when present)
         if: steps.pm_check.outputs.bun == 'true'
@@ -69,7 +69,7 @@ jobs:
           path: build-summary.txt
 
   deploy_preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     outputs:
       preview_url: ${{ steps.vercel_deploy.outputs.preview_url }}
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Deploy to Vercel (production)
         id: vercel_deploy
@@ -109,7 +109,7 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   selenium:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build, deploy_preview]
     steps:
       - name: Checkout
@@ -123,7 +123,7 @@ jobs:
       - name: Setup Node (for static server)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Serve `dist/` on :8080 or use preview URL
         run: |
@@ -175,7 +175,7 @@ jobs:
           path: selenium-results.xml
 
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - name: Checkout
@@ -184,7 +184,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install deps
         run: npm ci
@@ -219,7 +219,7 @@ jobs:
           path: checks-summary.txt
 
   secret-scan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Scan repository for leaked tokens (sk_live_, sk_test_, service_role)
@@ -238,20 +238,20 @@ jobs:
           path: secret-scan.txt
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - name: Install deps
         run: npm ci
       - name: Run linters
         run: npm run lint || true
 
   deploy_netlify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
@@ -261,7 +261,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Install dependencies
         run: npm ci

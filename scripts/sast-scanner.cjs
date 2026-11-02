@@ -49,7 +49,7 @@ const PATTERNS = [
   // Injection
   { id: "INJ001", severity: "Critical", category: "SQL Injection", pattern: /`[^`]*\$\{[^}]*\}[^`]*(?:SELECT|INSERT|UPDATE|DELETE|DROP|ALTER)\b/gi, description: "Potential SQL injection via template literal" },
   { id: "INJ002", severity: "High", category: "Command Injection", pattern: /(?:exec|execSync|spawn|execFile)\s*\([^)]*\$\{/g, description: "Potential command injection via template literal" },
-  { id: "INJ003", severity: "Medium", category: "Path Traversal", pattern: /\.\.\//g, description: "Relative path traversal pattern", maxPerFile: 1 },
+  { id: "INJ003", severity: "Medium", category: "Path Traversal", pattern: /\.\.\//g, description: "Relative path traversal pattern", maxPerFile: 1, exclude: ["import ", "from ", "require("] },
 
   // Crypto
   { id: "CRY001", severity: "Medium", category: "Weak Crypto", pattern: /Math\.random\(\)/g, description: "Use of Math.random() — not cryptographically secure" },
@@ -65,7 +65,7 @@ const PATTERNS = [
 
 // ─── File Scanner ───
 const SCAN_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".json", ".env", ".toml", ".yml", ".yaml"];
-const EXCLUDE_DIRS = ["node_modules", ".git", "dist", ".tanstack", ".netlify", ".wrangler", "bun.lockb"];
+const EXCLUDE_DIRS = ["node_modules", ".git", "dist", ".tanstack", ".netlify", ".wrangler", "bun.lockb", "android", "apk-fixed", "apk-login-fixed", "apk-output", "apk-vercel", "Vulnerability Test Results"];
 
 function getFiles(dir) {
   const results = [];
