@@ -25,7 +25,7 @@ jobs:
       pkg_manager: ${{ steps.detect.outputs.pkg_manager }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Detect backend technology
         id: detect
@@ -85,7 +85,7 @@ jobs:
           echo "=== Detection Complete ==="
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
 
@@ -110,7 +110,7 @@ jobs:
           fi
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-output
           path: |
@@ -126,10 +126,10 @@ jobs:
     needs: detect-and-build
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
 
@@ -138,7 +138,7 @@ jobs:
           node scripts/sast-scanner.cjs --json 2>&1 | tee sast-output.txt
 
       - name: Upload SAST results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sast-results
           path: |
@@ -153,12 +153,12 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -215,7 +215,7 @@ jobs:
           cat secret-scan-results.txt
 
       - name: Upload secret scan results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: secret-scan-results
           path: secret-scan-results.txt
@@ -228,10 +228,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
 
@@ -262,7 +262,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload dependency scan results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dependency-scan-results
           path: |
@@ -279,10 +279,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -328,7 +328,7 @@ jobs:
           cat headers-report.txt
 
       - name: Upload headers report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: headers-report
           path: headers-report.txt
@@ -343,10 +343,10 @@ jobs:
     if: always()
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
 
@@ -407,7 +407,7 @@ jobs:
           echo "| Package Manager | ${{ needs.detect-and-build.outputs.pkg_manager }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload complete security reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: security-reports
           path: Vulnerability Test Results/

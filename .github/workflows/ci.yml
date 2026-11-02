@@ -15,7 +15,7 @@ jobs:
       actions: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check for Bun
         id: pm_check
@@ -23,7 +23,7 @@ jobs:
           if [ -f "bun.lockb" ]; then echo "bun=true" >> "$GITHUB_OUTPUT"; else echo "bun=false" >> "$GITHUB_OUTPUT"; fi
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Upload build log and artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifacts
           path: |
@@ -63,7 +63,7 @@ jobs:
           if grep -q "error" build.log -i; then echo "BUILD_STATUS=FAIL" > build-summary.txt; else echo "BUILD_STATUS=PASS" > build-summary.txt; fi
           echo "Build log size:" $(wc -c < build.log) >> build-summary.txt
       - name: Upload build summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-summary
           path: build-summary.txt
@@ -75,10 +75,10 @@ jobs:
       preview_url: ${{ steps.vercel_deploy.outputs.preview_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -113,7 +113,7 @@ jobs:
     needs: [build, deploy_preview]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -121,7 +121,7 @@ jobs:
           path: build_artifacts
 
       - name: Setup Node (for static server)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -169,7 +169,7 @@ jobs:
           python scripts/generate-test-summary.py || true
 
       - name: Upload Selenium results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: selenium-results
           path: selenium-results.xml
@@ -179,10 +179,10 @@ jobs:
     needs: build
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -200,7 +200,7 @@ jobs:
           npx eslint "src/**/*.{ts,tsx,js,jsx}" -f unix 2>&1 | tee eslint-output.txt || true
 
       - name: Upload static-analysis artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: static-analysis
           path: |
@@ -213,7 +213,7 @@ jobs:
           echo "ESLINT_ERRORS=$(grep -ic "error" eslint-output.txt || true)" >> checks-summary.txt
         continue-on-error: true
       - name: Upload checks summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: checks-summary
           path: checks-summary.txt
@@ -221,9 +221,9 @@ jobs:
   secret-scan:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
       - name: Scan repository for leaked tokens (sk_live_, sk_test_, service_role)
@@ -236,7 +236,7 @@ jobs:
           grep -RIn --exclude-dir=node_modules --exclude-dir=.git "sk_live_\|sk_test_\|service_role\|SUPABASE_SERVICE_ROLE_KEY\|LOVABLE_API_KEY" > secret-scan.txt || true
         continue-on-error: true
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: secret-scan
           path: secret-scan.txt
@@ -244,9 +244,9 @@ jobs:
   lint:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
       - name: Install deps
@@ -260,10 +260,10 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
