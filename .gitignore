@@ -40,3 +40,16 @@ dist-ssr
 .netlify
 
 .vercel
+
+# Android build outputs & local models
+*.apk
+release-apk/
+apk-output/*.apk
+apk-fixed/*.apk
+apk-login-fixed/*.apk
+apk-vercel/*.apk
+android/app/src/main/assets/models/
+android/local.properties
+android/.gradle
+android/app/build/
+android/build/
