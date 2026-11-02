@@ -222,6 +222,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Scan repository for leaked tokens (sk_live_, sk_test_, service_role)
         run: |
           set -e
