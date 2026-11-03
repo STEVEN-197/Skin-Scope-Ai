@@ -41,6 +41,11 @@ jobs:
 
       - name: Build
         id: build_step
+        env:
+          VITE_SUPABASE_URL: "https://nrvptzzddpenyvcndcph.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E"
+          VITE_SUPABASE_PROJECT_ID: "nrvptzzddpenyvcndcph"
+          DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS: "1"
         run: |
           set -o pipefail
           if [ "${{ steps.pm_check.outputs.bun }}" == "true" ]; then
@@ -77,6 +82,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: build-artifacts
+          path: build_artifacts
+
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
@@ -92,13 +103,58 @@ jobs:
           fi
           echo "Installing vercel CLI"
           npm i -g vercel@latest || true
-          echo "Deploying to Vercel PRODUCTION"
-          # --prod ensures the canonical skinscopeai-main.vercel.app URL is updated
-          # DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 bypasses Vercel's CVE block
-          # (the XSS only affects server-rendered HTML; our app is a Capacitor-loaded SPA)
+          echo "Linking Vercel project skinscopeai-main"
+          mkdir -p .vercel
+          cat << 'EOF' > .vercel/project.json
+          {"projectId":"prj_JcKAqg0iLG7YpGYJYEUuuidkDnJf","orgId":"team_I1xsSxCdaleG5NjpBAxDzx1w","projectName":"skinscopeai-main"}
+          EOF
+
+          # Prepare Build Output API v3 (.vercel/output) from verified build_artifacts/dist/client
+          mkdir -p .vercel/output/static
+          cp -r build_artifacts/dist/client/* .vercel/output/static/
+          cat << 'EOF' > .vercel/output/config.json
+          {
+            "version": 3,
+            "routes": [
+              {
+                "src": "/(.*)",
+                "headers": {
+                  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+                  "X-Content-Type-Options": "nosniff",
+                  "X-Frame-Options": "DENY",
+                  "X-XSS-Protection": "1; mode=block",
+                  "X-Permitted-Cross-Domain-Policies": "none",
+                  "Referrer-Policy": "strict-origin-when-cross-origin",
+                  "Permissions-Policy": "camera=(self), microphone=(), geolocation=()"
+                },
+                "continue": true
+              },
+              {
+                "src": "/assets/(.*)",
+                "headers": {
+                  "Cache-Control": "public, max-age=31536000, immutable"
+                },
+                "continue": true
+              },
+              { "handle": "filesystem" },
+              { "src": "/(.*)", "dest": "/index.html" }
+            ]
+          }
+          EOF
+
+          echo "Verifying .vercel/output/static/index.html size:"
+          ls -lh .vercel/output/static/index.html
+          head -c 200 .vercel/output/static/index.html
+          echo ""
+
+          echo "Deploying prebuilt output to Vercel PRODUCTION"
+          npx vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1 | tee vercel.out || \
           npx vercel --token "$VERCEL_TOKEN" --prod --yes \
             --build-env DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 \
-            2>&1 | tee vercel.out || true
+            --build-env VITE_SUPABASE_URL="https://nrvptzzddpenyvcndcph.supabase.co" \
+            --build-env VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E" \
+            2>&1 | tee -a vercel.out || true
+
           # Parse production deployment URL from output
           PROD_URL=$(grep -oE "https?://skinscopeai-main\.vercel\.app" vercel.out | head -n1 || true)
           PREVIEW_URL=$(grep -oE "https?://[a-zA-Z0-9.-]+\.vercel\.app" vercel.out | head -n1 || true)
@@ -107,6 +163,8 @@ jobs:
           echo "preview_url=$DEPLOY_URL" >> $GITHUB_OUTPUT
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_I1xsSxCdaleG5NjpBAxDzx1w
+          VERCEL_PROJECT_ID: prj_JcKAqg0iLG7YpGYJYEUuuidkDnJf
 
   selenium:
     runs-on: ubuntu-24.04
@@ -115,7 +173,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: build-artifacts
           path: build_artifacts
@@ -138,7 +196,7 @@ jobs:
           fi
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
