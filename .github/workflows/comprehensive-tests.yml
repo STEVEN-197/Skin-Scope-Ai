@@ -62,7 +62,7 @@ jobs:
           echo "| Output Artifact | \`Selenium_Web_Test_Report.xlsx\` |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Selenium Excel Report Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: selenium-web-test-report
           path: selenium-tests/Selenium_Web_Test_Report.xlsx
@@ -107,7 +107,7 @@ jobs:
           echo "| Output Artifact | \`Appium_Mobile_Test_Report.xlsx\` |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Appium Excel Report Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: appium-mobile-test-report
           path: appium-tests/Appium_Mobile_Test_Report.xlsx
@@ -168,7 +168,7 @@ jobs:
 
       - name: Upload Load Testing Results
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: load-testing-results
           path: load-tests/
@@ -215,7 +215,7 @@ jobs:
           fi
 
       - name: Upload Security Excel Workbooks & Markdown Reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: security-assessment-reports
           path: |
