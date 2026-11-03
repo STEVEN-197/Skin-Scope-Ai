@@ -1,4 +1,4 @@
-import { createRouter, useRouter, createHashHistory, createBrowserHistory } from "@tanstack/react-router";
+import { createRouter, useRouter, createHashHistory, createBrowserHistory, createMemoryHistory } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
 function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
@@ -67,8 +67,8 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
 
 function getHistory() {
   if (typeof window === 'undefined') {
-    // SSR context — browser history placeholder
-    return createBrowserHistory();
+    // SSR context — memory history prevents window.history TypeError on server
+    return createMemoryHistory({ initialEntries: ['/'] });
   }
 
   // Check if loaded from a real HTTP/HTTPS origin (Vercel or dev server)

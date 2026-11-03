@@ -9,19 +9,8 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
 
   server: {
-    // ⚡ Point native WebView to live Vercel deployment
     url: VERCEL_URL,
     androidScheme: 'https',
-    hostname: 'skinscopeai-main.vercel.app',
-    // Allow all navigation so WebView can reach Supabase, CDNs, and Vercel routes freely
-    allowNavigation: [
-      'skinscopeai-main.vercel.app',
-      '*.vercel.app',
-      '*.supabase.co',
-      '*.supabase.in',
-      'nrvptzzddpenyvcndcph.supabase.co',
-      '*',
-    ],
     cleartext: true,
   },
 
@@ -33,7 +22,7 @@ const config: CapacitorConfig = {
 
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2500,
+      launchShowDuration: 1500,
       launchAutoHide: true,
       backgroundColor: '#0F172A',
       androidSplashResourceName: 'splash',
@@ -42,9 +31,6 @@ const config: CapacitorConfig = {
     Camera: {
       androidScaleType: 'CENTER_CROP',
     },
-    // NOTE: CapacitorHttp is intentionally NOT enabled here.
-    // Enabling CapacitorHttp breaks @supabase/supabase-js because it intercepts
-    // window.fetch and drops auth headers/cookies.
   },
 };
 
