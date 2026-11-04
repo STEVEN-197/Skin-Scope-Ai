@@ -43,15 +43,19 @@ dist-ssr
 !.vercel/project.json
 !.vercel/README.txt
 
-# Android build outputs & local models
-*.apk
+# React Native + Expo & Android build intermediates
 release-apk/
-apk-output/*.apk
-apk-fixed/*.apk
-apk-login-fixed/*.apk
-apk-vercel/*.apk
-android/app/src/main/assets/models/
-android/local.properties
-android/.gradle
-android/app/build/
-android/build/
+mobile/node_modules/
+mobile/.expo/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/local.properties
+mobile/android/app/.cxx/
+mobile/android/app/build/*
+!mobile/android/app/build/outputs/
+mobile/android/app/build/outputs/*
+!mobile/android/app/build/outputs/apk/
+mobile/android/app/build/outputs/apk/*
+!mobile/android/app/build/outputs/apk/release/
+!mobile/android/app/build/outputs/apk/release/app-release.apk
+!mobile/android/app/build/outputs/apk/release/output-metadata.json

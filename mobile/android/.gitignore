@@ -1,0 +1,28 @@
+# OSX
+.DS_Store
+
+# Android/IntelliJ
+/build/
+.idea
+.gradle
+local.properties
+*.iml
+*.hprof
+.cxx/
+gradle/gradle-daemon-jvm.properties
+
+# App build intermediates (keep verified release APK)
+app/build/*
+!app/build/outputs/
+app/build/outputs/*
+!app/build/outputs/apk/
+app/build/outputs/apk/*
+!app/build/outputs/apk/release/
+!app/build/outputs/apk/release/app-release.apk
+!app/build/outputs/apk/release/output-metadata.json
+
+# generated inline modules
+app/src/main/java/inline/
+
+# Bundle artifacts
+*.jsbundle

@@ -102,8 +102,10 @@ jobs:
           echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Total Mobile Cases | 300 |" >> $GITHUB_STEP_SUMMARY
+          echo "| Mobile Stack | React Native 0.88 + Expo SDK 55 + Expo Router |" >> $GITHUB_STEP_SUMMARY
           echo "| Framework | Appium 2.x + UiAutomator2 |" >> $GITHUB_STEP_SUMMARY
           echo "| App ID | \`app.lovable.skinscopeai\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Verified Release APK | \`mobile/android/app/build/outputs/apk/release/app-release.apk\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Output Artifact | \`Appium_Mobile_Test_Report.xlsx\` |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Appium Excel Report Artifact

@@ -9,7 +9,7 @@ SHOTS = pathlib.Path(__file__).resolve().parents[1] / "mobile-screenshots"
 SHOTS.mkdir(parents=True, exist_ok=True)
 
 APPIUM_SERVER = os.getenv("APPIUM_SERVER", "http://localhost:4723")
-APK_PATH = os.getenv("APK_PATH", "android/app/build/outputs/apk/debug/app-debug.apk")
+APK_PATH = os.getenv("APK_PATH", "mobile/android/app/build/outputs/apk/release/app-release.apk")
 APP_PACKAGE = os.getenv("APP_PACKAGE", "app.lovable.skinscopeai")
 APP_ACTIVITY = os.getenv("APP_ACTIVITY", ".MainActivity")
 
