@@ -36,6 +36,7 @@ public class MainActivity extends BridgeActivity {
             webView.post(new Runnable() {
                 @Override
                 public void run() {
+                    webView.clearCache(true);
                     webView.loadUrl(VERCEL_URL);
                 }
             });
