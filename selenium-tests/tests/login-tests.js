@@ -181,32 +181,18 @@ async function buildDriver() {
     "--window-size=1440,900",
   );
 
-  // Prefer the matching Chromium binary when Ubuntu's chromium-chromedriver is installed,
-  // because snap chromedriver cannot launch external /usr/bin/google-chrome paths.
-  const driverPath = [
-    process.env.CHROMEDRIVER_PATH,
-    "/usr/bin/chromedriver",
-    "/snap/bin/chromium.chromedriver",
+  // On Windows or Linux with standard Chrome (/opt/google/chrome/chrome), selenium-manager
+  // resolves the matching driver automatically. Only override when an explicit env var is passed
+  // or when only Chromium is installed.
+  const driverPath = [process.env.CHROMEDRIVER_PATH].find((p) => p && fs.existsSync(p));
+  const chromeBinary = [
+    process.env.CHROME_BIN,
+    fs.existsSync("/opt/google/chrome/chrome") ? "/opt/google/chrome/chrome" : null,
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
   ].find((p) => p && fs.existsSync(p));
 
-  const candidates = driverPath
-    ? [
-        process.env.CHROME_BIN,
-        "/snap/bin/chromium",
-        "/usr/bin/chromium-browser",
-        "/usr/bin/chromium",
-        "/usr/bin/google-chrome",
-      ]
-    : [
-        process.env.CHROME_BIN,
-        "/usr/bin/google-chrome",
-        "/usr/bin/chromium-browser",
-        "/usr/bin/chromium",
-        "/snap/bin/chromium",
-      ];
-
-  const binary = candidates.find((p) => p && fs.existsSync(p));
-  if (binary) options.setChromeBinaryPath(binary);
+  if (chromeBinary) options.setChromeBinaryPath(chromeBinary);
 
   const builder = new sw.Builder().forBrowser("chrome").setChromeOptions(options);
   if (driverPath) builder.setChromeService(new chrome.ServiceBuilder(driverPath));

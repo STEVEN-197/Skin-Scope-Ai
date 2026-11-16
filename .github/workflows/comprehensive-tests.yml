@@ -34,7 +34,11 @@ jobs:
       - name: Setup Chrome & Headless Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb chromium-browser chromium-chromedriver
+          sudo apt-get install -y xvfb wget
+          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+          rm -f google-chrome-stable_current_amd64.deb
+          google-chrome --version
 
       - name: Install Selenium WebDriver (test-only, not saved to package.json)
         run: npm install --no-save selenium-webdriver
