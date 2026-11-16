@@ -84,6 +84,7 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
           '
       - name: Upload Selenium Excel Report Artifact
+        if: always()
         uses: actions/upload-artifact@v6
         with:
           name: selenium-web-test-report

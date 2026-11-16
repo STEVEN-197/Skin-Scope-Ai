@@ -180,7 +180,26 @@ async function buildDriver() {
     "--disable-gpu",
     "--window-size=1440,900",
   );
-  return new sw.Builder().forBrowser("chrome").setChromeOptions(options).build();
+
+  // Locate Chrome/Chromium binary (Linux runners often install Chromium instead of /opt/google/chrome/chrome).
+  const binary = [
+    process.env.CHROME_BIN,
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+    "/snap/bin/chromium",
+  ].find((p) => p && fs.existsSync(p));
+  if (binary) options.setChromeBinaryPath(binary);
+
+  const driverPath = [
+    process.env.CHROMEDRIVER_PATH,
+    "/usr/bin/chromedriver",
+    "/snap/bin/chromium.chromedriver",
+  ].find((p) => p && fs.existsSync(p));
+
+  const builder = new sw.Builder().forBrowser("chrome").setChromeOptions(options);
+  if (driverPath) builder.setChromeService(new chrome.ServiceBuilder(driverPath));
+  return builder.build();
 }
 
 async function runChecks() {
