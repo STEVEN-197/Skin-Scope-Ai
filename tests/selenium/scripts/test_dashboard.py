@@ -5,11 +5,15 @@ from tests.selenium.utils.helpers import login, wait_for
 
 
 @pytest.fixture(autouse=True)
-def _login(driver, base_url, test_user):
-    try:
-        login(driver, base_url, test_user["email"], test_user["password"])
-    except Exception:
-        pytest.skip("Login unavailable")
+def _login(request, base_url, test_user):
+    # Dashboard pages require a real session; unauthenticated visitors are (correctly)
+    # redirected to /login, so these tests only make sense with a real account.
+    if not (test_user["email"] and test_user["password"]):
+        pytest.skip("Needs a real account: set TEST_USER_EMAIL and TEST_USER_PASSWORD")
+    # Resolve driver only when credentials exist so we don't spin up Chrome 57 times to skip.
+    driver = request.getfixturevalue("driver")
+    # A real login failure must fail the test, not be silently skipped.
+    login(driver, base_url, test_user["email"], test_user["password"])
 
 
 @pytest.mark.parametrize("size", [(1440, 900), (768, 1024), (375, 812)])

@@ -52,7 +52,11 @@ def pytest_runtest_makereport(item, call):
 
 @pytest.fixture
 def test_user():
+    """Real account used for authenticated tests (no fake default account).
+
+    Set TEST_USER_EMAIL / TEST_USER_PASSWORD (env or GitHub secrets) to enable them.
+    """
     return {
-        "email": os.getenv("TEST_USER_EMAIL", "test@example.com"),
-        "password": os.getenv("TEST_USER_PASSWORD", "TestPassword123!"),
+        "email": os.getenv("TEST_USER_EMAIL", ""),
+        "password": os.getenv("TEST_USER_PASSWORD", ""),
     }

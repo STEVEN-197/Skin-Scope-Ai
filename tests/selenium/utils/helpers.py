@@ -13,7 +13,14 @@ def wait_clickable(driver, locator, timeout=10):
 
 
 def login(driver, base_url, email, password):
+    """Sign in through the real login form (Supabase auth).
+
+    The old localStorage 'mock-user-logged-in' bypass was removed from the app
+    (security finding FINDING-002), so tests must authenticate for real.
+    Raises TimeoutException if the account cannot reach /dashboard.
+    """
     driver.get(f"{base_url}/login")
-    driver.execute_script("localStorage.setItem('mock-user-logged-in', 'true')")
-    driver.get(f"{base_url}/dashboard")
-    WebDriverWait(driver, 15).until(lambda d: "/dashboard" in d.current_url)
+    wait_for(driver, (By.ID, "email"), timeout=15).send_keys(email)
+    driver.find_element(By.ID, "password").send_keys(password)
+    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    WebDriverWait(driver, 20).until(lambda d: "/dashboard" in d.current_url)

@@ -31,12 +31,12 @@ def test_signup_page_loads(driver, base_url):
 
 
 @pytest.mark.auth
-def test_valid_login(driver, base_url, test_user):
+def test_valid_login(request, base_url, test_user):
     pytest.importorskip("dotenv")
-    try:
-        login(driver, base_url, test_user["email"], test_user["password"])
-    except Exception:
-        pytest.skip("Test account not provisioned")
+    if not (test_user["email"] and test_user["password"]):
+        pytest.skip("Needs a real account: set TEST_USER_EMAIL and TEST_USER_PASSWORD")
+    driver = request.getfixturevalue("driver")
+    login(driver, base_url, test_user["email"], test_user["password"])
     assert "/dashboard" in driver.current_url
 
 

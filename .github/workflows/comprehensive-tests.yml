@@ -36,31 +36,53 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y xvfb chromium-browser chromium-chromedriver
 
+      - name: Install Selenium WebDriver (test-only, not saved to package.json)
+        run: npm install --no-save selenium-webdriver
+
       - name: Run Selenium E2E Suite & Generate Excel Report
         env:
           SKINSCOPE_BASE_URL: https://skinscopeai-main.vercel.app
           HEADLESS: "true"
         run: |
-          xvfb-run -a node selenium-tests/tests/login-tests.cjs
+          xvfb-run -a node selenium-tests/tests/login-tests.js
 
       - name: Render Selenium Test Summary in GitHub
         if: always()
         run: |
-          echo "## 🌐 Selenium Web E2E Test Suite (300 Cases)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo '```mermaid' >> $GITHUB_STEP_SUMMARY
-          echo 'pie title Selenium Web Test Cases (300 Scenarios)' >> $GITHUB_STEP_SUMMARY
-          echo '    "Functional (180)" : 180' >> $GITHUB_STEP_SUMMARY
-          echo '    "Validation (90)" : 90' >> $GITHUB_STEP_SUMMARY
-          echo '    "Security & RBAC (30)" : 30' >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Test Cases | 300 |" >> $GITHUB_STEP_SUMMARY
-          echo "| Status | PASS (100%) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Output Artifact | \`Selenium_Web_Test_Report.xlsx\` |" >> $GITHUB_STEP_SUMMARY
-
+          node -e '
+            const fs = require("fs");
+            const f = "selenium-tests/selenium-audit-summary.json";
+            const s = fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null;
+            const lines = ["## 🌐 Selenium Web E2E Suite (Real Browser Checks)", ""];
+            if (!s) {
+              lines.push("> No summary was produced - the runner did not complete.");
+            } else {
+              lines.push(
+                "```mermaid",
+                "pie title Selenium Test Plan (" + s.total + " cases)",
+                `    "Passed (${s.passed})" : ${s.passed}`,
+                `    "Failed (${s.failed})" : ${s.failed}`,
+                `    "Not executed (${s.notExecuted})" : ${s.notExecuted}`,
+                "```",
+                "",
+                "| Metric | Value |",
+                "|---|---|",
+                `| Planned cases | ${s.total} |`,
+                `| Executed in headless Chrome | ${s.executed} |`,
+                `| Passed | ${s.passed} |`,
+                `| Failed | ${s.failed} |`,
+                `| Not executed (needs authenticated session) | ${s.notExecuted} |`,
+                `| Target | ${s.baseUrl} |`,
+                "| Output Artifact | `Selenium_Web_Test_Report.xlsx` |",
+                ""
+              );
+              if (s.driverError) lines.push("> ⚠️ " + s.driverError, "");
+              for (const c of s.checks) {
+                lines.push(`- ${c.status === "PASS" ? "✅" : "❌"} \`${c.id}\` ${c.name}${c.status === "FAIL" ? " - " + c.details : ""}`);
+              }
+            }
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+          '
       - name: Upload Selenium Excel Report Artifact
         uses: actions/upload-artifact@v6
         with:
@@ -86,7 +108,7 @@ jobs:
         run: npm ci
 
       - name: Run Appium Mobile Suite & Generate Excel Report
-        run: node appium-tests/app-tests.cjs
+        run: node appium-tests/app-tests.js
 
       - name: Render Appium Test Summary in GitHub
         if: always()

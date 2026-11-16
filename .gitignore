@@ -60,3 +60,11 @@ mobile/android/app/build/outputs/apk/*
 !mobile/android/app/build/outputs/apk/release/app-release.apk
 !mobile/android/app/build/outputs/apk/release/output-metadata.json
 backups/
+
+# Python / pytest / transient test outputs
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/screenshots/*.png
+tests/reports/
+tests/reports_latest/

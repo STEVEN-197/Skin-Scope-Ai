@@ -110,7 +110,7 @@ jobs:
           fi
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: build-output
           path: |
@@ -138,7 +138,7 @@ jobs:
           node scripts/sast-scanner.cjs --json 2>&1 | tee sast-output.txt
 
       - name: Upload SAST results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: sast-results
           path: |
@@ -163,7 +163,7 @@ jobs:
           node-version: '24'
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -215,7 +215,7 @@ jobs:
           cat secret-scan-results.txt
 
       - name: Upload secret scan results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: secret-scan-results
           path: secret-scan-results.txt
@@ -262,7 +262,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload dependency scan results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: dependency-scan-results
           path: |
@@ -328,7 +328,7 @@ jobs:
           cat headers-report.txt
 
       - name: Upload headers report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: headers-report
           path: headers-report.txt
@@ -351,7 +351,7 @@ jobs:
           node-version: "24"
 
       - name: Download all scan artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: scan-artifacts
 
@@ -407,7 +407,7 @@ jobs:
           echo "| Package Manager | ${{ needs.detect-and-build.outputs.pkg_manager }} |" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload complete security reports
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: security-reports
           path: Vulnerability Test Results/
