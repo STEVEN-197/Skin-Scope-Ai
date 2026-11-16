@@ -181,21 +181,32 @@ async function buildDriver() {
     "--window-size=1440,900",
   );
 
-  // Locate Chrome/Chromium binary (Linux runners often install Chromium instead of /opt/google/chrome/chrome).
-  const binary = [
-    process.env.CHROME_BIN,
-    "/usr/bin/google-chrome",
-    "/usr/bin/chromium-browser",
-    "/usr/bin/chromium",
-    "/snap/bin/chromium",
-  ].find((p) => p && fs.existsSync(p));
-  if (binary) options.setChromeBinaryPath(binary);
-
+  // Prefer the matching Chromium binary when Ubuntu's chromium-chromedriver is installed,
+  // because snap chromedriver cannot launch external /usr/bin/google-chrome paths.
   const driverPath = [
     process.env.CHROMEDRIVER_PATH,
     "/usr/bin/chromedriver",
     "/snap/bin/chromium.chromedriver",
   ].find((p) => p && fs.existsSync(p));
+
+  const candidates = driverPath
+    ? [
+        process.env.CHROME_BIN,
+        "/snap/bin/chromium",
+        "/usr/bin/chromium-browser",
+        "/usr/bin/chromium",
+        "/usr/bin/google-chrome",
+      ]
+    : [
+        process.env.CHROME_BIN,
+        "/usr/bin/google-chrome",
+        "/usr/bin/chromium-browser",
+        "/usr/bin/chromium",
+        "/snap/bin/chromium",
+      ];
+
+  const binary = candidates.find((p) => p && fs.existsSync(p));
+  if (binary) options.setChromeBinaryPath(binary);
 
   const builder = new sw.Builder().forBrowser("chrome").setChromeOptions(options);
   if (driverPath) builder.setChromeService(new chrome.ServiceBuilder(driverPath));
