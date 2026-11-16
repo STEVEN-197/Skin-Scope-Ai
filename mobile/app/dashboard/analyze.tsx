@@ -63,8 +63,18 @@ export default function AnalyzeScreen() {
     });
     if (res.canceled || !res.assets?.[0]?.base64) return;
     const asset = res.assets[0];
-    const mime = asset.mimeType || 'image/jpeg';
-    const ext = mime.split('/')[1] || 'jpg';
+    const mime = (asset.mimeType || 'image/jpeg').toLowerCase();
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedMimes.includes(mime)) {
+      toast.error('Please choose a JPEG, PNG, or WEBP image.');
+      return;
+    }
+    const approxBytes = Math.floor(((asset.base64?.length ?? 0) * 3) / 4);
+    if (approxBytes > 8 * 1024 * 1024) {
+      toast.error('Image must be under 8 MB.');
+      return;
+    }
+    const ext = (mime.split('/')[1] || 'jpg').replace(/[^a-z0-9]/gi, '').slice(0, 5) || 'jpg';
     setPicked({
       uri: asset.uri,
       base64: asset.base64 ?? '',
@@ -86,14 +96,35 @@ export default function AnalyzeScreen() {
     });
     if (res.canceled || !res.assets?.[0]?.base64) return;
     const asset = res.assets[0];
-    const mime = asset.mimeType || 'image/jpeg';
-    const ext = mime.split('/')[1] || 'jpg';
+    const mime = (asset.mimeType || 'image/jpeg').toLowerCase();
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedMimes.includes(mime)) {
+      toast.error('Please capture a JPEG, PNG, or WEBP image.');
+      return;
+    }
+    const approxBytes = Math.floor(((asset.base64?.length ?? 0) * 3) / 4);
+    if (approxBytes > 8 * 1024 * 1024) {
+      toast.error('Image must be under 8 MB.');
+      return;
+    }
+    const ext = (mime.split('/')[1] || 'jpg').replace(/[^a-z0-9]/gi, '').slice(0, 5) || 'jpg';
     setPicked({
       uri: asset.uri,
       base64: asset.base64 ?? '',
       mimeType: mime,
       ext,
     });
+  };
+
+  const generateSecureFileId = (): string => {
+    const c = (globalThis as any).crypto;
+    if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+    if (c && typeof c.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      c.getRandomValues(bytes);
+      return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    return `${Date.now().toString(36)}-${Math.floor(performance.now() * 1000).toString(36)}`;
   };
 
   const runAnalysis = async () => {
@@ -121,12 +152,15 @@ export default function AnalyzeScreen() {
 
       // 3. Upload image to private storage
       setStage('Uploading image securely…');
-      const fileId = `${Date.now()}-${Date.now().toString(36)}`;
+      const fileId = generateSecureFileId();
       const path = `${user.id}/${fileId}.${picked.ext}`;
       const arrayBuffer = decodeBase64(picked.base64);
+      if (arrayBuffer.byteLength > 8 * 1024 * 1024) {
+        throw new Error('Image must be under 8 MB.');
+      }
       const { error: upErr } = await supabase.storage
         .from('skin-images')
-        .upload(path, arrayBuffer, { contentType: picked.mimeType });
+        .upload(path, arrayBuffer, { contentType: picked.mimeType, upsert: false });
       if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
 
       // 4. Call edge function

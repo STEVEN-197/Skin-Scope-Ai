@@ -78,12 +78,22 @@ function MedicalReportsPage() {
       toast.error("Please choose a file");
       return;
     }
+    const allowedMimes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+    if (!allowedMimes.includes(file.type)) {
+      toast.error("Unsupported file type. Please upload a PDF, JPEG, PNG, or WEBP file.");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File must be under 10 MB.");
+      return;
+    }
     setSubmitting(true);
     try {
-      const path = `${user.id}/${Date.now()}-${file.name}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+      const path = `${user.id}/${crypto.randomUUID()}-${safeName}`;
       const { error: upErr } = await supabase.storage
         .from("medical-reports")
-        .upload(path, file);
+        .upload(path, file, { contentType: file.type, upsert: false });
       if (upErr) throw upErr;
 
       const base64 = await fileToBase64(file);

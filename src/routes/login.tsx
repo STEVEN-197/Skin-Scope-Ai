@@ -73,7 +73,9 @@ function LoginPage() {
       setSubmitting(false);
 
       if (error) {
-        console.error("Sign in error:", error);
+        if (import.meta.env.DEV) {
+          console.error("Sign in error:", error);
+        }
         failedAttempts.current += 1;
         if (failedAttempts.current >= MAX_ATTEMPTS) {
           lockedUntil.current = Date.now() + LOCKOUT_DURATION_MS;
@@ -108,7 +110,9 @@ function LoginPage() {
       }
     } catch (err: any) {
       setSubmitting(false);
-      console.error("Sign in unexpected error:", err);
+      if (import.meta.env.DEV) {
+        console.error("Sign in unexpected error:", err);
+      }
       toast.error(err?.message || "An unexpected error occurred during sign in.");
     }
   };

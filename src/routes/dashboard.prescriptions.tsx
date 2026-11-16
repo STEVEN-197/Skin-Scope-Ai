@@ -64,14 +64,20 @@ function PrescriptionsPage() {
 
   const handleFile = async (f: File | null) => {
     if (!f || !user) return;
-    if (!f.type.startsWith("image/")) {
-      toast.error("Please upload an image of the prescription.");
+    const allowedMimes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!f.type.startsWith("image/") || !allowedMimes.includes(f.type)) {
+      toast.error("Please upload a JPEG, PNG, WEBP, or GIF image of the prescription.");
+      return;
+    }
+    if (f.size > 10 * 1024 * 1024) {
+      toast.error("Prescription image must be under 10 MB.");
       return;
     }
     setAnalyzing(true);
     try {
-      const path = `${user.id}/${Date.now()}-${f.name}`;
-      const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, f, { contentType: f.type });
+      const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80);
+      const path = `${user.id}/${crypto.randomUUID()}-${safeName}`;
+      const { error: upErr } = await supabase.storage.from("prescriptions").upload(path, f, { contentType: f.type, upsert: false });
       if (upErr) throw upErr;
       const dataUrl = await fileToDataURL(f);
       const { data, error } = await supabase.functions.invoke("analyze-prescription", {

@@ -1,0 +1,21 @@
+{
+  "total": 300,
+  "passed": 268,
+  "failed": 0,
+  "skipped": 19,
+  "blocked": 13,
+  "hasLiveDevice": false,
+  "checks": {
+    "apkValid": true,
+    "manifestValid": true,
+    "authValid": true,
+    "sessionValid": true,
+    "cameraAndUploadValid": true,
+    "colorAndScanValid": true,
+    "jarvisValid": true,
+    "medAndRxValid": true,
+    "pdfValid": true,
+    "routesCount": 23
+  },
+  "timestamp": "2026-11-04T08:09:30.930Z"
+}

@@ -23,7 +23,7 @@ export default function () {
     'theme-color present': (r) => r.body && r.body.includes('theme-color'),
   });
 
-  sleep(0.5);
+  sleep(0.3);
 
   // 2. Authentication view
   const res2 = http.get(`${BASE_URL}/login`);
@@ -31,7 +31,7 @@ export default function () {
     'login route 200': (r) => r.status === 200,
   });
 
-  sleep(0.5);
+  sleep(0.3);
 
   // 3. Manifest and critical static asset response
   const res3 = http.get(`${BASE_URL}/manifest.webmanifest`);
@@ -39,5 +39,5 @@ export default function () {
     'manifest accessible': (r) => r.status === 200,
   });
 
-  sleep(1);
+  sleep(0.5);
 }

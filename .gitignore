@@ -59,3 +59,4 @@ mobile/android/app/build/outputs/apk/*
 !mobile/android/app/build/outputs/apk/release/
 !mobile/android/app/build/outputs/apk/release/app-release.apk
 !mobile/android/app/build/outputs/apk/release/output-metadata.json
+backups/

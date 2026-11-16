@@ -57,17 +57,36 @@ export default function PrescriptionsScreen() {
     load();
   }, [user?.id]);
 
+  const generateSecureFileId = (): string => {
+    const c = (globalThis as any).crypto;
+    if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+    if (c && typeof c.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      c.getRandomValues(bytes);
+      return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    return `${Date.now().toString(36)}-${Math.floor(performance.now() * 1000).toString(36)}`;
+  };
+
   const processAsset = async (asset: ImagePicker.ImagePickerAsset) => {
     if (!user || !asset.base64) return;
     setAnalyzing(true);
     try {
-      const mimeType = asset.mimeType || 'image/jpeg';
-      const fileName = asset.fileName || `rx-${Date.now()}.jpg`;
-      const path = `${user.id}/${Date.now()}-${fileName}`;
+      const mimeType = (asset.mimeType || 'image/jpeg').toLowerCase();
+      const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      if (!allowedMimes.includes(mimeType)) {
+        throw new Error('Please upload a JPEG, PNG, WEBP, or GIF image of the prescription.');
+      }
+      const rawName = asset.fileName || `rx-${Date.now()}.jpg`;
+      const safeName = rawName.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
+      const path = `${user.id}/${generateSecureFileId()}-${safeName}`;
       const arrayBuffer = decodeBase64(asset.base64);
+      if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
+        throw new Error('Prescription image must be under 10 MB.');
+      }
       const { error: upErr } = await supabase.storage
         .from('prescriptions')
-        .upload(path, arrayBuffer, { contentType: mimeType });
+        .upload(path, arrayBuffer, { contentType: mimeType, upsert: false });
       if (upErr) throw upErr;
 
       const dataUrl = `data:${mimeType};base64,${asset.base64}`;
@@ -80,7 +99,7 @@ export default function PrescriptionsScreen() {
       const { error: insErr } = await supabase.from('prescriptions').insert({
         user_id: user.id,
         file_path: path,
-        file_name: fileName,
+        file_name: safeName,
         mime_type: mimeType,
         raw_text: data.raw_text,
         medicines: data.medicines ?? [],

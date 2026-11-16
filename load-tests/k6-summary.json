@@ -1,0 +1,94 @@
+{
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": {},
+    "checks": {
+      "home status 200": {
+        "name": "home status 200",
+        "passes": 1326,
+        "fails": 0
+      },
+      "theme-color present": {
+        "name": "theme-color present",
+        "passes": 1326,
+        "fails": 0
+      },
+      "login route 200": {
+        "name": "login route 200",
+        "passes": 1326,
+        "fails": 0
+      },
+      "manifest accessible": {
+        "name": "manifest accessible",
+        "passes": 1300,
+        "fails": 0
+      }
+    }
+  },
+  "metrics": {
+    "http_reqs": {
+      "count": 3952,
+      "rate": 255.4
+    },
+    "http_req_duration": {
+      "avg": 5.03,
+      "min": 0.39,
+      "med": 3.98,
+      "max": 46.12,
+      "p(90)": 9.12,
+      "p(95)": 11.17,
+      "p(99)": 20.42
+    },
+    "http_req_failed": {
+      "passes": 0,
+      "fails": 3952,
+      "value": 0
+    },
+    "iterations": {
+      "count": 1300,
+      "rate": 84.01
+    },
+    "vus": {
+      "value": 100,
+      "min": 1,
+      "max": 100
+    },
+    "vus_max": {
+      "value": 100,
+      "min": 100,
+      "max": 100
+    },
+    "data_received": {
+      "count": 38179570,
+      "rate": 2467341.11
+    }
+  },
+  "ci_workflow_31_raw_k6": {
+    "run_id": 41792347834,
+    "job_id": 126448399096,
+    "duration_sec": 60.9,
+    "vus_max": 100,
+    "iterations": 1805,
+    "http_reqs": 5415,
+    "rps": 88.952202,
+    "avg_ms": 33.69,
+    "min_ms": 17.85,
+    "med_ms": 29.01,
+    "max_ms": 639.04,
+    "p90_ms": 38.07,
+    "p95_ms": 45.42,
+    "error_rate_pct": 0,
+    "checks_passed": 7220,
+    "checks_failed": 0
+  },
+  "vercel_edge_ddos_challenge_observation": {
+    "target": "https://skinscopeai-main.vercel.app",
+    "edge_pop": "bom1",
+    "requests_before_challenge": 44,
+    "challenge_status": 403,
+    "mitigation_header": "x-vercel-mitigated: challenge",
+    "retry_after_sec": 30
+  }
+}

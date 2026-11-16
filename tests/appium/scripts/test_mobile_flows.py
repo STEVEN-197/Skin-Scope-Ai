@@ -5,8 +5,12 @@ from appium.webdriver.common.appiumby import AppiumBy
 
 def _find_text(driver, text, timeout=10):
     end = time.time() + timeout
+    lower = text.lower()
     while time.time() < end:
-        els = driver.find_elements(AppiumBy.XPATH, f"//*[contains(@text,'{text}') or contains(@content-desc,'{text}')]")
+        els = driver.find_elements(
+            AppiumBy.XPATH,
+            f"//*[contains(translate(@text,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'{lower}') or contains(translate(@content-desc,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'{lower}')]"
+        )
         if els: return els[0]
         time.sleep(0.5)
     raise AssertionError(f"Element with text '{text}' not found")

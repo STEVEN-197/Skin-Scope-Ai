@@ -86,9 +86,25 @@ export default function MedicalReportsScreen() {
     });
   };
 
+  const generateSecureFileId = (): string => {
+    const c = (globalThis as any).crypto;
+    if (c && typeof c.randomUUID === 'function') return c.randomUUID();
+    if (c && typeof c.getRandomValues === 'function') {
+      const bytes = new Uint8Array(16);
+      c.getRandomValues(bytes);
+      return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    return `${Date.now().toString(36)}-${Math.floor(performance.now() * 1000).toString(36)}`;
+  };
+
   const handleUpload = async () => {
     if (!user || !pickedFile) {
       toast.error('Please choose a file');
+      return;
+    }
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedMimes.includes(pickedFile.mimeType.toLowerCase())) {
+      toast.error('Unsupported file type. Please upload a PDF, JPEG, PNG, or WEBP file.');
       return;
     }
     setSubmitting(true);
@@ -96,11 +112,15 @@ export default function MedicalReportsScreen() {
       const base64 = await FileSystem.readAsStringAsync(pickedFile.uri, {
         encoding: 'base64' as any,
       });
-      const path = `${user.id}/${Date.now()}-${pickedFile.name}`;
       const arrayBuffer = decodeBase64(base64);
+      if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
+        throw new Error('File must be under 10 MB.');
+      }
+      const safeName = pickedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
+      const path = `${user.id}/${generateSecureFileId()}-${safeName}`;
       const { error: upErr } = await supabase.storage
         .from('medical-reports')
-        .upload(path, arrayBuffer, { contentType: pickedFile.mimeType });
+        .upload(path, arrayBuffer, { contentType: pickedFile.mimeType, upsert: false });
       if (upErr) throw upErr;
 
       const { data, error } = await supabase.functions.invoke('analyze-medical-report', {
