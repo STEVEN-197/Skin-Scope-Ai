@@ -101,9 +101,9 @@ async function detectNonHumanObjectWithCNN(img: HTMLImageElement): Promise<strin
     const predictions: Array<{ className: string; probability: number }> = await model.classify(img, 3);
     for (const p of predictions) {
       const lower = p.className.toLowerCase();
-      // Only trigger CNN rejection when confidence >= 40% on an unmistakable non-human object
-      if (p.probability >= 0.40) {
-        for (const kw of STRICT_NON_HUMAN_OBJECTS) {
+      // Only trigger CNN rejection when confidence >= 65% on an unmistakable container/vehicle
+      if (p.probability >= 0.65) {
+        for (const kw of ["bucket", "pail", "ashcan", "trash can", "water bottle", "coffee mug", "sports car", "pickup", "garbage truck", "shopping cart"]) {
           if (lower.includes(kw.toLowerCase())) {
             return `${p.className} (${Math.round(p.probability * 100)}%)`;
           }
@@ -203,35 +203,33 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
     const grRatio = r > 0 ? g / r : 1;
 
     // 1. Synthetic Dye / Plastic / Non-Human Object Detection:
-    // - Pure red/orange plastic (like a red bucket) has G/R < 0.42 with S > 52%, or S > 68%, or Cr > 182
-    // - Non-human hues: green, cyan, blue, purple, magenta (80°..325° with S > 25%)
+    // - Pure neon/plastic red (like a red bucket) has G/R < 0.28 with S > 65%, or S > 82% with G/R < 0.35, or Cr > 202
+    // - Non-human hues: green, cyan, blue, purple (85°..315° with S > 28%)
     const isSyntheticDye =
-      (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68 || cr > 182)) ||
-      (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
+      (r > 120 && ((grRatio < 0.28 && ss > 65) || (ss > 82 && grRatio < 0.35) || cr > 202)) ||
+      (hh >= 85 && hh <= 315 && ss > 28 && vv > 20);
     if (isSyntheticDye) {
       syntheticPixels++;
     }
 
-    // 2. Human Skin & Palmar Volar Tissue Locus:
-    // Covers pale, rosy/pinkish palms (where G ~ B, so G - B >= -8), fair, olive, tan, brown,
-    // jaundiced, and erythematous human skin while excluding plastic buckets.
+    // 2. Human Skin, Face, Arm, Affected Area (Burns/Rashes/Lesions) & Palmar Tissue Locus:
+    // Supports all skin tones (very fair to deep brown), rosy/pale palms, and acute burns/rashes/dermatitis
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 50 &&
-      g >= 30 &&
-      b >= 18 &&
-      r >= g * 0.96 &&
-      r >= b * 1.02 &&
-      g - b >= -8 &&
-      grRatio >= 0.42 &&
-      grRatio <= 0.96 &&
-      (hh <= 65 || hh >= 330) &&
-      ss >= 6 &&
-      ss <= 65 &&
-      cb >= 70 &&
-      cb <= 136 &&
-      cr >= 126 &&
-      cr <= 180;
+      r >= 35 &&
+      g >= 20 &&
+      b >= 14 &&
+      r >= g * 0.90 &&
+      r >= b * 0.88 &&
+      grRatio >= 0.28 &&
+      grRatio <= 0.98 &&
+      (hh <= 72 || hh >= 315) &&
+      ss >= 3 &&
+      ss <= 80 &&
+      cb >= 65 &&
+      cb <= 142 &&
+      cr >= 122 &&
+      cr <= 198;
     if (isBiologicalSkin) {
       skinPixels++;
     }
@@ -254,7 +252,7 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
       }
 
       const isYellow =
-        (hh >= 26 && hh <= 68 && ss >= 15 && ss <= 62 && vv >= 35 && ybDiff >= 20) ||
+        (hh >= 26 && hh <= 68 && ss >= 15 && ss <= 65 && vv >= 35 && ybDiff >= 20) ||
         (isSclera && hh >= 28 && hh <= 68 && ss >= 11 && ybDiff >= 18 && b < g);
       if (isYellow) {
         yellow++;
@@ -263,10 +261,10 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
 
       const isRed =
         isBiologicalSkin &&
-        grRatio >= 0.42 &&
-        grRatio <= 0.68 &&
-        (((hh <= 18 || hh >= 335) && ss >= 24 && ss <= 65 && vv >= 25 && rgDiff >= 32) ||
-          (hh > 18 && hh <= 28 && ss >= 34 && ss <= 65 && vv >= 28 && rgDiff >= 40 && cr >= 150));
+        grRatio >= 0.28 &&
+        grRatio <= 0.72 &&
+        (((hh <= 20 || hh >= 325) && ss >= 22 && ss <= 78 && vv >= 22 && rgDiff >= 28) ||
+          (hh > 20 && hh <= 30 && ss >= 32 && ss <= 78 && vv >= 25 && rgDiff >= 38 && cr >= 148));
       if (isRed) {
         red++;
         patchRed[pIdx]++;
@@ -387,9 +385,8 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
     };
   }
 
-  // Reject if synthetic plastic/dye exceeds 22% (and exceeds biological skin), or if average G/R < 0.42 (red plastic)
   const avgGr = f.avgR > 0 ? f.avgG / f.avgR : 1;
-  if ((synthRatio > 22 && synthRatio > skinRatio) || (f.avgR > 110 && avgGr < 0.42)) {
+  if ((synthRatio > 35 && synthRatio > skinRatio) || (f.avgR > 130 && avgGr < 0.28)) {
     return {
       valid: false,
       detected: "synthetic object or non-biological surface",
@@ -402,7 +399,7 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
   }
 
   if (region === "eye") {
-    if (skinRatio + scleraRatio < 15 || scleraRatio < 2) {
+    if (skinRatio + scleraRatio < 10 || scleraRatio < 1.5) {
       return {
         valid: false,
         detected: "non-eye object",
@@ -414,12 +411,11 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
       };
     }
   } else {
-    // Allow palms/hands that fill at least 15% of the frame (even with background around the hand)
-    if (skinRatio < 15) {
+    if (skinRatio < 10) {
       return {
         valid: false,
         detected: "non-skin object or background",
-        reason: `Insufficient human skin/palm tissue detected (${skinRatio.toFixed(0)}%). Please move closer so your ${region} fills the frame.`,
+        reason: `Insufficient human ${region} tissue detected (${skinRatio.toFixed(0)}%). Please move closer so your ${region} fills the frame.`,
         quality: "poor",
         skinTissueRatio: skinRatio,
         syntheticObjectRatio: synthRatio,

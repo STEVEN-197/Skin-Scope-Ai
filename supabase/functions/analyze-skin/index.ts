@@ -151,17 +151,16 @@ function extractServerPixelFeatures(imageBase64: string, fallback: ColorFeatures
       const rbDiff = r - b;
       const grRatio = r > 0 ? g / r : 1;
       const isSyntheticDye =
-        (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68)) ||
-        (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
+        (r > 120 && ((grRatio < 0.28 && ss > 65) || (ss > 82 && grRatio < 0.35))) ||
+        (hh >= 85 && hh <= 315 && ss > 28 && vv > 20);
 
       const isBiologicalSkin =
         !isSyntheticDye &&
-        r >= 50 && g >= 30 && b >= 18 &&
-        r >= g * 0.96 && r >= b * 1.02 &&
-        g - b >= -8 &&
-        grRatio >= 0.42 && grRatio <= 0.96 &&
-        (hh <= 65 || hh >= 330) &&
-        ss >= 6 && ss <= 65;
+        r >= 35 && g >= 20 && b >= 14 &&
+        r >= g * 0.90 && r >= b * 0.88 &&
+        grRatio >= 0.28 && grRatio <= 0.98 &&
+        (hh <= 72 || hh >= 315) &&
+        ss >= 3 && ss <= 80;
 
       if (isBiologicalSkin) {
         sumErythema += Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
@@ -170,18 +169,18 @@ function extractServerPixelFeatures(imageBase64: string, fallback: ColorFeatures
         if (vv >= 30) sumYellowness += Math.max(0, ybDiff);
 
         const isYellow =
-          (hh >= 26 && hh <= 64 && ss >= 16 && ss <= 58 && vv >= 35 && ybDiff >= 22) ||
-          (hh >= 30 && hh <= 64 && ss >= 12 && vv >= 50 && ybDiff >= 20 && b < g);
+          (hh >= 26 && hh <= 68 && ss >= 15 && ss <= 65 && vv >= 35 && ybDiff >= 20) ||
+          (hh >= 28 && hh <= 68 && ss >= 11 && vv >= 48 && ybDiff >= 18 && b < g);
         if (isYellow) {
           yellow++;
           patchYellow[pIdx]++;
         }
 
         const isRed =
-          grRatio >= 0.44 &&
-          grRatio <= 0.66 &&
-          (((hh <= 18 || hh >= 345) && ss >= 26 && ss <= 60 && vv >= 28 && rgDiff >= 34) ||
-            (hh > 18 && hh <= 26 && ss >= 36 && ss <= 60 && vv >= 30 && rgDiff >= 44 && r >= 120));
+          grRatio >= 0.28 &&
+          grRatio <= 0.72 &&
+          (((hh <= 20 || hh >= 325) && ss >= 22 && ss <= 78 && vv >= 22 && rgDiff >= 28) ||
+            (hh > 20 && hh <= 30 && ss >= 32 && ss <= 78 && vv >= 25 && rgDiff >= 38 && r >= 110));
         if (isRed) {
           red++;
           patchRed[pIdx]++;
@@ -437,9 +436,9 @@ serve(async (req: Request) => {
       const skinRatio = typeof colorFeatures.skinTissueRatio === "number" ? colorFeatures.skinTissueRatio : 50;
       const synthRatio = typeof colorFeatures.syntheticRatio === "number" ? colorFeatures.syntheticRatio : 0;
       const isNonBioAvg =
-        (colorFeatures.avgR > 110 && avgGr < 0.42) ||
-        (synthRatio > 22 && synthRatio > skinRatio) ||
-        (region !== "eye" && skinRatio < 15);
+        (colorFeatures.avgR > 130 && avgGr < 0.28) ||
+        (synthRatio > 35 && synthRatio > skinRatio) ||
+        (region !== "eye" && skinRatio < 10);
 
       if (isNonBioAvg) {
         return new Response(

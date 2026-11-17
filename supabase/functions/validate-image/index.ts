@@ -91,19 +91,18 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
 
     const grRatio = r > 0 ? g / r : 1;
     const isSyntheticDye =
-      (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68 || cr > 182)) ||
-      (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
+      (r > 120 && ((grRatio < 0.28 && ss > 65) || (ss > 82 && grRatio < 0.35) || cr > 202)) ||
+      (hh >= 85 && hh <= 315 && ss > 28 && vv > 20);
     if (isSyntheticDye) syntheticPixels++;
 
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 50 && g >= 30 && b >= 18 &&
-      r >= g * 0.96 && r >= b * 1.02 &&
-      g - b >= -8 &&
-      grRatio >= 0.42 && grRatio <= 0.96 &&
-      (hh <= 65 || hh >= 330) &&
-      ss >= 6 && ss <= 65 &&
-      cb >= 70 && cb <= 136 && cr >= 126 && cr <= 180;
+      r >= 35 && g >= 20 && b >= 14 &&
+      r >= g * 0.90 && r >= b * 0.88 &&
+      grRatio >= 0.28 && grRatio <= 0.98 &&
+      (hh <= 72 || hh >= 315) &&
+      ss >= 3 && ss <= 80 &&
+      cb >= 65 && cb <= 142 && cr >= 122 && cr <= 198;
     if (isBiologicalSkin) skinPixels++;
 
     const isSclera = !isSyntheticDye && vv >= 48 && ss <= 42 && r >= 115 && g >= 110 && b >= 75;
@@ -133,7 +132,7 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
   }
 
   const avgGr = mR > 0 ? mG / mR : 1;
-  if ((synthRatio > 22 && synthRatio > skinRatio) || (mR > 110 && avgGr < 0.42)) {
+  if ((synthRatio > 35 && synthRatio > skinRatio) || (mR > 130 && avgGr < 0.28)) {
     return {
       valid: false,
       detected: "synthetic object or non-biological color",
@@ -143,7 +142,7 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
   }
 
   if (region === "eye") {
-    if (skinRatio + scleraRatio < 15 || scleraRatio < 2) {
+    if (skinRatio + scleraRatio < 10 || scleraRatio < 1.5) {
       return {
         valid: false,
         detected: "non-eye object",
@@ -152,7 +151,7 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
       };
     }
   } else {
-    if (skinRatio < 15) {
+    if (skinRatio < 10) {
       return {
         valid: false,
         detected: "non-skin object",
@@ -209,7 +208,7 @@ serve(async (req: Request) => {
         const skinRatio = colorFeatures.skinTissueRatio;
         const synthRatio = colorFeatures.syntheticRatio ?? 0;
         const scleraRatio = colorFeatures.scleraRatio ?? 0;
-        if (synthRatio > 22 && synthRatio > skinRatio) {
+        if (synthRatio > 35 && synthRatio > skinRatio) {
           return j({
             valid: false,
             detected: "synthetic object or non-biological color",
@@ -217,7 +216,7 @@ serve(async (req: Request) => {
             quality: "poor",
           }, 200, corsHeaders);
         }
-        if (region === "eye" && (skinRatio + scleraRatio < 15 || scleraRatio < 2)) {
+        if (region === "eye" && (skinRatio + scleraRatio < 10 || scleraRatio < 1.5)) {
           return j({
             valid: false,
             detected: "non-eye object",
@@ -225,7 +224,7 @@ serve(async (req: Request) => {
             quality: "poor",
           }, 200, corsHeaders);
         }
-        if (region !== "eye" && skinRatio < 15) {
+        if (region !== "eye" && skinRatio < 10) {
           return j({
             valid: false,
             detected: "non-skin object",
