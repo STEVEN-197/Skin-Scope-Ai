@@ -2,9 +2,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 
-const LOVABLE_SUPABASE_URL = "https://nrvptzzddpenyvcndcph.supabase.co";
+const LOVABLE_SUPABASE_URL = "https://oiepakmeezaqiorhsbom.supabase.co";
 const LOVABLE_SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBha21lZXphcWlvcmhzYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4OTczMzAsImV4cCI6MjExMDQ3MzMzMH0.CbiNyOIAI6QMp75caCkdbHntU9N4GksT-SwCSiobfHg";
 
 function createSupabaseClient() {
   const envUrl =

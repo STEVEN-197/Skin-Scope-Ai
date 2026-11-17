@@ -63,7 +63,7 @@ export function JarvisChat({ compact = false }: { compact?: boolean }) {
         import.meta.env.VITE_SUPABASE_URL &&
         !import.meta.env.VITE_SUPABASE_URL.includes("your-project")
           ? import.meta.env.VITE_SUPABASE_URL
-          : "https://nrvptzzddpenyvcndcph.supabase.co";
+          : "https://oiepakmeezaqiorhsbom.supabase.co";
       const url = `${baseUrl}/functions/v1/jarvis-chat`;
       const resp = await fetch(url, {
         method: "POST",
