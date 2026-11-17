@@ -151,17 +151,17 @@ function extractServerPixelFeatures(imageBase64: string, fallback: ColorFeatures
       const rbDiff = r - b;
       const grRatio = r > 0 ? g / r : 1;
       const isSyntheticDye =
-        (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
-        (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
+        (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68)) ||
+        (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
 
       const isBiologicalSkin =
         !isSyntheticDye &&
-        r >= 60 && g >= 35 && b >= 20 &&
-        r > g && g > b &&
-        g - b >= 7 && r - g >= 12 &&
-        grRatio >= 0.44 && grRatio <= 0.88 &&
-        (hh <= 38 || hh >= 345) &&
-        ss >= 12 && ss <= 60;
+        r >= 50 && g >= 30 && b >= 18 &&
+        r >= g * 0.96 && r >= b * 1.02 &&
+        g - b >= -8 &&
+        grRatio >= 0.42 && grRatio <= 0.96 &&
+        (hh <= 65 || hh >= 330) &&
+        ss >= 6 && ss <= 65;
 
       if (isBiologicalSkin) {
         sumErythema += Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
@@ -434,12 +434,12 @@ serve(async (req: Request) => {
     // Server-side biological tissue gatekeeper on colorFeatures (catches WebP/cached clients too)
     if (imageBase64.length > 500) {
       const avgGr = colorFeatures.avgR > 0 ? colorFeatures.avgG / colorFeatures.avgR : 1;
-      const gbDiff = colorFeatures.avgG - colorFeatures.avgB;
-      const rgDiffAvg = colorFeatures.avgR - colorFeatures.avgG;
+      const skinRatio = typeof colorFeatures.skinTissueRatio === "number" ? colorFeatures.skinTissueRatio : 50;
+      const synthRatio = typeof colorFeatures.syntheticRatio === "number" ? colorFeatures.syntheticRatio : 0;
       const isNonBioAvg =
-        (region !== "eye" && (avgGr < 0.46 || avgGr > 0.92 || gbDiff < 5 || rgDiffAvg < 8)) ||
-        (typeof colorFeatures.syntheticRatio === "number" && colorFeatures.syntheticRatio > 20) ||
-        (region !== "eye" && typeof colorFeatures.skinTissueRatio === "number" && colorFeatures.skinTissueRatio < 30);
+        (colorFeatures.avgR > 110 && avgGr < 0.42) ||
+        (synthRatio > 22 && synthRatio > skinRatio) ||
+        (region !== "eye" && skinRatio < 15);
 
       if (isNonBioAvg) {
         return new Response(

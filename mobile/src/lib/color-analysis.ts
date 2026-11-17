@@ -106,35 +106,34 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
 
     const grRatio = r > 0 ? g / r : 1;
     const isSyntheticDye =
-      (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
-      (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
+      (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68 || cr > 182)) ||
+      (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
     if (isSyntheticDye) {
       syntheticPixels++;
     }
 
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 60 &&
-      g >= 35 &&
-      b >= 20 &&
-      r > g &&
-      g > b &&
-      g - b >= 7 &&
-      r - g >= 12 &&
-      grRatio >= 0.44 &&
-      grRatio <= 0.88 &&
-      (hh <= 38 || hh >= 345) &&
-      ss >= 12 &&
-      ss <= 60 &&
-      cb >= 78 &&
-      cb <= 126 &&
-      cr >= 133 &&
-      cr <= 178;
+      r >= 50 &&
+      g >= 30 &&
+      b >= 18 &&
+      r >= g * 0.96 &&
+      r >= b * 1.02 &&
+      g - b >= -8 &&
+      grRatio >= 0.42 &&
+      grRatio <= 0.96 &&
+      (hh <= 65 || hh >= 330) &&
+      ss >= 6 &&
+      ss <= 65 &&
+      cb >= 70 &&
+      cb <= 136 &&
+      cr >= 126 &&
+      cr <= 180;
     if (isBiologicalSkin) {
       skinPixels++;
     }
 
-    const isSclera = !isSyntheticDye && vv >= 52 && ss <= 38 && r >= 125 && g >= 120 && b >= 85;
+    const isSclera = !isSyntheticDye && vv >= 48 && ss <= 42 && r >= 115 && g >= 110 && b >= 75;
     if (isSclera) {
       scleraPixels++;
     }
@@ -273,11 +272,11 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
   }
 
   const avgGr = f.avgR > 0 ? f.avgG / f.avgR : 1;
-  if (synthRatio > 20 || (region !== 'eye' && (avgGr < 0.46 || f.avgG - f.avgB < 5))) {
+  if ((synthRatio > 22 && synthRatio > skinRatio) || (f.avgR > 110 && avgGr < 0.42)) {
     return {
       valid: false,
       detected: 'synthetic object or non-biological color',
-      reason: `Detected artificial/non-biological colors (${synthRatio.toFixed(0)}% synthetic spectrum, only ${skinRatio.toFixed(0)}% human tissue). Please upload a clear photo of real human ${region}.`,
+      reason: `Detected artificial/non-biological colors (${synthRatio.toFixed(0)}% synthetic spectrum). Please upload a clear photo of real human ${region}.`,
       quality: 'poor',
       skinTissueRatio: skinRatio,
       syntheticObjectRatio: synthRatio,
@@ -286,7 +285,7 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
   }
 
   if (region === 'eye') {
-    if (skinRatio < 12 || scleraRatio < 4) {
+    if (skinRatio + scleraRatio < 15 || scleraRatio < 2) {
       return {
         valid: false,
         detected: 'non-eye object',
@@ -298,11 +297,11 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
       };
     }
   } else {
-    if (skinRatio < 30) {
+    if (skinRatio < 15) {
       return {
         valid: false,
         detected: 'non-skin object or background',
-        reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}%). Please upload a clear, well-lit photo of human ${region}.`,
+        reason: `Insufficient human ${region} tissue detected (${skinRatio.toFixed(0)}%). Please move closer so your ${region} fills the frame.`,
         quality: 'poor',
         skinTissueRatio: skinRatio,
         syntheticObjectRatio: synthRatio,

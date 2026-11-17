@@ -1,6 +1,6 @@
 // Client-side Dermatological & Clinical Computer Vision feature extractor + Tissue Gatekeeper.
-// Uses Kovac/Peer YCbCr + Melanin-Hemoglobin RGB reflectance models (R > G > B, G-B >= 7,
-// 0.44 <= G/R <= 0.88) + MobileNetV2 CNN object filter + 8x8 Spatial Patch Hotspot analysis.
+// Supports pale/rosy/pinkish/tan/brown palms, skin, and eyes while rejecting synthetic
+// plastic/paint objects (e.g. red/blue buckets, cups, vehicles, pets).
 
 export interface TissueValidation {
   valid: boolean;
@@ -61,29 +61,22 @@ function rgbToYCbCr(r: number, g: number, b: number): [number, number, number] {
   return [y, cb, cr];
 }
 
-// Non-human ImageNet object keywords that MobileNetV2 recognizes
-const NON_HUMAN_OBJECT_KEYWORDS = [
-  "bucket", "pail", "ashcan", "barrel", "tub", "vat", "cup", "mug", "pitcher", "bottle", "jug",
-  "bowl", "plate", "tray", "pot", "pan", "kettle", "teapot", "vase", "jar", "can", "carton",
-  "box", "crate", "basket", "bag", "backpack", "purse", "wallet", "umbrella", "shoe", "boot",
-  "sandal", "clog", "sock", "jean", "shirt", "jersey", "sweater", "coat", "suit", "dress",
-  "skirt", "chair", "couch", "sofa", "table", "desk", "bed", "cabinet", "wardrobe", "bookcase",
-  "lamp", "pillow", "curtain", "carpet", "rug", "wall", "tile", "brick", "fence", "door",
-  "window", "car", "truck", "bus", "bicycle", "motorcycle", "train", "airplane", "boat",
-  "ship", "traffic light", "sign", "bench", "parking meter", "fire hydrant", "dog", "cat",
-  "bird", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "monkey", "fish",
-  "insect", "spider", "snake", "lizard", "frog", "turtle", "flower", "daisy", "rose", "tree",
-  "plant", "mushroom", "apple", "orange", "lemon", "banana", "strawberry", "pineapple",
-  "pomegranate", "bell pepper", "tomato", "carrot", "broccoli", "cucumber", "pizza", "burger",
-  "sandwich", "hotdog", "ice cream", "cake", "chocolate", "bread", "coffee", "wine", "beer",
-  "laptop", "notebook", "computer", "keyboard", "mouse", "monitor", "screen", "television",
-  "telephone", "cellular", "iPod", "camera", "clock", "watch", "calculator", "remote",
-  "speaker", "microphone", "headphone", "guitar", "piano", "drum", "violin", "ball", "racket",
-  "kite", "skateboard", "surfboard", "ski", "book", "envelope", "pen", "pencil", "paintbrush",
-  "scissors", "hammer", "screwdriver", "wrench", "shovel", "broom", "mop", "soap dispenser",
-  "toilet", "sink", "bathtub", "refrigerator", "microwave", "oven", "toaster", "washing machine",
-  "vacuum", "iron", "hair dryer", "toothbrush", "comb", "perfume", "lipstick", "lotion",
-  "pill bottle", "syringe", "teddy", "toy", "doll", "balloon", "candle", "lighter", "matchstick",
+// High-specificity non-human ImageNet classes (excludes classes that ImageNet confuses with hands/skin)
+const STRICT_NON_HUMAN_OBJECTS = [
+  "bucket", "pail", "ashcan", "trash can", "barrel", "water bottle", "pop bottle", "beer bottle",
+  "wine bottle", "coffee mug", "teacup", "pitcher", "teapot", "vase", "flowerpot", "frying pan",
+  "wok", "Dutch oven", "toaster", "microwave", "refrigerator", "washing machine", "lawn mower",
+  "shopping cart", "wheelbarrow", "sports car", "convertible", "minivan", "limousine", "cab",
+  "police van", "ambulance", "fire engine", "garbage truck", "pickup", "tractor", "forklift",
+  "motor scooter", "moped", "mountain bike", "bicycle", "airliner", "speedboat", "canoe",
+  "traffic light", "parking meter", "fire hydrant", "park bench", "folding chair", "rocking chair",
+  "barber chair", "throne", "dining table", "desk", "bookcase", "wardrobe", "television",
+  "desktop computer", "laptop", "computer keyboard", "joystick", "iPod", "digital clock",
+  "wall clock", "umbrella", "backpack", "suit", "jean", "running shoe", "cowboy boot",
+  "soccer ball", "basketball", "tennis ball", "baseball", "volleyball", "golf ball",
+  "golden retriever", "Labrador", "German shepherd", "beagle", "pug", "tabby", "Persian cat",
+  "Siamese cat", "broccoli", "cauliflower", "zucchini", "bell pepper", "Granny Smith",
+  "strawberry", "orange", "lemon", "banana", "pineapple", "pizza", "cheeseburger", "hotdog",
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -102,22 +95,23 @@ async function detectNonHumanObjectWithCNN(img: HTMLImageElement): Promise<strin
     }
     const model = await Promise.race([
       _mobilenetPromise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 4500)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000)),
     ]);
     if (!model) return null;
     const predictions: Array<{ className: string; probability: number }> = await model.classify(img, 3);
     for (const p of predictions) {
       const lower = p.className.toLowerCase();
-      if (p.probability >= 0.18) {
-        for (const kw of NON_HUMAN_OBJECT_KEYWORDS) {
-          if (lower.includes(kw)) {
+      // Only trigger CNN rejection when confidence >= 40% on an unmistakable non-human object
+      if (p.probability >= 0.40) {
+        for (const kw of STRICT_NON_HUMAN_OBJECTS) {
+          if (lower.includes(kw.toLowerCase())) {
             return `${p.className} (${Math.round(p.probability * 100)}%)`;
           }
         }
       }
     }
   } catch {
-    // Proceed with strict Melanin-Hemoglobin YCbCr gatekeeper if offline or CDN blocked
+    // Proceed with YCbCr + RGB tissue gatekeeper
   }
   return null;
 }
@@ -207,43 +201,43 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
     patchCount[pIdx]++;
 
     const grRatio = r > 0 ? g / r : 1;
-    // 1. Strict Synthetic Dye / Plastic / Non-Human Object Detection:
-    // - Red plastic/paint (like a red bucket) has G/R < 0.43, or S > 62%, or R-G > 35 with G-B < 7 (no melanin gradient)
-    // - Non-biological hues: green, cyan, blue, purple, magenta (65°..335° with S >= 18%)
+
+    // 1. Synthetic Dye / Plastic / Non-Human Object Detection:
+    // - Pure red/orange plastic (like a red bucket) has G/R < 0.42 with S > 52%, or S > 68%, or Cr > 182
+    // - Non-human hues: green, cyan, blue, purple, magenta (80°..325° with S > 25%)
     const isSyntheticDye =
-      (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
-      (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
+      (r > 100 && ((grRatio < 0.42 && ss > 52) || ss > 68 || cr > 182)) ||
+      (hh >= 80 && hh <= 325 && ss > 25 && vv > 20);
     if (isSyntheticDye) {
       syntheticPixels++;
     }
 
-    // 2. Strict Biological Human Epidermis Locus:
-    // Requires strict melanin-hemoglobin gradient: R > G > B, (G - B) >= 7, (R - G) >= 12,
-    // 0.44 <= G/R <= 0.88, S in 12..60%, Cb in 78..126, Cr in 133..178
+    // 2. Human Skin & Palmar Volar Tissue Locus:
+    // Covers pale, rosy/pinkish palms (where G ~ B, so G - B >= -8), fair, olive, tan, brown,
+    // jaundiced, and erythematous human skin while excluding plastic buckets.
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 60 &&
-      g >= 35 &&
-      b >= 20 &&
-      r > g &&
-      g > b &&
-      g - b >= 7 &&
-      r - g >= 12 &&
-      grRatio >= 0.44 &&
-      grRatio <= 0.88 &&
-      (hh <= 38 || hh >= 345) &&
-      ss >= 12 &&
-      ss <= 60 &&
-      cb >= 78 &&
-      cb <= 126 &&
-      cr >= 133 &&
-      cr <= 178;
+      r >= 50 &&
+      g >= 30 &&
+      b >= 18 &&
+      r >= g * 0.96 &&
+      r >= b * 1.02 &&
+      g - b >= -8 &&
+      grRatio >= 0.42 &&
+      grRatio <= 0.96 &&
+      (hh <= 65 || hh >= 330) &&
+      ss >= 6 &&
+      ss <= 65 &&
+      cb >= 70 &&
+      cb <= 136 &&
+      cr >= 126 &&
+      cr <= 180;
     if (isBiologicalSkin) {
       skinPixels++;
     }
 
     // 3. Sclera locus (for eye scans)
-    const isSclera = !isSyntheticDye && vv >= 52 && ss <= 38 && r >= 125 && g >= 120 && b >= 85;
+    const isSclera = !isSyntheticDye && vv >= 48 && ss <= 42 && r >= 115 && g >= 110 && b >= 75;
     if (isSclera) {
       scleraPixels++;
     }
@@ -260,8 +254,8 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
       }
 
       const isYellow =
-        (hh >= 26 && hh <= 64 && ss >= 16 && ss <= 58 && vv >= 35 && ybDiff >= 22) ||
-        (isSclera && hh >= 30 && hh <= 64 && ss >= 12 && ybDiff >= 20 && b < g);
+        (hh >= 26 && hh <= 68 && ss >= 15 && ss <= 62 && vv >= 35 && ybDiff >= 20) ||
+        (isSclera && hh >= 28 && hh <= 68 && ss >= 11 && ybDiff >= 18 && b < g);
       if (isYellow) {
         yellow++;
         patchYellow[pIdx]++;
@@ -269,17 +263,17 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
 
       const isRed =
         isBiologicalSkin &&
-        grRatio >= 0.44 &&
-        grRatio <= 0.66 &&
-        (((hh <= 18 || hh >= 345) && ss >= 26 && ss <= 60 && vv >= 28 && rgDiff >= 34) ||
-          (hh > 18 && hh <= 26 && ss >= 36 && ss <= 60 && vv >= 30 && rgDiff >= 44 && cr >= 154));
+        grRatio >= 0.42 &&
+        grRatio <= 0.68 &&
+        (((hh <= 18 || hh >= 335) && ss >= 24 && ss <= 65 && vv >= 25 && rgDiff >= 32) ||
+          (hh > 18 && hh <= 28 && ss >= 34 && ss <= 65 && vv >= 28 && rgDiff >= 40 && cr >= 150));
       if (isRed) {
         red++;
         patchRed[pIdx]++;
       }
     }
 
-    const isDark = isBiologicalSkin && vv < 36 && ss >= 25 && r < 105 && g < 75;
+    const isDark = isBiologicalSkin && vv < 35 && ss >= 22 && r < 105 && g < 78;
     if (isDark) {
       dark++;
       patchDark[pIdx]++;
@@ -373,7 +367,7 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
     return {
       valid: false,
       detected: f.detectedObject,
-      reason: `MobileNetV2 CNN identified a non-human object: ${f.detectedObject}. Please upload a clear photo of real human ${region}.`,
+      reason: `Detected a non-human object (${f.detectedObject}). Please upload a clear photo of real human ${region}.`,
       quality: "poor",
       skinTissueRatio: skinRatio,
       syntheticObjectRatio: synthRatio,
@@ -381,7 +375,7 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
     };
   }
 
-  if (cv < 2.5) {
+  if (cv < 2.0) {
     return {
       valid: false,
       detected: "blank or solid-color surface",
@@ -393,13 +387,13 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
     };
   }
 
-  // Reject if synthetic plastic/dye pixels exceed 20% OR average RGB violates human melanin-hemoglobin hierarchy
+  // Reject if synthetic plastic/dye exceeds 22% (and exceeds biological skin), or if average G/R < 0.42 (red plastic)
   const avgGr = f.avgR > 0 ? f.avgG / f.avgR : 1;
-  if (synthRatio > 20 || (region !== "eye" && (avgGr < 0.46 || f.avgG - f.avgB < 5))) {
+  if ((synthRatio > 22 && synthRatio > skinRatio) || (f.avgR > 110 && avgGr < 0.42)) {
     return {
       valid: false,
       detected: "synthetic object or non-biological surface",
-      reason: `Detected synthetic/non-biological color spectrum (${synthRatio.toFixed(0)}% artificial dye, ${skinRatio.toFixed(0)}% human tissue). Please upload a clear photo of real human ${region}.`,
+      reason: `Detected synthetic/non-biological color spectrum (${synthRatio.toFixed(0)}% artificial dye). Please upload a clear photo of real human ${region}.`,
       quality: "poor",
       skinTissueRatio: skinRatio,
       syntheticObjectRatio: synthRatio,
@@ -408,11 +402,11 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
   }
 
   if (region === "eye") {
-    if (skinRatio < 12 || scleraRatio < 4) {
+    if (skinRatio + scleraRatio < 15 || scleraRatio < 2) {
       return {
         valid: false,
         detected: "non-eye object",
-        reason: "Could not detect human eye anatomy (sclera and surrounding eyelid skin). Please upload a clear close-up of a real human eye.",
+        reason: "Could not detect human eye anatomy (sclera and eyelid skin). Please upload a clear close-up of a real human eye.",
         quality: "poor",
         skinTissueRatio: skinRatio,
         syntheticObjectRatio: synthRatio,
@@ -420,11 +414,12 @@ export function validateTissueFeatures(region: "eye" | "skin" | "palm", f: Color
       };
     }
   } else {
-    if (skinRatio < 30) {
+    // Allow palms/hands that fill at least 15% of the frame (even with background around the hand)
+    if (skinRatio < 15) {
       return {
         valid: false,
         detected: "non-skin object or background",
-        reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}% biological epidermis; minimum 30% required). Please upload a clear close-up photo of human ${region}.`,
+        reason: `Insufficient human skin/palm tissue detected (${skinRatio.toFixed(0)}%). Please move closer so your ${region} fills the frame.`,
         quality: "poor",
         skinTissueRatio: skinRatio,
         syntheticObjectRatio: synthRatio,
