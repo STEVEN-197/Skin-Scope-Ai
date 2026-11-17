@@ -9,38 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
-import { Route as DashboardTwinRouteImport } from './routes/dashboard.twin'
-import { Route as DashboardTimelineRouteImport } from './routes/dashboard.timeline'
-import { Route as DashboardShareRouteImport } from './routes/dashboard.share'
-import { Route as DashboardRemindersRouteImport } from './routes/dashboard.reminders'
-import { Route as DashboardPrescriptionsRouteImport } from './routes/dashboard.prescriptions'
-import { Route as DashboardMedicalReportsRouteImport } from './routes/dashboard.medical-reports'
-import { Route as DashboardLifestyleRouteImport } from './routes/dashboard.lifestyle'
-import { Route as DashboardJarvisRouteImport } from './routes/dashboard.jarvis'
-import { Route as DashboardIntelligenceRouteImport } from './routes/dashboard.intelligence'
-import { Route as DashboardInsightsRouteImport } from './routes/dashboard.insights'
-import { Route as DashboardFamilyRouteImport } from './routes/dashboard.family'
-import { Route as DashboardDiaryRouteImport } from './routes/dashboard.diary'
-import { Route as DashboardCompareRouteImport } from './routes/dashboard.compare'
-import { Route as DashboardAppointmentsRouteImport } from './routes/dashboard.appointments'
-import { Route as DashboardAnalyzeRouteImport } from './routes/dashboard.analyze'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardAnalyzeRouteImport } from './routes/dashboard.analyze'
+import { Route as DashboardAppointmentsRouteImport } from './routes/dashboard.appointments'
+import { Route as DashboardCompareRouteImport } from './routes/dashboard.compare'
+import { Route as DashboardDiaryRouteImport } from './routes/dashboard.diary'
+import { Route as DashboardFamilyRouteImport } from './routes/dashboard.family'
+import { Route as DashboardInsightsRouteImport } from './routes/dashboard.insights'
+import { Route as DashboardIntelligenceRouteImport } from './routes/dashboard.intelligence'
+import { Route as DashboardJarvisRouteImport } from './routes/dashboard.jarvis'
+import { Route as DashboardLifestyleRouteImport } from './routes/dashboard.lifestyle'
+import { Route as DashboardMedicalReportsRouteImport } from './routes/dashboard.medical-reports'
+import { Route as DashboardPrescriptionsRouteImport } from './routes/dashboard.prescriptions'
+import { Route as DashboardRemindersRouteImport } from './routes/dashboard.reminders'
+import { Route as DashboardShareRouteImport } from './routes/dashboard.share'
+import { Route as DashboardTimelineRouteImport } from './routes/dashboard.timeline'
+import { Route as DashboardTwinRouteImport } from './routes/dashboard.twin'
 import { Route as DashboardReportsIndexRouteImport } from './routes/dashboard.reports.index'
 import { Route as DashboardReportsReportIdRouteImport } from './routes/dashboard.reports.$reportId'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -48,9 +43,19 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -58,69 +63,9 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardTwinRoute = DashboardTwinRouteImport.update({
-  id: '/twin',
-  path: '/twin',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardTimelineRoute = DashboardTimelineRouteImport.update({
-  id: '/timeline',
-  path: '/timeline',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardShareRoute = DashboardShareRouteImport.update({
-  id: '/share',
-  path: '/share',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardRemindersRoute = DashboardRemindersRouteImport.update({
-  id: '/reminders',
-  path: '/reminders',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardPrescriptionsRoute = DashboardPrescriptionsRouteImport.update({
-  id: '/prescriptions',
-  path: '/prescriptions',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardMedicalReportsRoute = DashboardMedicalReportsRouteImport.update({
-  id: '/medical-reports',
-  path: '/medical-reports',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardLifestyleRoute = DashboardLifestyleRouteImport.update({
-  id: '/lifestyle',
-  path: '/lifestyle',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardJarvisRoute = DashboardJarvisRouteImport.update({
-  id: '/jarvis',
-  path: '/jarvis',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardIntelligenceRoute = DashboardIntelligenceRouteImport.update({
-  id: '/intelligence',
-  path: '/intelligence',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardInsightsRoute = DashboardInsightsRouteImport.update({
-  id: '/insights',
-  path: '/insights',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardFamilyRoute = DashboardFamilyRouteImport.update({
-  id: '/family',
-  path: '/family',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardDiaryRoute = DashboardDiaryRouteImport.update({
-  id: '/diary',
-  path: '/diary',
-  getParentRoute: () => DashboardRoute,
-} as any)
-const DashboardCompareRoute = DashboardCompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
+const DashboardAnalyzeRoute = DashboardAnalyzeRouteImport.update({
+  id: '/analyze',
+  path: '/analyze',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAppointmentsRoute = DashboardAppointmentsRouteImport.update({
@@ -128,15 +73,70 @@ const DashboardAppointmentsRoute = DashboardAppointmentsRouteImport.update({
   path: '/appointments',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardAnalyzeRoute = DashboardAnalyzeRouteImport.update({
-  id: '/analyze',
-  path: '/analyze',
+const DashboardCompareRoute = DashboardCompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => DashboardRoute,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => rootRouteImport,
+const DashboardDiaryRoute = DashboardDiaryRouteImport.update({
+  id: '/diary',
+  path: '/diary',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardFamilyRoute = DashboardFamilyRouteImport.update({
+  id: '/family',
+  path: '/family',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInsightsRoute = DashboardInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardIntelligenceRoute = DashboardIntelligenceRouteImport.update({
+  id: '/intelligence',
+  path: '/intelligence',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardJarvisRoute = DashboardJarvisRouteImport.update({
+  id: '/jarvis',
+  path: '/jarvis',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLifestyleRoute = DashboardLifestyleRouteImport.update({
+  id: '/lifestyle',
+  path: '/lifestyle',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardMedicalReportsRoute = DashboardMedicalReportsRouteImport.update({
+  id: '/medical-reports',
+  path: '/medical-reports',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPrescriptionsRoute = DashboardPrescriptionsRouteImport.update({
+  id: '/prescriptions',
+  path: '/prescriptions',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardRemindersRoute = DashboardRemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardShareRoute = DashboardShareRouteImport.update({
+  id: '/share',
+  path: '/share',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTimelineRoute = DashboardTimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTwinRoute = DashboardTwinRouteImport.update({
+  id: '/twin',
+  path: '/twin',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardReportsIndexRoute = DashboardReportsIndexRouteImport.update({
   id: '/reports/',
@@ -312,18 +312,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -333,11 +326,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -347,95 +354,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/twin': {
-      id: '/dashboard/twin'
-      path: '/twin'
-      fullPath: '/dashboard/twin'
-      preLoaderRoute: typeof DashboardTwinRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/timeline': {
-      id: '/dashboard/timeline'
-      path: '/timeline'
-      fullPath: '/dashboard/timeline'
-      preLoaderRoute: typeof DashboardTimelineRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/share': {
-      id: '/dashboard/share'
-      path: '/share'
-      fullPath: '/dashboard/share'
-      preLoaderRoute: typeof DashboardShareRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/reminders': {
-      id: '/dashboard/reminders'
-      path: '/reminders'
-      fullPath: '/dashboard/reminders'
-      preLoaderRoute: typeof DashboardRemindersRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/prescriptions': {
-      id: '/dashboard/prescriptions'
-      path: '/prescriptions'
-      fullPath: '/dashboard/prescriptions'
-      preLoaderRoute: typeof DashboardPrescriptionsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/medical-reports': {
-      id: '/dashboard/medical-reports'
-      path: '/medical-reports'
-      fullPath: '/dashboard/medical-reports'
-      preLoaderRoute: typeof DashboardMedicalReportsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/lifestyle': {
-      id: '/dashboard/lifestyle'
-      path: '/lifestyle'
-      fullPath: '/dashboard/lifestyle'
-      preLoaderRoute: typeof DashboardLifestyleRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/jarvis': {
-      id: '/dashboard/jarvis'
-      path: '/jarvis'
-      fullPath: '/dashboard/jarvis'
-      preLoaderRoute: typeof DashboardJarvisRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/intelligence': {
-      id: '/dashboard/intelligence'
-      path: '/intelligence'
-      fullPath: '/dashboard/intelligence'
-      preLoaderRoute: typeof DashboardIntelligenceRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/insights': {
-      id: '/dashboard/insights'
-      path: '/insights'
-      fullPath: '/dashboard/insights'
-      preLoaderRoute: typeof DashboardInsightsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/family': {
-      id: '/dashboard/family'
-      path: '/family'
-      fullPath: '/dashboard/family'
-      preLoaderRoute: typeof DashboardFamilyRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/diary': {
-      id: '/dashboard/diary'
-      path: '/diary'
-      fullPath: '/dashboard/diary'
-      preLoaderRoute: typeof DashboardDiaryRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/compare': {
-      id: '/dashboard/compare'
-      path: '/compare'
-      fullPath: '/dashboard/compare'
-      preLoaderRoute: typeof DashboardCompareRouteImport
+    '/dashboard/analyze': {
+      id: '/dashboard/analyze'
+      path: '/analyze'
+      fullPath: '/dashboard/analyze'
+      preLoaderRoute: typeof DashboardAnalyzeRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/appointments': {
@@ -445,19 +368,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAppointmentsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/analyze': {
-      id: '/dashboard/analyze'
-      path: '/analyze'
-      fullPath: '/dashboard/analyze'
-      preLoaderRoute: typeof DashboardAnalyzeRouteImport
+    '/dashboard/compare': {
+      id: '/dashboard/compare'
+      path: '/compare'
+      fullPath: '/dashboard/compare'
+      preLoaderRoute: typeof DashboardCompareRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
+    '/dashboard/diary': {
+      id: '/dashboard/diary'
+      path: '/diary'
+      fullPath: '/dashboard/diary'
+      preLoaderRoute: typeof DashboardDiaryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/family': {
+      id: '/dashboard/family'
+      path: '/family'
+      fullPath: '/dashboard/family'
+      preLoaderRoute: typeof DashboardFamilyRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/insights': {
+      id: '/dashboard/insights'
+      path: '/insights'
+      fullPath: '/dashboard/insights'
+      preLoaderRoute: typeof DashboardInsightsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/intelligence': {
+      id: '/dashboard/intelligence'
+      path: '/intelligence'
+      fullPath: '/dashboard/intelligence'
+      preLoaderRoute: typeof DashboardIntelligenceRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/jarvis': {
+      id: '/dashboard/jarvis'
+      path: '/jarvis'
+      fullPath: '/dashboard/jarvis'
+      preLoaderRoute: typeof DashboardJarvisRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/lifestyle': {
+      id: '/dashboard/lifestyle'
+      path: '/lifestyle'
+      fullPath: '/dashboard/lifestyle'
+      preLoaderRoute: typeof DashboardLifestyleRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/medical-reports': {
+      id: '/dashboard/medical-reports'
+      path: '/medical-reports'
+      fullPath: '/dashboard/medical-reports'
+      preLoaderRoute: typeof DashboardMedicalReportsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/prescriptions': {
+      id: '/dashboard/prescriptions'
+      path: '/prescriptions'
+      fullPath: '/dashboard/prescriptions'
+      preLoaderRoute: typeof DashboardPrescriptionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/reminders': {
+      id: '/dashboard/reminders'
+      path: '/reminders'
+      fullPath: '/dashboard/reminders'
+      preLoaderRoute: typeof DashboardRemindersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/share': {
+      id: '/dashboard/share'
+      path: '/share'
+      fullPath: '/dashboard/share'
+      preLoaderRoute: typeof DashboardShareRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/timeline': {
+      id: '/dashboard/timeline'
+      path: '/timeline'
+      fullPath: '/dashboard/timeline'
+      preLoaderRoute: typeof DashboardTimelineRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/twin': {
+      id: '/dashboard/twin'
+      path: '/twin'
+      fullPath: '/dashboard/twin'
+      preLoaderRoute: typeof DashboardTwinRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/reports/': {
       id: '/dashboard/reports/'

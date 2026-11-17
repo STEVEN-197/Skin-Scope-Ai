@@ -42,9 +42,9 @@ jobs:
       - name: Build
         id: build_step
         env:
-          VITE_SUPABASE_URL: "https://nrvptzzddpenyvcndcph.supabase.co"
-          VITE_SUPABASE_PUBLISHABLE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E"
-          VITE_SUPABASE_PROJECT_ID: "nrvptzzddpenyvcndcph"
+          VITE_SUPABASE_URL: "https://oiepakmeezaqiorhsbom.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBha21lZXphcWlvcmhzYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4OTczMzAsImV4cCI6MjExMDQ3MzMzMH0.CbiNyOIAI6QMp75caCkdbHntU9N4GksT-SwCSiobfHg"
+          VITE_SUPABASE_PROJECT_ID: "oiepakmeezaqiorhsbom"
           DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS: "1"
         run: |
           set -o pipefail
@@ -151,8 +151,8 @@ jobs:
           npx vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN" 2>&1 | tee vercel.out || \
           npx vercel --token "$VERCEL_TOKEN" --prod --yes \
             --build-env DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS=1 \
-            --build-env VITE_SUPABASE_URL="https://nrvptzzddpenyvcndcph.supabase.co" \
-            --build-env VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E" \
+            --build-env VITE_SUPABASE_URL="https://oiepakmeezaqiorhsbom.supabase.co" \
+            --build-env VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBha21lZXphcWlvcmhzYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4OTczMzAsImV4cCI6MjExMDQ3MzMzMH0.CbiNyOIAI6QMp75caCkdbHntU9N4GksT-SwCSiobfHg" \
             2>&1 | tee -a vercel.out || true
 
           # Parse production deployment URL from output
