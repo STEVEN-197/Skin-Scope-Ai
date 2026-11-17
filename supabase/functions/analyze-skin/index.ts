@@ -151,29 +151,37 @@ function extractServerPixelFeatures(imageBase64: string, fallback: ColorFeatures
       const rbDiff = r - b;
       const grRatio = r > 0 ? g / r : 1;
       const isSyntheticDye =
-        (r > 120 && grRatio < 0.29 && ss > 65) ||
-        (ss > 76 && vv > 35) ||
-        (hh >= 80 && hh <= 325 && ss >= 24 && vv >= 20);
+        (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
+        (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
 
-      if (!isSyntheticDye) {
+      const isBiologicalSkin =
+        !isSyntheticDye &&
+        r >= 60 && g >= 35 && b >= 20 &&
+        r > g && g > b &&
+        g - b >= 7 && r - g >= 12 &&
+        grRatio >= 0.44 && grRatio <= 0.88 &&
+        (hh <= 38 || hh >= 345) &&
+        ss >= 12 && ss <= 60;
+
+      if (isBiologicalSkin) {
         sumErythema += Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
 
         const ybDiff = (r + g) * 0.5 - b;
         if (vv >= 30) sumYellowness += Math.max(0, ybDiff);
 
         const isYellow =
-          (hh >= 26 && hh <= 72 && ss >= 16 && ss <= 68 && vv >= 35 && ybDiff >= 22) ||
-          (hh >= 30 && hh <= 68 && ss >= 12 && vv >= 50 && ybDiff >= 20 && b < g);
+          (hh >= 26 && hh <= 64 && ss >= 16 && ss <= 58 && vv >= 35 && ybDiff >= 22) ||
+          (hh >= 30 && hh <= 64 && ss >= 12 && vv >= 50 && ybDiff >= 20 && b < g);
         if (isYellow) {
           yellow++;
           patchYellow[pIdx]++;
         }
 
         const isRed =
-          grRatio >= 0.30 &&
-          grRatio <= 0.70 &&
-          (((hh <= 20 || hh >= 335) && ss >= 25 && ss <= 70 && vv >= 25 && rgDiff >= 32) ||
-            (hh > 20 && hh <= 28 && ss >= 36 && ss <= 70 && vv >= 28 && rgDiff >= 42 && r >= 120));
+          grRatio >= 0.44 &&
+          grRatio <= 0.66 &&
+          (((hh <= 18 || hh >= 345) && ss >= 26 && ss <= 60 && vv >= 28 && rgDiff >= 34) ||
+            (hh > 18 && hh <= 26 && ss >= 36 && ss <= 60 && vv >= 30 && rgDiff >= 44 && r >= 120));
         if (isRed) {
           red++;
           patchRed[pIdx]++;
@@ -421,6 +429,26 @@ serve(async (req: Request) => {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Server-side biological tissue gatekeeper on colorFeatures (catches WebP/cached clients too)
+    if (imageBase64.length > 500) {
+      const avgGr = colorFeatures.avgR > 0 ? colorFeatures.avgG / colorFeatures.avgR : 1;
+      const gbDiff = colorFeatures.avgG - colorFeatures.avgB;
+      const rgDiffAvg = colorFeatures.avgR - colorFeatures.avgG;
+      const isNonBioAvg =
+        (region !== "eye" && (avgGr < 0.46 || avgGr > 0.92 || gbDiff < 5 || rgDiffAvg < 8)) ||
+        (typeof colorFeatures.syntheticRatio === "number" && colorFeatures.syntheticRatio > 20) ||
+        (region !== "eye" && typeof colorFeatures.skinTissueRatio === "number" && colorFeatures.skinTissueRatio < 30);
+
+      if (isNonBioAvg) {
+        return new Response(
+          JSON.stringify({
+            error: `This doesn't look like a real human ${region} image (synthetic or non-biological color spectrum detected). Please upload a clear photo of human ${region}.`,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const { data: history } = await supabase

@@ -106,33 +106,35 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
 
     const grRatio = r > 0 ? g / r : 1;
     const isSyntheticDye =
-      (r > 120 && grRatio < 0.29 && ss > 65) ||
-      (ss > 76 && vv > 35) ||
-      (hh >= 80 && hh <= 325 && ss >= 24 && vv >= 20);
+      (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
+      (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
     if (isSyntheticDye) {
       syntheticPixels++;
     }
 
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 55 &&
-      g >= 30 &&
-      b >= 18 &&
-      r >= g * 0.95 &&
-      r >= b * 1.05 &&
-      grRatio >= 0.30 &&
-      grRatio <= 0.96 &&
-      cb >= 72 &&
-      cb <= 135 &&
-      cr >= 128 &&
-      cr <= 182 &&
-      ss >= 8 &&
-      ss <= 72;
+      r >= 60 &&
+      g >= 35 &&
+      b >= 20 &&
+      r > g &&
+      g > b &&
+      g - b >= 7 &&
+      r - g >= 12 &&
+      grRatio >= 0.44 &&
+      grRatio <= 0.88 &&
+      (hh <= 38 || hh >= 345) &&
+      ss >= 12 &&
+      ss <= 60 &&
+      cb >= 78 &&
+      cb <= 126 &&
+      cr >= 133 &&
+      cr <= 178;
     if (isBiologicalSkin) {
       skinPixels++;
     }
 
-    const isSclera = !isSyntheticDye && vv >= 48 && ss <= 45 && r >= 115 && g >= 110 && b >= 75;
+    const isSclera = !isSyntheticDye && vv >= 52 && ss <= 38 && r >= 125 && g >= 120 && b >= 85;
     if (isSclera) {
       scleraPixels++;
     }
@@ -149,26 +151,26 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
       }
 
       const isYellow =
-        (hh >= 26 && hh <= 72 && ss >= 16 && ss <= 68 && vv >= 35 && ybDiff >= 22) ||
-        (isSclera && hh >= 30 && hh <= 68 && ss >= 12 && ybDiff >= 20 && b < g);
+        (hh >= 26 && hh <= 64 && ss >= 16 && ss <= 58 && vv >= 35 && ybDiff >= 22) ||
+        (isSclera && hh >= 30 && hh <= 64 && ss >= 12 && ybDiff >= 20 && b < g);
       if (isYellow) {
         yellow++;
         patchYellow[pIdx]++;
       }
 
       const isRed =
-        !isSyntheticDye &&
-        grRatio >= 0.30 &&
-        grRatio <= 0.70 &&
-        (((hh <= 20 || hh >= 335) && ss >= 25 && ss <= 70 && vv >= 25 && rgDiff >= 32) ||
-          (hh > 20 && hh <= 28 && ss >= 36 && ss <= 70 && vv >= 28 && rgDiff >= 42 && cr >= 152));
+        isBiologicalSkin &&
+        grRatio >= 0.44 &&
+        grRatio <= 0.66 &&
+        (((hh <= 18 || hh >= 345) && ss >= 26 && ss <= 60 && vv >= 28 && rgDiff >= 34) ||
+          (hh > 18 && hh <= 26 && ss >= 36 && ss <= 60 && vv >= 30 && rgDiff >= 44 && cr >= 154));
       if (isRed) {
         red++;
         patchRed[pIdx]++;
       }
     }
 
-    const isDark = !isSyntheticDye && (vv < 24 || (vv < 40 && ss >= 30 && r < 105 && g < 80 && r >= b));
+    const isDark = isBiologicalSkin && vv < 36 && ss >= 25 && r < 105 && g < 75;
     if (isDark) {
       dark++;
       patchDark[pIdx]++;
@@ -270,7 +272,8 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
     };
   }
 
-  if (synthRatio > 28 && skinRatio < 25) {
+  const avgGr = f.avgR > 0 ? f.avgG / f.avgR : 1;
+  if (synthRatio > 20 || (region !== 'eye' && (avgGr < 0.46 || f.avgG - f.avgB < 5))) {
     return {
       valid: false,
       detected: 'synthetic object or non-biological color',
@@ -283,7 +286,7 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
   }
 
   if (region === 'eye') {
-    if (skinRatio + scleraRatio < 22 || scleraRatio < 3) {
+    if (skinRatio < 12 || scleraRatio < 4) {
       return {
         valid: false,
         detected: 'non-eye object',
@@ -295,7 +298,7 @@ export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: Color
       };
     }
   } else {
-    if (skinRatio < 25) {
+    if (skinRatio < 30) {
       return {
         valid: false,
         detected: 'non-skin object or background',

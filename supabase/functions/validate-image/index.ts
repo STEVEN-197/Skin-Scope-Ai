@@ -1,7 +1,7 @@
 // 100% Keyless Biological Tissue Gatekeeper (JPEG + PNG + Client Features).
 // Rejects non-biological objects (e.g. red plastic buckets, clothes, walls,
-// furniture, cartoons, blank screens) using Kovac/Peer YCbCr + RGB biological
-// reflectance envelopes before allowing dermatological analysis.
+// furniture, cartoons, blank screens) using Kovac/Peer YCbCr + Melanin-Hemoglobin
+// reflectance rules (R > G > B, G-B >= 7, 0.44 <= G/R <= 0.88).
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore
@@ -92,21 +92,22 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
 
     const grRatio = r > 0 ? g / r : 1;
     const isSyntheticDye =
-      (r > 120 && grRatio < 0.29 && ss > 65) ||
-      (ss > 76 && vv > 35) ||
-      (hh >= 80 && hh <= 325 && ss >= 24 && vv >= 20);
+      (r > 95 && (grRatio < 0.43 || ss > 62 || (r - g > 35 && g - b < 7))) ||
+      (hh >= 65 && hh <= 335 && ss >= 18 && vv >= 15);
     if (isSyntheticDye) syntheticPixels++;
 
     const isBiologicalSkin =
       !isSyntheticDye &&
-      r >= 55 && g >= 30 && b >= 18 &&
-      r >= g * 0.95 && r >= b * 1.05 &&
-      grRatio >= 0.30 && grRatio <= 0.96 &&
-      cb >= 72 && cb <= 135 && cr >= 128 && cr <= 182 &&
-      ss >= 8 && ss <= 72;
+      r >= 60 && g >= 35 && b >= 20 &&
+      r > g && g > b &&
+      g - b >= 7 && r - g >= 12 &&
+      grRatio >= 0.44 && grRatio <= 0.88 &&
+      (hh <= 38 || hh >= 345) &&
+      ss >= 12 && ss <= 60 &&
+      cb >= 78 && cb <= 126 && cr >= 133 && cr <= 178;
     if (isBiologicalSkin) skinPixels++;
 
-    const isSclera = !isSyntheticDye && vv >= 48 && ss <= 45 && r >= 115 && g >= 110 && b >= 75;
+    const isSclera = !isSyntheticDye && vv >= 52 && ss <= 38 && r >= 125 && g >= 120 && b >= 85;
     if (isSclera) scleraPixels++;
 
     count++;
@@ -132,7 +133,8 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
     };
   }
 
-  if (synthRatio > 28 && skinRatio < 25) {
+  const avgGr = mR > 0 ? mG / mR : 1;
+  if (synthRatio > 20 || (region !== "eye" && (avgGr < 0.46 || mG - mB < 5))) {
     return {
       valid: false,
       detected: "synthetic object or non-biological color",
@@ -142,20 +144,20 @@ function validateRgbaPixels(data: Uint8Array, region: string) {
   }
 
   if (region === "eye") {
-    if (skinRatio + scleraRatio < 22 || scleraRatio < 3) {
+    if (skinRatio < 12 || scleraRatio < 4) {
       return {
         valid: false,
         detected: "non-eye object",
-        reason: "Could not detect human eye (sclera and eyelid tissue) features. Please upload a clear close-up of the eye.",
+        reason: "Could not detect human eye (sclera and eyelid skin) features. Please upload a clear close-up of the eye.",
         quality: "poor",
       };
     }
   } else {
-    if (skinRatio < 25) {
+    if (skinRatio < 30) {
       return {
         valid: false,
         detected: "non-skin object",
-        reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}%). Please upload a clear, well-lit photo of human ${region}.`,
+        reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}% biological epidermis; minimum 30% required). Please upload a clear, well-lit photo of human ${region}.`,
         quality: "poor",
       };
     }
@@ -195,34 +197,43 @@ serve(async (req: Request) => {
       return j({ error: `Invalid region. Must be one of: ${VALID_REGIONS.join(", ")}` }, 400, corsHeaders);
     }
 
-    // 1. Check client-computed tissue ratios if supplied
-    if (colorFeatures && typeof colorFeatures.skinTissueRatio === "number") {
-      const skinRatio = colorFeatures.skinTissueRatio;
-      const synthRatio = colorFeatures.syntheticRatio ?? 0;
-      const scleraRatio = colorFeatures.scleraRatio ?? 0;
-      if (synthRatio > 28 && skinRatio < 25) {
+    if (colorFeatures) {
+      if (colorFeatures.detectedObject) {
         return j({
           valid: false,
-          detected: "synthetic object or non-biological color",
-          reason: `Detected artificial/non-biological object (${synthRatio.toFixed(0)}% synthetic spectrum, only ${skinRatio.toFixed(0)}% human tissue). Please upload a clear photo of real human ${region}.`,
+          detected: colorFeatures.detectedObject,
+          reason: `Identified non-human object (${colorFeatures.detectedObject}). Please upload a clear photo of real human ${region}.`,
           quality: "poor",
         }, 200, corsHeaders);
       }
-      if (region === "eye" && (skinRatio + scleraRatio < 22 || scleraRatio < 3)) {
-        return j({
-          valid: false,
-          detected: "non-eye object",
-          reason: "Could not detect human eye (sclera and eyelid tissue) features.",
-          quality: "poor",
-        }, 200, corsHeaders);
-      }
-      if (region !== "eye" && skinRatio < 25) {
-        return j({
-          valid: false,
-          detected: "non-skin object",
-          reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}%). Please upload a clear photo of human ${region}.`,
-          quality: "poor",
-        }, 200, corsHeaders);
+      if (typeof colorFeatures.skinTissueRatio === "number") {
+        const skinRatio = colorFeatures.skinTissueRatio;
+        const synthRatio = colorFeatures.syntheticRatio ?? 0;
+        const scleraRatio = colorFeatures.scleraRatio ?? 0;
+        if (synthRatio > 20) {
+          return j({
+            valid: false,
+            detected: "synthetic object or non-biological color",
+            reason: `Detected artificial/non-biological object (${synthRatio.toFixed(0)}% synthetic spectrum, only ${skinRatio.toFixed(0)}% human tissue). Please upload a clear photo of real human ${region}.`,
+            quality: "poor",
+          }, 200, corsHeaders);
+        }
+        if (region === "eye" && (skinRatio < 12 || scleraRatio < 4)) {
+          return j({
+            valid: false,
+            detected: "non-eye object",
+            reason: "Could not detect human eye (sclera and eyelid skin) features.",
+            quality: "poor",
+          }, 200, corsHeaders);
+        }
+        if (region !== "eye" && skinRatio < 30) {
+          return j({
+            valid: false,
+            detected: "non-skin object",
+            reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}%). Please upload a clear photo of human ${region}.`,
+            quality: "poor",
+          }, 200, corsHeaders);
+        }
       }
     }
 
@@ -231,7 +242,6 @@ serve(async (req: Request) => {
       return j({ valid: true, detected: region, reason: "", quality: "good" }, 200, corsHeaders);
     }
 
-    // 2. Server-side JPEG decoding
     if (bytes[0] === 0xff && bytes[1] === 0xd8) {
       try {
         const decoded = jpeg.decode(bytes, { useTArray: true, maxResolutionInMP: 16 });
@@ -241,7 +251,6 @@ serve(async (req: Request) => {
       }
     }
 
-    // 3. Server-side PNG decoding (89 50 4E 47)
     if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
       try {
         const img = UPNG.decode(bytes.buffer);
