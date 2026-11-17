@@ -4,12 +4,10 @@ import { LayoutDashboard, Upload, FileText, LogOut, Menu, X, BookOpen, Bell, Bar
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { FloatingJarvis } from "@/components/FloatingJarvis";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { to: "/dashboard/jarvis", label: "JARVIS Assistant", icon: Sparkles },
   { to: "/dashboard/analyze", label: "New Analysis", icon: Upload },
   { to: "/dashboard/reports", label: "Scan Reports", icon: FileText },
   { to: "/dashboard/medical-reports", label: "Medical Reports", icon: FlaskConical },
@@ -155,7 +153,6 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
           </main>
         </div>
       </div>
-      <FloatingJarvis />
     </div>
   );
 }

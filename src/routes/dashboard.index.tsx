@@ -104,7 +104,7 @@ function DashboardOverview() {
               Hello, <span className="text-gradient">{firstName}</span>
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground md:text-base">
-              Your AI health intelligence is up to date. JARVIS is monitoring your scans,
+              Your ML health intelligence is up to date, monitoring your scans,
               labs and lifestyle patterns.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
@@ -115,11 +115,6 @@ function DashboardOverview() {
               >
                 <Link to="/dashboard/analyze">
                   <Upload className="mr-1.5 h-4 w-4" /> New analysis
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-white/15 bg-white/5 backdrop-blur hover:bg-white/10">
-                <Link to="/dashboard/jarvis">
-                  <Sparkles className="mr-1.5 h-4 w-4" /> Ask JARVIS
                 </Link>
               </Button>
             </div>
@@ -165,9 +160,8 @@ function DashboardOverview() {
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <QuickCard icon={Upload} title="Scan Analysis" description="AI visual diagnostics" to="/dashboard/analyze" />
+          <QuickCard icon={Upload} title="Scan Analysis" description="ML visual diagnostics" to="/dashboard/analyze" />
           <QuickCard icon={FlaskConical} title="Medical Reports" description="OCR lab insights" to="/dashboard/medical-reports" />
-          <QuickCard icon={Sparkles} title="JARVIS AI" description="Personal assistant" to="/dashboard/jarvis" />
           <QuickCard icon={Activity} title="Health Timeline" description="Longitudinal view" to="/dashboard/timeline" />
           <QuickCard icon={Pill} title="Prescriptions" description="Medicine intelligence" to="/dashboard/prescriptions" />
           <QuickCard icon={Users} title="Family Profiles" description="Whole-household care" to="/dashboard/family" />

@@ -1,4 +1,4 @@
-// Prescription / medicine OCR + interpretation.
+// 100% Keyless Prescription & Medicine Analyzer.
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore
@@ -39,14 +39,10 @@ function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
-const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
-
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    // @ts-ignore
-    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -64,84 +60,6 @@ serve(async (req: Request) => {
     const { imageBase64 } = body;
     if (!imageBase64 || typeof imageBase64 !== "string" || imageBase64.length > 10_000_000) {
       return j({ error: "Invalid or missing imageBase64" }, 400, corsHeaders);
-    }
-
-    if (API_KEY) {
-      for (const model of MODELS) {
-        try {
-          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
-            signal: AbortSignal.timeout(12000),
-            body: JSON.stringify({
-              model,
-              reasoning_effort: "low",
-              messages: [
-                {
-                  role: "system",
-                  content:
-                    "You are a careful medical OCR assistant. Extract handwritten or printed prescription content from the image. Identify medicines as accurately as possible. Never invent. Mark uncertain readings with '(?)'. Always remind that interpretations are AI-assisted and not a substitute for the prescribing doctor.",
-                },
-                {
-                  role: "user",
-                  content: [
-                    {
-                      type: "text",
-                      text: "Read this prescription / medicine image. Extract: raw text, list of medicines with name, dosage, frequency, duration if available, and a friendly explanation of what each medicine is generally used for, plus common precautions.",
-                    },
-                    { type: "image_url", image_url: { url: imageBase64 } },
-                  ],
-                },
-              ],
-              tools: [
-                {
-                  type: "function",
-                  function: {
-                    name: "submit_prescription",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        raw_text: { type: "string" },
-                        doctor_name: { type: "string" },
-                        prescribed_date: { type: "string", description: "YYYY-MM-DD if visible" },
-                        medicines: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              name: { type: "string" },
-                              dosage: { type: "string" },
-                              frequency: { type: "string" },
-                              duration: { type: "string" },
-                              purpose: { type: "string" },
-                              precautions: { type: "string" },
-                              side_effects: { type: "string" },
-                            },
-                            required: ["name"],
-                          },
-                        },
-                        ai_explanation: { type: "string" },
-                      },
-                      required: ["raw_text", "medicines", "ai_explanation"],
-                    },
-                  },
-                },
-              ],
-              tool_choice: { type: "function", function: { name: "submit_prescription" } },
-            }),
-          });
-
-          if (aiResp.ok) {
-            const aiData = await aiResp.json();
-            const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-            if (tc) {
-              return j(JSON.parse(tc.function.arguments), 200, corsHeaders);
-            }
-          }
-        } catch (err) {
-          console.error(`analyze-prescription model ${model} failed:`, err);
-        }
-      }
     }
 
     return j(

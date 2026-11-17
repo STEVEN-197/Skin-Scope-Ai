@@ -78,9 +78,8 @@ export default function DashboardOverview() {
   const firstName = (user?.email ?? 'there').split('@')[0].split('.')[0];
 
   const quickItems = [
-    { Icon: Upload, title: 'Scan Analysis', desc: 'AI visual diagnostics', to: '/dashboard/analyze' },
+    { Icon: Upload, title: 'Scan Analysis', desc: 'ML visual diagnostics', to: '/dashboard/analyze' },
     { Icon: FlaskConical, title: 'Medical Reports', desc: 'OCR lab insights', to: '/dashboard/medical-reports' },
-    { Icon: Sparkles, title: 'JARVIS AI', desc: 'Personal assistant', to: '/dashboard/jarvis' },
     { Icon: Activity, title: 'Health Timeline', desc: 'Longitudinal view', to: '/dashboard/timeline' },
     { Icon: Pill, title: 'Prescriptions', desc: 'Medicine intelligence', to: '/dashboard/prescriptions' },
     { Icon: Users, title: 'Family Profiles', desc: 'Whole-household care', to: '/dashboard/family' },
@@ -102,7 +101,7 @@ export default function DashboardOverview() {
               Hello, <Text style={{ color: colors.primaryGlow }}>{capitalize(firstName)}</Text>
             </Text>
             <Text style={[commonStyles.subtitle, { marginTop: 6 }]}>
-              Your AI health intelligence is up to date. JARVIS is monitoring your scans, labs and
+              Your ML health intelligence is up to date, monitoring your scans, labs and
               lifestyle patterns.
             </Text>
           </View>
@@ -116,13 +115,6 @@ export default function DashboardOverview() {
           >
             <Upload size={15} color="#FFF" />
             <Text style={styles.heroPrimaryText}>New analysis</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.heroOutlineBtn}
-            onPress={() => router.push('/dashboard/jarvis')}
-          >
-            <Sparkles size={15} color={colors.foreground} />
-            <Text style={styles.heroOutlineText}>Ask JARVIS</Text>
           </TouchableOpacity>
         </View>
       </View>

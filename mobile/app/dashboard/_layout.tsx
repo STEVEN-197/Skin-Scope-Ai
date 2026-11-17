@@ -33,12 +33,10 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '../../src/lib/auth-context';
 import { Logo } from '../../src/components/Logo';
-import { FloatingJarvis } from '../../src/components/FloatingJarvis';
 import { colors, commonStyles } from '../../src/theme';
 
 const navItems = [
   { to: '/dashboard', label: 'Overview', Icon: LayoutDashboard },
-  { to: '/dashboard/jarvis', label: 'JARVIS Assistant', Icon: Sparkles },
   { to: '/dashboard/analyze', label: 'New Analysis', Icon: Upload },
   { to: '/dashboard/reports', label: 'Scan Reports', Icon: FileText },
   { to: '/dashboard/medical-reports', label: 'Medical Reports', Icon: FlaskConical },
@@ -102,9 +100,6 @@ export default function DashboardLayout() {
       <View style={{ flex: 1 }}>
         <Slot />
       </View>
-
-      {/* Floating JARVIS Assistant */}
-      <FloatingJarvis />
 
       {/* Navigation Drawer */}
       <Modal

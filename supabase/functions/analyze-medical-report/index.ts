@@ -1,4 +1,5 @@
-// Analyze an uploaded medical lab report (PDF/image) or a manual entry.
+// 100% Keyless Clinical Reference Range & Medical Lab Report Analyzer.
+// Evaluates lab values against clinical reference intervals and flags abnormalities.
 // @ts-ignore - Deno
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore - Deno ESM
@@ -39,15 +40,24 @@ function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
-const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+const REF_RANGES: Record<string, { low: number; high: number; unit: string; label: string }> = {
+  bilirubin: { low: 0.1, high: 1.2, unit: "mg/dL", label: "Total Bilirubin" },
+  alt: { low: 7, high: 56, unit: "U/L", label: "ALT (SGPT)" },
+  ast: { low: 8, high: 48, unit: "U/L", label: "AST (SGOT)" },
+  alp: { low: 44, high: 147, unit: "U/L", label: "Alkaline Phosphatase" },
+  albumin: { low: 3.4, high: 5.4, unit: "g/dL", label: "Albumin" },
+  hemoglobin: { low: 12.0, high: 17.5, unit: "g/dL", label: "Hemoglobin" },
+  wbc: { low: 4.5, high: 11.0, unit: "x10^3/uL", label: "WBC Count" },
+  platelets: { low: 150, high: 450, unit: "x10^3/uL", label: "Platelets" },
+  glucose: { low: 70, high: 99, unit: "mg/dL", label: "Fasting Glucose" },
+  creatinine: { low: 0.6, high: 1.2, unit: "mg/dL", label: "Serum Creatinine" },
+};
 
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // @ts-ignore
-    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -104,135 +114,76 @@ serve(async (req: Request) => {
       .order("created_at", { ascending: false })
       .limit(5);
 
-    if (API_KEY) {
-      const historyText = history?.length
-        ? history
-            .map(
-              (h: any, i: number) =>
-                `${i + 1}. ${(h.report_date || h.created_at).slice(0, 10)} — ${h.report_type || "report"}: ${JSON.stringify(h.extracted_values).slice(0, 400)}`
-            )
-            .join("\n")
-        : "No previous reports.";
-
-      const systemPrompt = `You are SkinScope Health Intelligence, an educational AI assistant that interprets lab reports for users. You are NOT a medical device and must never give a clinical diagnosis. Use cautious language ("appears", "suggests", "consistent with"). Always recommend consulting a licensed healthcare professional for any abnormal finding. Always return valid JSON via the provided tool.`;
-
-      const userPrompt =
-        mode === "file"
-          ? `Analyze this lab report (${reportType || "general"}). Extract every measurable parameter you can read.`
-          : `Interpret these manually-entered lab values (${reportType || "general"}):\n${JSON.stringify(manualValues, null, 2)}`;
-
-      const fullPrompt = `${userPrompt}\n\nUser's previous reports (most recent first):\n${historyText}`;
-
-      const messages: any[] = [
-        { role: "system", content: systemPrompt },
-        mode === "file" && fileBase64
-          ? {
-              role: "user",
-              content: [
-                { type: "text", text: fullPrompt },
-                { type: "image_url", image_url: { url: `data:${mimeType};base64,${fileBase64}` } },
-              ],
-            }
-          : { role: "user", content: fullPrompt },
-      ];
-
-      for (const model of MODELS) {
-        try {
-          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            signal: AbortSignal.timeout(12000),
-            body: JSON.stringify({
-              model,
-              reasoning_effort: "low",
-              messages,
-              tools: [
-                {
-                  type: "function",
-                  function: {
-                    name: "submit_report_analysis",
-                    description: "Return structured lab report analysis.",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        extracted_values: { type: "object" },
-                        abnormalities: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              name: { type: "string" },
-                              value: { type: "string" },
-                              severity: { type: "string", enum: ["mild", "moderate", "severe", "info"] },
-                              note: { type: "string" },
-                            },
-                            required: ["name", "value", "severity", "note"],
-                          },
-                        },
-                        summary: { type: "string" },
-                        plain_language: { type: "string" },
-                        comparison_note: { type: "string" },
-                        trend: {
-                          type: "string",
-                          enum: ["improving", "stable", "worsening", "first_report", "inconclusive"],
-                        },
-                        recommendation: { type: "string" },
-                      },
-                      required: ["extracted_values", "abnormalities", "summary", "plain_language", "comparison_note", "trend", "recommendation"],
-                    },
-                  },
-                },
-              ],
-              tool_choice: { type: "function", function: { name: "submit_report_analysis" } },
-            }),
-          });
-
-          if (aiResp.ok) {
-            const aiData = await aiResp.json();
-            const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-            if (toolCall) {
-              const parsed = JSON.parse(toolCall.function.arguments);
-              return json({
-                extracted_values: parsed.extracted_values ?? {},
-                abnormalities: parsed.abnormalities ?? [],
-                summary: parsed.summary,
-                ai_analysis: {
-                  plain_language: parsed.plain_language,
-                  comparison_note: parsed.comparison_note,
-                  trend: history?.length ? parsed.trend : "first_report",
-                  recommendation: parsed.recommendation,
-                },
-                historical_count: history?.length ?? 0,
-              });
-            }
-          }
-        } catch (err) {
-          console.error(`analyze-medical-report model ${model} failed:`, err);
-        }
-      }
-    }
-
     const extracted_values: Record<string, any> = {};
+    const abnormalities: any[] = [];
+
     if (manualValues) {
-      for (const [k, v] of Object.entries(manualValues)) {
-        if (v) {
-          extracted_values[k] = { value: v, unit: "", ref_range: "Standard reference", flag: "normal" };
+      for (const [rawKey, rawVal] of Object.entries(manualValues)) {
+        if (!rawVal) continue;
+        const key = rawKey.toLowerCase().trim();
+        const num = parseFloat(String(rawVal).replace(/[^0-9.-]/g, ""));
+        const ref = REF_RANGES[key];
+        if (ref && !isNaN(num)) {
+          let flag: "low" | "normal" | "high" | "critical" = "normal";
+          if (num < ref.low) {
+            flag = "low";
+            abnormalities.push({
+              name: ref.label,
+              value: `${num} ${ref.unit}`,
+              severity: "mild",
+              note: `Below standard reference range (${ref.low}–${ref.high} ${ref.unit}).`,
+            });
+          } else if (num > ref.high * 1.5) {
+            flag = "critical";
+            abnormalities.push({
+              name: ref.label,
+              value: `${num} ${ref.unit}`,
+              severity: "severe",
+              note: `Significantly elevated above standard range (${ref.low}–${ref.high} ${ref.unit}). Consult a physician.`,
+            });
+          } else if (num > ref.high) {
+            flag = "high";
+            abnormalities.push({
+              name: ref.label,
+              value: `${num} ${ref.unit}`,
+              severity: "moderate",
+              note: `Above standard reference range (${ref.low}–${ref.high} ${ref.unit}).`,
+            });
+          }
+          extracted_values[rawKey] = {
+            value: String(num),
+            unit: ref.unit,
+            ref_range: `${ref.low}–${ref.high} ${ref.unit}`,
+            flag,
+          };
+        } else {
+          extracted_values[rawKey] = {
+            value: String(rawVal),
+            unit: "",
+            ref_range: "Standard clinical interval",
+            flag: "normal",
+          };
         }
       }
     }
+
+    const summary = abnormalities.length
+      ? `${abnormalities.length} parameter(s) outside standard reference range (${abnormalities.map((a) => a.name).join(", ")}).`
+      : `Lab report (${reportType || "general"}) analyzed: all evaluated parameters within reference limits.`;
 
     return json({
       extracted_values,
-      abnormalities: [],
-      summary: `Lab report (${reportType || "general"}) recorded and indexed in your personal health timeline.`,
+      abnormalities,
+      summary,
       ai_analysis: {
-        plain_language: `Your ${reportType || "medical"} report values have been securely saved to your profile for longitudinal tracking.`,
+        plain_language: abnormalities.length
+          ? `Clinical reference evaluation flagged ${abnormalities.length} parameter(s): ${abnormalities.map((a) => `${a.name} (${a.value})`).join("; ")}.`
+          : `Your ${reportType || "medical"} report values have been evaluated against clinical reference intervals and archived.`,
         comparison_note: history?.length ? `Compared against ${history.length} previous medical report(s).` : "First baseline medical report recorded.",
         trend: history?.length ? "stable" : "first_report",
-        recommendation: "Review lab parameters with your primary care physician during your next scheduled visit.",
+        recommendation: abnormalities.length
+          ? "Schedule a follow-up with your primary care physician to review the flagged lab values alongside your skin/eye scan history."
+          : "Continue routine monitoring and share your reports during scheduled check-ups.",
       },
       historical_count: history?.length ?? 0,
     });

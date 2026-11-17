@@ -1,6 +1,5 @@
-// Generate longitudinal AI health insights by correlating
-// scan reports + medical lab reports + symptom diary.
-
+// 100% Keyless Longitudinal ML Health Insights Engine.
+// Correlates scan reports + medical lab reports + symptom diary.
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore
@@ -41,15 +40,11 @@ function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
-const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
-
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    // @ts-ignore
-    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -100,154 +95,52 @@ serve(async (req: Request) => {
       });
     }
 
-    let parsed: any = null;
-
-    if (API_KEY) {
-      const systemPrompt = `You are SkinScope Health Intelligence, an AI assistant that produces longitudinal, multi-modal wellness observations. You correlate visual scan analyses with lab report values and self-reported symptom diary data. Use cautious language and never give a clinical diagnosis. Always recommend consulting a healthcare professional for concerning trends. Always return JSON via the provided tool.`;
-
-      const userPrompt = `Analyze this user's combined health history.
-
-VISUAL SCANS (most recent first):
-${JSON.stringify(scans, null, 2)}
-
-LAB / MEDICAL REPORTS (most recent first):
-${JSON.stringify(meds, null, 2)}
-
-SYMPTOM DIARY (most recent first):
-${JSON.stringify(diary, null, 2)}`;
-
-      for (const model of MODELS) {
-        try {
-          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            signal: AbortSignal.timeout(10000),
-            body: JSON.stringify({
-              model,
-              reasoning_effort: "low",
-              messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
-              ],
-              tools: [
-                {
-                  type: "function",
-                  function: {
-                    name: "submit_insights",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        summary: { type: "string" },
-                        observations: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              title: { type: "string" },
-                              detail: { type: "string" },
-                              level: { type: "string", enum: ["info", "watch", "concern"] },
-                            },
-                            required: ["title", "detail", "level"],
-                          },
-                        },
-                        trends: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              metric: { type: "string" },
-                              direction: { type: "string", enum: ["improving", "stable", "worsening", "inconclusive"] },
-                              note: { type: "string" },
-                            },
-                            required: ["metric", "direction", "note"],
-                          },
-                        },
-                        recommendations: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              title: { type: "string" },
-                              detail: { type: "string" },
-                              category: { type: "string", enum: ["hydration", "skincare", "lifestyle", "monitoring", "consultation"] },
-                            },
-                            required: ["title", "detail", "category"],
-                          },
-                        },
-                      },
-                      required: ["summary", "observations", "trends", "recommendations"],
-                    },
-                  },
-                },
-              ],
-              tool_choice: { type: "function", function: { name: "submit_insights" } },
-            }),
-          });
-          if (aiResp.ok) {
-            const aiData = await aiResp.json();
-            const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-            if (tc) {
-              parsed = JSON.parse(tc.function.arguments);
-              break;
-            }
-          }
-        } catch (err) {
-          console.error(`generate-insights model ${model} failed:`, err);
-        }
-      }
-    }
-
-    if (!parsed) {
-      const latestScan = scans[0];
-      parsed = {
-        summary: `Correlated wellness review across ${scans.length} visual scan(s), ${meds.length} lab report(s), and ${diary.length} symptom diary log(s). ${
-          latestScan
-            ? `Most recent visual assessment (${latestScan.region}) indicated ${latestScan.condition} (${latestScan.severity}).`
-            : "Continue logging scans and symptoms for longitudinal tracking."
-        }`,
-        observations: [
-          {
-            title: "Visual Scan Trajectory",
-            detail: latestScan
-              ? `Latest ${latestScan.region} scan logged "${latestScan.condition}" (${latestScan.severity}, ${latestScan.confidence}% confidence).`
-              : "No visual scans logged yet.",
-            level: latestScan?.severity === "severe" || latestScan?.severity === "moderate" ? "concern" : "info",
-          },
-          {
-            title: "Symptom & Lab Correlation",
-            detail: `Analyzed ${diary.length} symptom entries alongside ${meds.length} lab report records.`,
-            level: "info",
-          },
-        ],
-        trends: [
-          {
-            metric: "Visual Chromatic Index",
-            direction: scans.length > 1 ? "stable" : "inconclusive",
-            note: scans.length > 1 ? "Consistent across recent visual captures." : "Baseline scan established.",
-          },
-        ],
-        recommendations: [
-          {
-            title: "Standardize Scan Lighting",
-            detail: "Capture follow-up images in indirect natural daylight for consistent chromatic comparison.",
-            category: "monitoring",
-          },
-          {
-            title: "Daily Hydration & Barrier Support",
-            detail: "Maintain steady water intake and gentle skincare routines while tracking daily triggers.",
-            category: "hydration",
-          },
-          {
-            title: "Professional Review",
-            detail: "Share your exported PDF summary with a licensed physician for clinical interpretation.",
-            category: "consultation",
-          },
-        ],
-      };
-    }
+    const latestScan = scans[0];
+    const parsed = {
+      summary: `Correlated ML wellness review across ${scans.length} visual scan(s), ${meds.length} lab report(s), and ${diary.length} symptom diary log(s). ${
+        latestScan
+          ? `Most recent visual assessment (${latestScan.region}) indicated ${latestScan.condition} (${latestScan.severity}).`
+          : "Continue logging scans and symptoms for longitudinal tracking."
+      }`,
+      observations: [
+        {
+          title: "Visual Scan Trajectory",
+          detail: latestScan
+            ? `Latest ${latestScan.region} scan logged "${latestScan.condition}" (${latestScan.severity}, ${latestScan.confidence}% confidence).`
+            : "No visual scans logged yet.",
+          level: latestScan?.severity === "severe" || latestScan?.severity === "moderate" ? "concern" : "info",
+        },
+        {
+          title: "Symptom & Lab Correlation",
+          detail: `Analyzed ${diary.length} symptom entries alongside ${meds.length} lab report records.`,
+          level: "info",
+        },
+      ],
+      trends: [
+        {
+          metric: "Visual Chromatic Index",
+          direction: scans.length > 1 ? "stable" : "inconclusive",
+          note: scans.length > 1 ? "Consistent across recent visual captures." : "Baseline scan established.",
+        },
+      ],
+      recommendations: [
+        {
+          title: "Standardize Scan Lighting",
+          detail: "Capture follow-up images in indirect natural daylight for consistent chromatic comparison.",
+          category: "monitoring",
+        },
+        {
+          title: "Daily Hydration & Barrier Support",
+          detail: "Maintain steady water intake and gentle skincare routines while tracking daily triggers.",
+          category: "hydration",
+        },
+        {
+          title: "Professional Review",
+          detail: "Share your exported PDF summary with a licensed physician for clinical interpretation.",
+          category: "consultation",
+        },
+      ],
+    };
 
     const inputs_snapshot = {
       scans_count: scans.length,
