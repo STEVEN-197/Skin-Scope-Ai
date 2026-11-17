@@ -308,8 +308,7 @@ function HealthScoreRing({ score }: { score: number }) {
           fill="none"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c}`}
-          rotation="-90"
-          origin="52, 52"
+          transform="rotate(-90 52 52)"
         />
       </Svg>
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
