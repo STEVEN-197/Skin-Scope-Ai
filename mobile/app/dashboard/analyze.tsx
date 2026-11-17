@@ -172,7 +172,7 @@ export default function AnalyzeScreen() {
       if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
 
       // 4. Call edge function
-      setStage('Running AI vision analysis…');
+      setStage('Running scan…');
       const { data: aiData, error: fnErr } = await supabase.functions.invoke('analyze-skin', {
         body: { imageBase64: dataUrl, region, colorFeatures, ruleResult },
       });

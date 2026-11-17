@@ -203,7 +203,7 @@ function AnalyzePage() {
       if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
 
       // 4. Call ML edge function + optional local Ollama Vision AI ensemble
-      setStage("Running ML + Vision ensemble analysis…");
+      setStage("Running scan…");
       const imageBase64 = await fileToDataURL(file);
 
       const [edgeRes, ollamaRes] = await Promise.all([
