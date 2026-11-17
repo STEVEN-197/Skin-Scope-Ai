@@ -23,6 +23,7 @@ def base_url():
 @pytest.fixture
 def driver(request):
     opts = Options()
+    opts.page_load_strategy = "eager"
     if HEADLESS:
         opts.add_argument("--headless=new")
     opts.add_argument("--no-sandbox")
