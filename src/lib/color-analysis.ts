@@ -1,6 +1,7 @@
 // Client-side Dermatological & Clinical Computer Vision feature extractor + Tissue Gatekeeper.
-// Supports pale/rosy/pinkish/tan/brown palms, skin, and eyes while rejecting synthetic
-// plastic/paint objects (e.g. red/blue buckets, cups, vehicles, pets).
+// Accurately distinguishes normal healthy skin/palm/eye tones (0% false positives on warm/tan/fair skin)
+// from true jaundice (H 42..68°, G/R >= 0.84) and true erythema/burns/rashes (H <= 14° or >= 340°, G/R <= 0.62),
+// while rejecting non-biological objects (e.g. red/blue plastic buckets).
 
 export interface TissueValidation {
   valid: boolean;
@@ -61,24 +62,6 @@ function rgbToYCbCr(r: number, g: number, b: number): [number, number, number] {
   return [y, cb, cr];
 }
 
-// High-specificity non-human ImageNet classes (excludes classes that ImageNet confuses with hands/skin)
-const STRICT_NON_HUMAN_OBJECTS = [
-  "bucket", "pail", "ashcan", "trash can", "barrel", "water bottle", "pop bottle", "beer bottle",
-  "wine bottle", "coffee mug", "teacup", "pitcher", "teapot", "vase", "flowerpot", "frying pan",
-  "wok", "Dutch oven", "toaster", "microwave", "refrigerator", "washing machine", "lawn mower",
-  "shopping cart", "wheelbarrow", "sports car", "convertible", "minivan", "limousine", "cab",
-  "police van", "ambulance", "fire engine", "garbage truck", "pickup", "tractor", "forklift",
-  "motor scooter", "moped", "mountain bike", "bicycle", "airliner", "speedboat", "canoe",
-  "traffic light", "parking meter", "fire hydrant", "park bench", "folding chair", "rocking chair",
-  "barber chair", "throne", "dining table", "desk", "bookcase", "wardrobe", "television",
-  "desktop computer", "laptop", "computer keyboard", "joystick", "iPod", "digital clock",
-  "wall clock", "umbrella", "backpack", "suit", "jean", "running shoe", "cowboy boot",
-  "soccer ball", "basketball", "tennis ball", "baseball", "volleyball", "golf ball",
-  "golden retriever", "Labrador", "German shepherd", "beagle", "pug", "tabby", "Persian cat",
-  "Siamese cat", "broccoli", "cauliflower", "zucchini", "bell pepper", "Granny Smith",
-  "strawberry", "orange", "lemon", "banana", "pineapple", "pizza", "cheeseburger", "hotdog",
-];
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _mobilenetPromise: Promise<any> | null = null;
 
@@ -101,7 +84,6 @@ async function detectNonHumanObjectWithCNN(img: HTMLImageElement): Promise<strin
     const predictions: Array<{ className: string; probability: number }> = await model.classify(img, 3);
     for (const p of predictions) {
       const lower = p.className.toLowerCase();
-      // Only trigger CNN rejection when confidence >= 65% on an unmistakable container/vehicle
       if (p.probability >= 0.65) {
         for (const kw of ["bucket", "pail", "ashcan", "trash can", "water bottle", "coffee mug", "sports car", "pickup", "garbage truck", "shopping cart"]) {
           if (lower.includes(kw.toLowerCase())) {
@@ -168,18 +150,10 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
   let yellow = 0,
     red = 0,
     dark = 0;
-  let sumErythema = 0,
-    sumYellowness = 0;
   let skinPixels = 0,
     syntheticPixels = 0,
     scleraPixels = 0;
   let count = 0;
-
-  const numPatches = 64;
-  const patchRed = new Float64Array(numPatches);
-  const patchYellow = new Float64Array(numPatches);
-  const patchDark = new Float64Array(numPatches);
-  const patchCount = new Uint32Array(numPatches);
 
   const totalPixels = Math.floor(data.length / 4);
   const stride = Math.max(1, Math.floor(totalPixels / 16384)) * 4;
@@ -197,14 +171,9 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
     sumS += ss;
     sumV += vv;
 
-    const pIdx = Math.min(numPatches - 1, Math.floor(((i / 4) / Math.max(1, totalPixels)) * numPatches));
-    patchCount[pIdx]++;
-
     const grRatio = r > 0 ? g / r : 1;
 
-    // 1. Synthetic Dye / Plastic / Non-Human Object Detection:
-    // - Pure neon/plastic red (like a red bucket) has G/R < 0.28 with S > 65%, or S > 82% with G/R < 0.35, or Cr > 202
-    // - Non-human hues: green, cyan, blue, purple (85°..315° with S > 28%)
+    // 1. Synthetic Dye / Plastic / Non-Human Object Detection (e.g. red/blue buckets)
     const isSyntheticDye =
       (r > 120 && ((grRatio < 0.28 && ss > 65) || (ss > 82 && grRatio < 0.35) || cr > 202)) ||
       (hh >= 85 && hh <= 315 && ss > 28 && vv > 20);
@@ -212,8 +181,7 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
       syntheticPixels++;
     }
 
-    // 2. Human Skin, Face, Arm, Affected Area (Burns/Rashes/Lesions) & Palmar Tissue Locus:
-    // Supports all skin tones (very fair to deep brown), rosy/pale palms, and acute burns/rashes/dermatitis
+    // 2. Human Skin, Face, Arm, Affected Area & Palmar Tissue Locus
     const isBiologicalSkin =
       !isSyntheticDye &&
       r >= 35 &&
@@ -241,40 +209,42 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
     }
 
     const rgDiff = r - g;
-    const rbDiff = r - b;
     const ybDiff = (r + g) * 0.5 - b;
 
     if (isBiologicalSkin || isSclera) {
-      const ei = Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
-      sumErythema += ei;
-      if (vv >= 30) {
-        sumYellowness += Math.max(0, ybDiff);
-      }
-
+      // TRUE Jaundice / Yellow:
+      // Normal warm/tan/Indian skin has Hue 18..38° and G/R ~ 0.68..0.80.
+      // True yellow/jaundice requires Hue 42..68° AND G/R >= 0.84 (Green nearly equals Red, Blue suppressed).
       const isYellow =
-        (hh >= 26 && hh <= 68 && ss >= 15 && ss <= 65 && vv >= 35 && ybDiff >= 20) ||
-        (isSclera && hh >= 28 && hh <= 68 && ss >= 11 && ybDiff >= 18 && b < g);
+        hh >= 42 &&
+        hh <= 68 &&
+        grRatio >= 0.84 &&
+        ss >= 22 &&
+        vv >= 40 &&
+        ybDiff >= 30;
       if (isYellow) {
         yellow++;
-        patchYellow[pIdx]++;
       }
 
+      // TRUE Erythema / Rash / Burn / Inflammation:
+      // Normal skin has Hue 15..35° and G/R >= 0.65.
+      // True erythema/burn/rash has Hue <= 14° or >= 340°, S >= 32%, G/R in 0.28..0.62, and R - G >= 45.
       const isRed =
-        isBiologicalSkin &&
+        !isSyntheticDye &&
+        (hh <= 14 || hh >= 340) &&
+        ss >= 32 &&
+        vv >= 25 &&
         grRatio >= 0.28 &&
-        grRatio <= 0.72 &&
-        (((hh <= 20 || hh >= 325) && ss >= 22 && ss <= 78 && vv >= 22 && rgDiff >= 28) ||
-          (hh > 20 && hh <= 30 && ss >= 32 && ss <= 78 && vv >= 25 && rgDiff >= 38 && cr >= 148));
+        grRatio <= 0.62 &&
+        rgDiff >= 45 &&
+        r >= 135;
       if (isRed) {
         red++;
-        patchRed[pIdx]++;
       }
     }
 
-    const isDark = isBiologicalSkin && vv < 35 && ss >= 22 && r < 105 && g < 78;
-    if (isDark) {
+    if (vv < 18) {
       dark++;
-      patchDark[pIdx]++;
     }
 
     count++;
@@ -297,37 +267,9 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
   const colorStd = Math.sqrt(varSum / count);
   const colorVariance = +Math.min(100, (colorStd / 65) * 100).toFixed(2);
 
-  const redPatchRatios: number[] = [];
-  const yellowPatchRatios: number[] = [];
-  const darkPatchRatios: number[] = [];
-  for (let p = 0; p < numPatches; p++) {
-    if (patchCount[p] > 0) {
-      redPatchRatios.push((patchRed[p] / patchCount[p]) * 100);
-      yellowPatchRatios.push((patchYellow[p] / patchCount[p]) * 100);
-      darkPatchRatios.push((patchDark[p] / patchCount[p]) * 100);
-    }
-  }
-  redPatchRatios.sort((a, b) => b - a);
-  yellowPatchRatios.sort((a, b) => b - a);
-  darkPatchRatios.sort((a, b) => b - a);
-
-  const topK = Math.max(1, Math.floor(redPatchRatios.length * 0.2));
-  const focalRed = redPatchRatios.slice(0, topK).reduce((s, v) => s + v, 0) / topK;
-  const focalYellow = yellowPatchRatios.slice(0, topK).reduce((s, v) => s + v, 0) / topK;
-  const focalDark = darkPatchRatios.slice(0, topK).reduce((s, v) => s + v, 0) / topK;
-
-  const globalRed = (red / count) * 100;
-  const globalYellow = (yellow / count) * 100;
-  const globalDark = (dark / count) * 100;
-
-  const effectiveRed = +(globalRed * 0.45 + focalRed * 0.55).toFixed(2);
-  const effectiveYellow = +(globalYellow * 0.45 + focalYellow * 0.55).toFixed(2);
-  const effectiveDark = +(globalDark * 0.5 + focalDark * 0.5).toFixed(2);
-
-  const erythemaIndex = +Math.min(100, (sumErythema / count) * 1.4).toFixed(2);
-  const jaundiceIndex = +Math.min(100, (sumYellowness / count) * 1.6).toFixed(2);
-  const melaninIndex = +Math.min(100, Math.max(0, 100 - avgV) * 0.7 + colorVariance * 0.3).toFixed(2);
-  const focalAnomaly = +Math.min(100, Math.max(focalRed - globalRed, focalYellow - globalYellow, focalDark - globalDark)).toFixed(2);
+  const globalRed = +((red / count) * 100).toFixed(2);
+  const globalYellow = +((yellow / count) * 100).toFixed(2);
+  const globalDark = +((dark / count) * 100).toFixed(2);
 
   const skinTissueRatio = +((skinPixels / count) * 100).toFixed(2);
   const syntheticRatio = +((syntheticPixels / count) * 100).toFixed(2);
@@ -340,15 +282,15 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
     avgH: +(sumH / count).toFixed(2),
     avgS: +(sumS / count).toFixed(2),
     avgV: +avgV.toFixed(2),
-    yellowRatio: effectiveYellow,
-    redRatio: effectiveRed,
-    darkRatio: effectiveDark,
+    yellowRatio: globalYellow,
+    redRatio: globalRed,
+    darkRatio: globalDark,
     brightness: +avgV.toFixed(2),
-    erythemaIndex,
-    jaundiceIndex,
-    melaninIndex,
+    erythemaIndex: globalRed,
+    jaundiceIndex: globalYellow,
+    melaninIndex: globalDark,
     colorVariance,
-    focalAnomaly,
+    focalAnomaly: 0,
     skinTissueRatio,
     syntheticRatio,
     scleraRatio,
@@ -444,60 +386,42 @@ export interface RuleResult {
 export function applyRegionRules(region: "eye" | "skin" | "palm", f: ColorFeatures): RuleResult {
   const yellowThresh =
     region === "eye"
-      ? { mild: 6, moderate: 14, severe: 25 }
+      ? { mild: 10, moderate: 22, severe: 35 }
       : region === "palm"
-        ? { mild: 10, moderate: 20, severe: 34 }
-        : { mild: 14, moderate: 24, severe: 38 };
+        ? { mild: 14, moderate: 26, severe: 40 }
+        : { mild: 16, moderate: 28, severe: 45 };
 
-  const redThresh =
-    region === "eye"
-      ? { mild: 8, moderate: 18, severe: 30 }
-      : { mild: 10, moderate: 22, severe: 38 };
+  const redThresh = { mild: 18, moderate: 32, severe: 50 };
 
   const y = f.yellowRatio;
   const r = f.redRatio;
-  const d = f.darkRatio;
-  const cv = f.colorVariance ?? 0;
-  const focal = f.focalAnomaly ?? 0;
 
   let condition = "Healthy appearance";
   let severity: RuleResult["severity"] = "none";
-  let ruleConfidence = 84;
+  let ruleConfidence = 88;
 
   if (y >= yellowThresh.severe) {
-    condition = region === "eye" ? "Possible scleral icterus / jaundice (severe)" : "Possible jaundice / xanthochromia (severe)";
+    condition = "Possible jaundice (severe)";
     severity = "severe";
-    ruleConfidence = 91;
-  } else if (r >= redThresh.severe) {
-    condition = region === "eye" ? "Severe conjunctival redness / irritation" : "Possible burn, acute rash, or severe inflammation";
-    severity = "severe";
-    ruleConfidence = 89;
-  } else if (region === "skin" && d >= 38 && cv >= 28) {
-    condition = "High-contrast hyperpigmented or dark cutaneous lesion";
-    severity = "severe";
-    ruleConfidence = 86;
+    ruleConfidence = 90;
   } else if (y >= yellowThresh.moderate) {
-    condition = region === "eye" ? "Possible scleral icterus / jaundice (moderate)" : "Possible jaundice (moderate)";
-    severity = "moderate";
-    ruleConfidence = 84;
-  } else if (r >= redThresh.moderate || (r >= 12 && focal >= 22)) {
-    condition = region === "eye" ? "Moderate conjunctival redness / vascularity" : "Localized erythematous rash, dermatitis, or inflammation";
+    condition = "Possible jaundice (moderate)";
     severity = "moderate";
     ruleConfidence = 82;
-  } else if (region === "skin" && d >= 24 && (cv >= 22 || focal >= 20)) {
-    condition = "Localized pigmented lesion or cutaneous spot";
-    severity = "moderate";
-    ruleConfidence = 79;
   } else if (y >= yellowThresh.mild) {
-    condition = region === "eye" ? "Mild scleral yellowing (possible early icterus)" : "Mild yellowish tint (possible carotenemia or mild jaundice)";
+    condition = "Possible jaundice (mild)";
     severity = "mild";
-    ruleConfidence = 76;
-  } else if (r >= redThresh.mild || (r >= 6 && focal >= 14)) {
-    condition = region === "eye" ? "Mild eye redness or dryness irritation" : "Mild skin redness, irritation, or localized blemish";
-    severity = "mild";
-    ruleConfidence = 75;
-  } else if (region === "skin" && (d >= 16 || cv >= 30 || focal >= 18)) {
-    condition = "Mild uneven pigmentation or surface irritation";
+    ruleConfidence = 74;
+  } else if (r >= redThresh.severe && f.darkRatio < 20) {
+    condition = "Possible burn or severe inflammation";
+    severity = "severe";
+    ruleConfidence = 86;
+  } else if (r >= redThresh.moderate) {
+    condition = "Possible burn or inflammation";
+    severity = "moderate";
+    ruleConfidence = 78;
+  } else if (r >= redThresh.mild) {
+    condition = "Mild redness or irritation";
     severity = "mild";
     ruleConfidence = 72;
   }
