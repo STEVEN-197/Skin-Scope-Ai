@@ -14,7 +14,6 @@ const ALLOWED_ORIGINS = [
   "capacitor://localhost",
 ];
 
-// Local dev (any port), LAN preview (Expo web on phone/PC), and Vercel previews.
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
@@ -40,13 +39,15 @@ function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     // @ts-ignore
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY"); const LOVABLE_API_KEY = GEMINI_API_KEY || Deno.env.get("LOVABLE_API_KEY");
+    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -102,6 +103,117 @@ serve(async (req: Request) => {
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(5);
+
+    if (API_KEY) {
+      const historyText = history?.length
+        ? history
+            .map(
+              (h: any, i: number) =>
+                `${i + 1}. ${(h.report_date || h.created_at).slice(0, 10)} — ${h.report_type || "report"}: ${JSON.stringify(h.extracted_values).slice(0, 400)}`
+            )
+            .join("\n")
+        : "No previous reports.";
+
+      const systemPrompt = `You are SkinScope Health Intelligence, an educational AI assistant that interprets lab reports for users. You are NOT a medical device and must never give a clinical diagnosis. Use cautious language ("appears", "suggests", "consistent with"). Always recommend consulting a licensed healthcare professional for any abnormal finding. Always return valid JSON via the provided tool.`;
+
+      const userPrompt =
+        mode === "file"
+          ? `Analyze this lab report (${reportType || "general"}). Extract every measurable parameter you can read.`
+          : `Interpret these manually-entered lab values (${reportType || "general"}):\n${JSON.stringify(manualValues, null, 2)}`;
+
+      const fullPrompt = `${userPrompt}\n\nUser's previous reports (most recent first):\n${historyText}`;
+
+      const messages: any[] = [
+        { role: "system", content: systemPrompt },
+        mode === "file" && fileBase64
+          ? {
+              role: "user",
+              content: [
+                { type: "text", text: fullPrompt },
+                { type: "image_url", image_url: { url: `data:${mimeType};base64,${fileBase64}` } },
+              ],
+            }
+          : { role: "user", content: fullPrompt },
+      ];
+
+      for (const model of MODELS) {
+        try {
+          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            signal: AbortSignal.timeout(12000),
+            body: JSON.stringify({
+              model,
+              reasoning_effort: "low",
+              messages,
+              tools: [
+                {
+                  type: "function",
+                  function: {
+                    name: "submit_report_analysis",
+                    description: "Return structured lab report analysis.",
+                    parameters: {
+                      type: "object",
+                      properties: {
+                        extracted_values: { type: "object" },
+                        abnormalities: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              name: { type: "string" },
+                              value: { type: "string" },
+                              severity: { type: "string", enum: ["mild", "moderate", "severe", "info"] },
+                              note: { type: "string" },
+                            },
+                            required: ["name", "value", "severity", "note"],
+                          },
+                        },
+                        summary: { type: "string" },
+                        plain_language: { type: "string" },
+                        comparison_note: { type: "string" },
+                        trend: {
+                          type: "string",
+                          enum: ["improving", "stable", "worsening", "first_report", "inconclusive"],
+                        },
+                        recommendation: { type: "string" },
+                      },
+                      required: ["extracted_values", "abnormalities", "summary", "plain_language", "comparison_note", "trend", "recommendation"],
+                    },
+                  },
+                },
+              ],
+              tool_choice: { type: "function", function: { name: "submit_report_analysis" } },
+            }),
+          });
+
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+            if (toolCall) {
+              const parsed = JSON.parse(toolCall.function.arguments);
+              return json({
+                extracted_values: parsed.extracted_values ?? {},
+                abnormalities: parsed.abnormalities ?? [],
+                summary: parsed.summary,
+                ai_analysis: {
+                  plain_language: parsed.plain_language,
+                  comparison_note: parsed.comparison_note,
+                  trend: history?.length ? parsed.trend : "first_report",
+                  recommendation: parsed.recommendation,
+                },
+                historical_count: history?.length ?? 0,
+              });
+            }
+          }
+        } catch (err) {
+          console.error(`analyze-medical-report model ${model} failed:`, err);
+        }
+      }
+    }
 
     const extracted_values: Record<string, any> = {};
     if (manualValues) {

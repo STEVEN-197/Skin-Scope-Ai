@@ -1,13 +1,9 @@
 // AI vision analysis edge function.
-// Combines a Lovable AI (Gemini) multimodal call with the client-supplied
-// color features and historical reports to produce a structured assessment.
-
 // @ts-ignore - Deno
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore - Deno ESM import
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.0";
 
-// SECURITY FIX (FINDING-004): Restrict CORS to known production origins only.
 const ALLOWED_ORIGINS = [
   "https://skinscopeai-main.vercel.app",
   "https://skinscopeai.vercel.app",
@@ -18,7 +14,6 @@ const ALLOWED_ORIGINS = [
   "capacitor://localhost",
 ];
 
-// Local dev (any port), LAN preview (Expo web on phone/PC), and Vercel previews.
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
@@ -131,6 +126,8 @@ function buildFallbackAssessment(
   };
 }
 
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
@@ -139,7 +136,7 @@ serve(async (req: Request) => {
 
   try {
     // @ts-ignore
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY"); const LOVABLE_API_KEY = GEMINI_API_KEY || Deno.env.get("LOVABLE_API_KEY");
+    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -204,7 +201,6 @@ serve(async (req: Request) => {
       });
     }
 
-    // Pull last 5 reports for trend analysis
     const { data: history } = await supabase
       .from("reports")
       .select("condition, severity, confidence, created_at")
@@ -224,7 +220,7 @@ serve(async (req: Request) => {
       recommendation: string;
     } | null = null;
 
-    if (LOVABLE_API_KEY) {
+    if (API_KEY) {
       const historyText = histArr.length
         ? histArr
             .map(
@@ -255,84 +251,88 @@ ${historyText}
 
 Provide a structured wellness assessment. Confirm or refine the rule-based finding using what you see in the image. Note image quality issues if any. Compare with history to identify trend (improving / stable / worsening / first_report). Never diagnose — use "appears", "possible", "consistent with".`;
 
-      try {
-        const aiResp = await fetch(
-          "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "gemini-3.8-flash",
-              messages: [
-                { role: "system", content: systemPrompt },
-                {
-                  role: "user",
-                  content: [
-                    { type: "text", text: userPrompt },
-                    {
-                      type: "image_url",
-                      image_url: { url: imageBase64 },
-                    },
-                  ],
-                },
-              ],
-              tools: [
-                {
-                  type: "function",
-                  function: {
-                    name: "submit_assessment",
-                    description: "Return the structured wellness assessment.",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        condition: { type: "string" },
-                        severity: {
-                          type: "string",
-                          enum: ["none", "mild", "moderate", "severe"],
-                        },
-                        confidence: { type: "number" },
-                        observations: { type: "string" },
-                        trend: {
-                          type: "string",
-                          enum: ["improving", "stable", "worsening", "first_report", "inconclusive"],
-                        },
-                        trend_note: { type: "string" },
-                        recommendation: { type: "string" },
+      for (const model of MODELS) {
+        try {
+          const aiResp = await fetch(
+            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              signal: AbortSignal.timeout(10000),
+              body: JSON.stringify({
+                model,
+                reasoning_effort: "low",
+                messages: [
+                  { role: "system", content: systemPrompt },
+                  {
+                    role: "user",
+                    content: [
+                      { type: "text", text: userPrompt },
+                      {
+                        type: "image_url",
+                        image_url: { url: imageBase64 },
                       },
-                      required: [
-                        "condition",
-                        "severity",
-                        "confidence",
-                        "observations",
-                        "trend",
-                        "trend_note",
-                        "recommendation",
-                      ],
-                      additionalProperties: false,
+                    ],
+                  },
+                ],
+                tools: [
+                  {
+                    type: "function",
+                    function: {
+                      name: "submit_assessment",
+                      description: "Return the structured wellness assessment.",
+                      parameters: {
+                        type: "object",
+                        properties: {
+                          condition: { type: "string" },
+                          severity: {
+                            type: "string",
+                            enum: ["none", "mild", "moderate", "severe"],
+                          },
+                          confidence: { type: "number" },
+                          observations: { type: "string" },
+                          trend: {
+                            type: "string",
+                            enum: ["improving", "stable", "worsening", "first_report", "inconclusive"],
+                          },
+                          trend_note: { type: "string" },
+                          recommendation: { type: "string" },
+                        },
+                        required: [
+                          "condition",
+                          "severity",
+                          "confidence",
+                          "observations",
+                          "trend",
+                          "trend_note",
+                          "recommendation",
+                        ],
+                      },
                     },
                   },
+                ],
+                tool_choice: {
+                  type: "function",
+                  function: { name: "submit_assessment" },
                 },
-              ],
-              tool_choice: {
-                type: "function",
-                function: { name: "submit_assessment" },
-              },
-            }),
-          }
-        );
+              }),
+            }
+          );
 
-        if (aiResp.ok) {
-          const aiData = await aiResp.json();
-          const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-          if (toolCall) {
-            parsed = JSON.parse(toolCall.function.arguments);
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            const toolCall = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+            if (toolCall) {
+              parsed = JSON.parse(toolCall.function.arguments);
+              break;
+            }
           }
+        } catch (err) {
+          console.error(`analyze-skin model ${model} failed:`, err);
         }
-      } catch (err) {
-        console.error("AI gateway fallback triggered", err);
       }
     }
 
@@ -340,7 +340,6 @@ Provide a structured wellness assessment. Confirm or refine the rule-based findi
       parsed = buildFallbackAssessment(region, colorFeatures, ruleResult, histArr);
     }
 
-    // Weighted final severity: 70% current AI + 30% historical mean
     const histScore = histArr.length
       ? histArr.reduce((sum, h) => sum + (SEVERITY_SCORE[h.severity] ?? 0), 0) / histArr.length
       : SEVERITY_SCORE[parsed.severity] ?? 0;

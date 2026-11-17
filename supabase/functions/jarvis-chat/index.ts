@@ -14,7 +14,6 @@ const ALLOWED_ORIGINS = [
   "capacitor://localhost",
 ];
 
-// Local dev (any port), LAN preview (Expo web on phone/PC), and Vercel previews.
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
@@ -59,13 +58,15 @@ function streamSseText(text: string, corsHeaders: Record<string, string>): Respo
   });
 }
 
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     // @ts-ignore
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY"); const LOVABLE_API_KEY = GEMINI_API_KEY || Deno.env.get("LOVABLE_API_KEY");
+    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -102,7 +103,6 @@ serve(async (req: Request) => {
     }));
     const userId = u.user.id;
 
-    // Pull personal health context
     const [r, m, d, p, l] = await Promise.all([
       supabase.from("reports").select("region,condition,severity,confidence,trend,created_at").eq("user_id", userId).order("created_at", { ascending: false }).limit(5),
       supabase.from("medical_reports").select("report_type,extracted_values,abnormalities,summary,report_date").eq("user_id", userId).order("created_at", { ascending: false }).limit(5),
@@ -117,7 +117,7 @@ serve(async (req: Request) => {
     const rx = p.data ?? [];
     const life = l.data ?? [];
 
-    if (LOVABLE_API_KEY) {
+    if (API_KEY) {
       const context = `
 USER HEALTH CONTEXT (most recent first):
 Recent visual scans: ${JSON.stringify(scans)}
@@ -137,27 +137,30 @@ CRITICAL RULES:
 
 ${context}`;
 
-      try {
-        const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "gemini-3.8-flash",
-            stream: true,
-            messages: [{ role: "system", content: systemPrompt }, ...sanitizedMessages],
-          }),
-        });
-        if (aiResp.ok && aiResp.body) {
-          return new Response(aiResp.body, {
-            headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      for (const model of MODELS) {
+        try {
+          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+            signal: AbortSignal.timeout(10000),
+            body: JSON.stringify({
+              model,
+              reasoning_effort: "low",
+              stream: true,
+              messages: [{ role: "system", content: systemPrompt }, ...sanitizedMessages],
+            }),
           });
+          if (aiResp.ok && aiResp.body) {
+            return new Response(aiResp.body, {
+              headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+            });
+          }
+        } catch (err) {
+          console.error(`jarvis-chat model ${model} failed:`, err);
         }
-      } catch (err) {
-        console.error("JARVIS gateway fallback triggered", err);
       }
     }
 
-    // Contextual wellness assistant response grounded in live Supabase user data
     const lastQuestion = sanitizedMessages[sanitizedMessages.length - 1]?.content || "";
     const latestScan = scans[0];
     const latestMed = meds[0];

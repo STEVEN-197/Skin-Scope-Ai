@@ -16,7 +16,6 @@ const ALLOWED_ORIGINS = [
   "capacitor://localhost",
 ];
 
-// Local dev (any port), LAN preview (Expo web on phone/PC), and Vercel previews.
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
@@ -42,13 +41,15 @@ function getCorsHeaders(req: Request): Record<string, string> {
   };
 }
 
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     // @ts-ignore
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY"); const LOVABLE_API_KEY = GEMINI_API_KEY || Deno.env.get("LOVABLE_API_KEY");
+    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
     // @ts-ignore
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     // @ts-ignore
@@ -101,7 +102,7 @@ serve(async (req: Request) => {
 
     let parsed: any = null;
 
-    if (LOVABLE_API_KEY) {
+    if (API_KEY) {
       const systemPrompt = `You are SkinScope Health Intelligence, an AI assistant that produces longitudinal, multi-modal wellness observations. You correlate visual scan analyses with lab report values and self-reported symptom diary data. Use cautious language and never give a clinical diagnosis. Always recommend consulting a healthcare professional for concerning trends. Always return JSON via the provided tool.`;
 
       const userPrompt = `Analyze this user's combined health history.
@@ -115,47 +116,87 @@ ${JSON.stringify(meds, null, 2)}
 SYMPTOM DIARY (most recent first):
 ${JSON.stringify(diary, null, 2)}`;
 
-      try {
-        const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "gemini-3.8-flash",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            tools: [
-              {
-                type: "function",
-                function: {
-                  name: "submit_insights",
-                  parameters: {
-                    type: "object",
-                    properties: {
-                      summary: { type: "string" },
-                      observations: { type: "array", items: { type: "object" } },
-                      trends: { type: "array", items: { type: "object" } },
-                      recommendations: { type: "array", items: { type: "object" } },
+      for (const model of MODELS) {
+        try {
+          const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            signal: AbortSignal.timeout(10000),
+            body: JSON.stringify({
+              model,
+              reasoning_effort: "low",
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt },
+              ],
+              tools: [
+                {
+                  type: "function",
+                  function: {
+                    name: "submit_insights",
+                    parameters: {
+                      type: "object",
+                      properties: {
+                        summary: { type: "string" },
+                        observations: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              title: { type: "string" },
+                              detail: { type: "string" },
+                              level: { type: "string", enum: ["info", "watch", "concern"] },
+                            },
+                            required: ["title", "detail", "level"],
+                          },
+                        },
+                        trends: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              metric: { type: "string" },
+                              direction: { type: "string", enum: ["improving", "stable", "worsening", "inconclusive"] },
+                              note: { type: "string" },
+                            },
+                            required: ["metric", "direction", "note"],
+                          },
+                        },
+                        recommendations: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              title: { type: "string" },
+                              detail: { type: "string" },
+                              category: { type: "string", enum: ["hydration", "skincare", "lifestyle", "monitoring", "consultation"] },
+                            },
+                            required: ["title", "detail", "category"],
+                          },
+                        },
+                      },
+                      required: ["summary", "observations", "trends", "recommendations"],
                     },
-                    required: ["summary", "observations", "trends", "recommendations"],
                   },
                 },
-              },
-            ],
-            tool_choice: { type: "function", function: { name: "submit_insights" } },
-          }),
-        });
-        if (aiResp.ok) {
-          const aiData = await aiResp.json();
-          const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-          if (tc) parsed = JSON.parse(tc.function.arguments);
+              ],
+              tool_choice: { type: "function", function: { name: "submit_insights" } },
+            }),
+          });
+          if (aiResp.ok) {
+            const aiData = await aiResp.json();
+            const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+            if (tc) {
+              parsed = JSON.parse(tc.function.arguments);
+              break;
+            }
+          }
+        } catch (err) {
+          console.error(`generate-insights model ${model} failed:`, err);
         }
-      } catch (err) {
-        console.error("generate-insights fallback triggered", err);
       }
     }
 

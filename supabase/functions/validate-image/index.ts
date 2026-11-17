@@ -5,7 +5,6 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.0";
 
-// SECURITY FIX (FINDING-004): Restrict CORS to known production origins only.
 const ALLOWED_ORIGINS = [
   "https://skinscopeai-main.vercel.app",
   "https://skinscopeai.vercel.app",
@@ -16,7 +15,6 @@ const ALLOWED_ORIGINS = [
   "capacitor://localhost",
 ];
 
-// Local dev (any port), LAN preview (Expo web on phone/PC), and Vercel previews.
 const ALLOWED_ORIGIN_PATTERNS = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
@@ -41,6 +39,8 @@ function getCorsHeaders(req: Request): Record<string, string> {
     "Vary": "Origin",
   };
 }
+
+const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
 
 serve(async (req: Request) => {
   const corsHeaders = getCorsHeaders(req);
@@ -74,59 +74,69 @@ serve(async (req: Request) => {
     }
 
     // @ts-ignore
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY"); const LOVABLE_API_KEY = GEMINI_API_KEY || Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const API_KEY = Deno.env.get("GEMINI_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
+    if (!API_KEY) {
       return j({ valid: true, detected: region, reason: "", quality: "good" }, 200, corsHeaders);
     }
 
-    const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gemini-3.8-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an image content validator. Decide whether an image clearly shows the requested human body region (skin / eye / palm / face) suitable for visual wellness analysis. Reject paper, walls, random objects, blurred or extreme close-ups, screenshots, and irrelevant content.",
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: `Does this image clearly show a real human ${region}? Be strict.` },
-              { type: "image_url", image_url: { url: imageBase64 } },
-            ],
-          },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "submit_validation",
-              parameters: {
-                type: "object",
-                properties: {
-                  valid: { type: "boolean" },
-                  detected: { type: "string", description: "What appears in the image" },
-                  reason: { type: "string", description: "If invalid, why" },
-                  quality: { type: "string", enum: ["good", "fair", "poor"] },
-                },
-                required: ["valid", "detected", "reason", "quality"],
+    for (const model of MODELS) {
+      try {
+        const aiResp = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+          signal: AbortSignal.timeout(10000),
+          body: JSON.stringify({
+            model,
+            reasoning_effort: "low",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are an image content validator. Decide whether an image clearly shows the requested human body region (skin / eye / palm / face) suitable for visual wellness analysis. Reject paper, walls, random objects, blurred or extreme close-ups, screenshots, and irrelevant content.",
               },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "submit_validation" } },
-      }),
-    });
+              {
+                role: "user",
+                content: [
+                  { type: "text", text: `Does this image clearly show a real human ${region}? Be strict.` },
+                  { type: "image_url", image_url: { url: imageBase64 } },
+                ],
+              },
+            ],
+            tools: [
+              {
+                type: "function",
+                function: {
+                  name: "submit_validation",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      valid: { type: "boolean" },
+                      detected: { type: "string", description: "What appears in the image" },
+                      reason: { type: "string", description: "If invalid, why" },
+                      quality: { type: "string", enum: ["good", "fair", "poor"] },
+                    },
+                    required: ["valid", "detected", "reason", "quality"],
+                  },
+                },
+              },
+            ],
+            tool_choice: { type: "function", function: { name: "submit_validation" } },
+          }),
+        });
 
-    if (!aiResp.ok) {
-      return j({ valid: true, detected: region, reason: "", quality: "good" }, 200, corsHeaders);
+        if (aiResp.ok) {
+          const aiData = await aiResp.json();
+          const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
+          if (tc) {
+            return j(JSON.parse(tc.function.arguments), 200, corsHeaders);
+          }
+        }
+      } catch (err) {
+        console.error(`validate-image model ${model} failed:`, err);
+      }
     }
-    const aiData = await aiResp.json();
-    const tc = aiData?.choices?.[0]?.message?.tool_calls?.[0];
-    if (!tc) return j({ valid: true, detected: "unknown", reason: "", quality: "fair" }, 200, corsHeaders);
-    return j(JSON.parse(tc.function.arguments), 200, corsHeaders);
+
+    return j({ valid: true, detected: region, reason: "", quality: "good" }, 200, corsHeaders);
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : "Unknown" }, 500, corsHeaders);
   }
