@@ -68,7 +68,7 @@ export default function DashboardOverview() {
     : 0;
   const healthScore = total
     ? Math.max(20, Math.min(99, Math.round(95 - avgSev * 18 + (avgConfidence - 70) * 0.2)))
-    : 88;
+    : 0;
 
   const chartData = [...reports].reverse().map((r) => ({
     date: format(new Date(r.created_at), 'MMM d'),
