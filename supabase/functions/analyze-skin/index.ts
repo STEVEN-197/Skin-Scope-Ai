@@ -149,26 +149,35 @@ function extractServerPixelFeatures(imageBase64: string, fallback: ColorFeatures
 
       const rgDiff = r - g;
       const rbDiff = r - b;
-      sumErythema += Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
+      const grRatio = r > 0 ? g / r : 1;
+      const isSyntheticDye =
+        (r > 120 && grRatio < 0.29 && ss > 65) ||
+        (ss > 76 && vv > 35) ||
+        (hh >= 80 && hh <= 325 && ss >= 24 && vv >= 20);
 
-      const ybDiff = (r + g) * 0.5 - b;
-      if (vv >= 30) sumYellowness += Math.max(0, ybDiff);
+      if (!isSyntheticDye) {
+        sumErythema += Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
 
-      const isYellow =
-        (hh >= 26 && hh <= 75 && ss >= 15 && vv >= 32 && ybDiff >= 20) ||
-        (hh >= 32 && hh <= 68 && ss >= 10 && vv >= 55 && ybDiff >= 18 && b < g);
-      if (isYellow) {
-        yellow++;
-        patchYellow[pIdx]++;
-      }
+        const ybDiff = (r + g) * 0.5 - b;
+        if (vv >= 30) sumYellowness += Math.max(0, ybDiff);
 
-      const isRed =
-        ((hh <= 18 || hh >= 330) && ss >= 22 && vv >= 20) ||
-        (hh > 18 && hh <= 28 && ss >= 34 && vv >= 25 && rgDiff >= 38 && r >= 120) ||
-        (rgDiff >= 45 && rbDiff >= 45 && r >= 130);
-      if (isRed) {
-        red++;
-        patchRed[pIdx]++;
+        const isYellow =
+          (hh >= 26 && hh <= 72 && ss >= 16 && ss <= 68 && vv >= 35 && ybDiff >= 22) ||
+          (hh >= 30 && hh <= 68 && ss >= 12 && vv >= 50 && ybDiff >= 20 && b < g);
+        if (isYellow) {
+          yellow++;
+          patchYellow[pIdx]++;
+        }
+
+        const isRed =
+          grRatio >= 0.30 &&
+          grRatio <= 0.70 &&
+          (((hh <= 20 || hh >= 335) && ss >= 25 && ss <= 70 && vv >= 25 && rgDiff >= 32) ||
+            (hh > 20 && hh <= 28 && ss >= 36 && ss <= 70 && vv >= 28 && rgDiff >= 42 && r >= 120));
+        if (isRed) {
+          red++;
+          patchRed[pIdx]++;
+        }
       }
 
       const isDark = vv < 25 || (vv < 42 && ss >= 35 && r < 110 && g < 85);

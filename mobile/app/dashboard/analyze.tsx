@@ -22,7 +22,7 @@ import {
 } from 'lucide-react-native';
 import { supabase } from '../../src/integrations/supabase/client';
 import { useAuth } from '../../src/lib/auth-context';
-import { analyzeImageBase64, applyRegionRules } from '../../src/lib/color-analysis';
+import { analyzeImageBase64, applyRegionRules, validateTissueFeatures } from '../../src/lib/color-analysis';
 import { toast } from '../../src/lib/toast';
 import { DisclaimerBanner } from '../../src/components/ui';
 import { colors, commonStyles } from '../../src/theme';
@@ -133,10 +133,19 @@ export default function AnalyzeScreen() {
     try {
       const dataUrl = `data:${picked.mimeType};base64,${picked.base64}`;
 
-      // 1. Validate image actually shows the requested region
-      setStage('Validating image…');
+      // 1. Extract dermatological color features & run biological tissue gatekeeper
+      setStage('Validating biological tissue…');
+      const colorFeatures = await analyzeImageBase64(picked.base64);
+      const localCheck = validateTissueFeatures(region, colorFeatures);
+      if (!localCheck.valid) {
+        toast.error(`This doesn't look like a ${region} image. ${localCheck.reason}`);
+        setAnalyzing(false);
+        setStage('');
+        return;
+      }
+
       const { data: vData } = await supabase.functions.invoke('validate-image', {
-        body: { imageBase64: dataUrl, region },
+        body: { imageBase64: dataUrl, region, colorFeatures },
       });
       if (vData && vData.valid === false) {
         toast.error(`This doesn't look like a ${region} image. ${vData.reason || ''}`);
@@ -145,9 +154,8 @@ export default function AnalyzeScreen() {
         return;
       }
 
-      // 2. Color analysis (on-device)
-      setStage('Extracting color features…');
-      const colorFeatures = await analyzeImageBase64(picked.base64);
+      // 2. Apply region ML rules
+      setStage('Running ML feature classification…');
       const ruleResult = applyRegionRules(region, colorFeatures);
 
       // 3. Upload image to private storage

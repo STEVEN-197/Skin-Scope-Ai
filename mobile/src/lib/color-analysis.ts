@@ -1,25 +1,38 @@
-// Native Dermatological & Clinical Computer Vision feature extractor for React Native + Expo.
-// Mirrors src/lib/color-analysis.ts with RGB, HSV, CIE L*a*b* proxies, Dawson Erythema Index,
-// Bilirubin Yellowness Index, and 8x8 Spatial Patch Hotspot detection (100% API-key-free).
+// Native Dermatological & Clinical Computer Vision feature extractor + Tissue Gatekeeper.
+// Uses Kovac/Peer YCbCr + RGB biological tissue reflectance models, 8x8 Spatial Patch
+// Hotspot analysis, Dawson Erythema Index, and Scleral Bilirubin Chromaticity.
 import { decode as decodeBase64 } from 'base64-arraybuffer';
 import * as jpeg from 'jpeg-js';
+
+export interface TissueValidation {
+  valid: boolean;
+  detected: string;
+  reason: string;
+  quality: 'good' | 'fair' | 'poor';
+  skinTissueRatio: number;
+  syntheticObjectRatio: number;
+  scleraRatio: number;
+}
 
 export interface ColorFeatures {
   avgR: number;
   avgG: number;
   avgB: number;
-  avgH: number; // 0-360
-  avgS: number; // 0-100
-  avgV: number; // 0-100
+  avgH: number;
+  avgS: number;
+  avgV: number;
   yellowRatio: number;
   redRatio: number;
   darkRatio: number;
-  brightness: number; // 0-100
+  brightness: number;
   erythemaIndex?: number;
   jaundiceIndex?: number;
   melaninIndex?: number;
   colorVariance?: number;
   focalAnomaly?: number;
+  skinTissueRatio?: number;
+  syntheticRatio?: number;
+  scleraRatio?: number;
 }
 
 export function rgbToHsv(r: number, g: number, b: number): [number, number, number] {
@@ -42,6 +55,13 @@ export function rgbToHsv(r: number, g: number, b: number): [number, number, numb
   return [h, s * 100, v * 100];
 }
 
+function rgbToYCbCr(r: number, g: number, b: number): [number, number, number] {
+  const y = 0.299 * r + 0.587 * g + 0.114 * b;
+  const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+  const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+  return [y, cb, cr];
+}
+
 function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
   let sumR = 0,
     sumG = 0,
@@ -54,6 +74,9 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
     dark = 0;
   let sumErythema = 0,
     sumYellowness = 0;
+  let skinPixels = 0,
+    syntheticPixels = 0,
+    scleraPixels = 0;
   let count = 0;
 
   const numPatches = 64;
@@ -73,6 +96,7 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
     sumG += g;
     sumB += b;
     const [hh, ss, vv] = rgbToHsv(r, g, b);
+    const [, cb, cr] = rgbToYCbCr(r, g, b);
     sumH += hh;
     sumS += ss;
     sumV += vv;
@@ -80,34 +104,71 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
     const pIdx = Math.min(numPatches - 1, Math.floor(((i / 4) / Math.max(1, totalPixels)) * numPatches));
     patchCount[pIdx]++;
 
+    const grRatio = r > 0 ? g / r : 1;
+    const isSyntheticDye =
+      (r > 120 && grRatio < 0.29 && ss > 65) ||
+      (ss > 76 && vv > 35) ||
+      (hh >= 80 && hh <= 325 && ss >= 24 && vv >= 20);
+    if (isSyntheticDye) {
+      syntheticPixels++;
+    }
+
+    const isBiologicalSkin =
+      !isSyntheticDye &&
+      r >= 55 &&
+      g >= 30 &&
+      b >= 18 &&
+      r >= g * 0.95 &&
+      r >= b * 1.05 &&
+      grRatio >= 0.30 &&
+      grRatio <= 0.96 &&
+      cb >= 72 &&
+      cb <= 135 &&
+      cr >= 128 &&
+      cr <= 182 &&
+      ss >= 8 &&
+      ss <= 72;
+    if (isBiologicalSkin) {
+      skinPixels++;
+    }
+
+    const isSclera = !isSyntheticDye && vv >= 48 && ss <= 45 && r >= 115 && g >= 110 && b >= 75;
+    if (isSclera) {
+      scleraPixels++;
+    }
+
     const rgDiff = r - g;
     const rbDiff = r - b;
-    const ei = Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
-    sumErythema += ei;
-
     const ybDiff = (r + g) * 0.5 - b;
-    if (vv >= 30) {
-      sumYellowness += Math.max(0, ybDiff);
+
+    if (isBiologicalSkin || isSclera) {
+      const ei = Math.max(0, rgDiff * 1.3 + (rbDiff - rgDiff) * 0.4);
+      sumErythema += ei;
+      if (vv >= 30) {
+        sumYellowness += Math.max(0, ybDiff);
+      }
+
+      const isYellow =
+        (hh >= 26 && hh <= 72 && ss >= 16 && ss <= 68 && vv >= 35 && ybDiff >= 22) ||
+        (isSclera && hh >= 30 && hh <= 68 && ss >= 12 && ybDiff >= 20 && b < g);
+      if (isYellow) {
+        yellow++;
+        patchYellow[pIdx]++;
+      }
+
+      const isRed =
+        !isSyntheticDye &&
+        grRatio >= 0.30 &&
+        grRatio <= 0.70 &&
+        (((hh <= 20 || hh >= 335) && ss >= 25 && ss <= 70 && vv >= 25 && rgDiff >= 32) ||
+          (hh > 20 && hh <= 28 && ss >= 36 && ss <= 70 && vv >= 28 && rgDiff >= 42 && cr >= 152));
+      if (isRed) {
+        red++;
+        patchRed[pIdx]++;
+      }
     }
 
-    const isYellow =
-      (hh >= 26 && hh <= 75 && ss >= 15 && vv >= 32 && ybDiff >= 20) ||
-      (hh >= 32 && hh <= 68 && ss >= 10 && vv >= 55 && ybDiff >= 18 && b < g);
-    if (isYellow) {
-      yellow++;
-      patchYellow[pIdx]++;
-    }
-
-    const isRed =
-      ((hh <= 18 || hh >= 330) && ss >= 22 && vv >= 20) ||
-      (hh > 18 && hh <= 28 && ss >= 34 && vv >= 25 && rgDiff >= 38 && r >= 120) ||
-      (rgDiff >= 45 && rbDiff >= 45 && r >= 130);
-    if (isRed) {
-      red++;
-      patchRed[pIdx]++;
-    }
-
-    const isDark = vv < 25 || (vv < 42 && ss >= 35 && r < 110 && g < 85);
+    const isDark = !isSyntheticDye && (vv < 24 || (vv < 40 && ss >= 30 && r < 105 && g < 80 && r >= b));
     if (isDark) {
       dark++;
       patchDark[pIdx]++;
@@ -165,6 +226,10 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
   const melaninIndex = +Math.min(100, Math.max(0, 100 - avgV) * 0.7 + colorVariance * 0.3).toFixed(2);
   const focalAnomaly = +Math.min(100, Math.max(focalRed - globalRed, focalYellow - globalYellow, focalDark - globalDark)).toFixed(2);
 
+  const skinTissueRatio = +((skinPixels / count) * 100).toFixed(2);
+  const syntheticRatio = +((syntheticPixels / count) * 100).toFixed(2);
+  const scleraRatio = +((scleraPixels / count) * 100).toFixed(2);
+
   return {
     avgR: +avgR.toFixed(2),
     avgG: +avgG.toFixed(2),
@@ -181,6 +246,76 @@ function computeFeaturesFromRgba(data: Uint8Array, step = 4): ColorFeatures {
     melaninIndex,
     colorVariance,
     focalAnomaly,
+    skinTissueRatio,
+    syntheticRatio,
+    scleraRatio,
+  };
+}
+
+export function validateTissueFeatures(region: 'eye' | 'skin' | 'palm', f: ColorFeatures): TissueValidation {
+  const skinRatio = f.skinTissueRatio ?? 0;
+  const synthRatio = f.syntheticRatio ?? 0;
+  const scleraRatio = f.scleraRatio ?? 0;
+  const cv = f.colorVariance ?? 10;
+
+  if (cv < 2.5) {
+    return {
+      valid: false,
+      detected: 'blank or solid-color surface',
+      reason: 'Image is a solid or blank color without biological tissue texture.',
+      quality: 'poor',
+      skinTissueRatio: skinRatio,
+      syntheticObjectRatio: synthRatio,
+      scleraRatio,
+    };
+  }
+
+  if (synthRatio > 28 && skinRatio < 25) {
+    return {
+      valid: false,
+      detected: 'synthetic object or non-biological color',
+      reason: `Detected artificial/non-biological colors (${synthRatio.toFixed(0)}% synthetic spectrum, only ${skinRatio.toFixed(0)}% human tissue). Please upload a clear photo of real human ${region}.`,
+      quality: 'poor',
+      skinTissueRatio: skinRatio,
+      syntheticObjectRatio: synthRatio,
+      scleraRatio,
+    };
+  }
+
+  if (region === 'eye') {
+    if (skinRatio + scleraRatio < 22 || scleraRatio < 3) {
+      return {
+        valid: false,
+        detected: 'non-eye object',
+        reason: 'Could not detect human eye (sclera and eyelid tissue) features. Please upload a clear close-up of the eye.',
+        quality: 'poor',
+        skinTissueRatio: skinRatio,
+        syntheticObjectRatio: synthRatio,
+        scleraRatio,
+      };
+    }
+  } else {
+    if (skinRatio < 25) {
+      return {
+        valid: false,
+        detected: 'non-skin object or background',
+        reason: `Insufficient human skin tissue detected (${skinRatio.toFixed(0)}%). Please upload a clear, well-lit photo of human ${region}.`,
+        quality: 'poor',
+        skinTissueRatio: skinRatio,
+        syntheticObjectRatio: synthRatio,
+        scleraRatio,
+      };
+    }
+  }
+
+  return {
+    valid: true,
+    detected: region,
+    reason: '',
+    quality: f.brightness < 25 || f.brightness > 90 ? 'fair' : 'good',
+    skinTissueRatio: skinRatio,
+    syntheticObjectRatio: synthRatio,
+    scleraRatio,
   };
 }
 

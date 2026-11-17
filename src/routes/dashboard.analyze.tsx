@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { analyzeImageFile, applyRegionRules } from "@/lib/color-analysis";
+import { analyzeImageFile, applyRegionRules, validateTissueFeatures } from "@/lib/color-analysis";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/analyze")({
@@ -165,11 +165,20 @@ function AnalyzePage() {
     if (!file || !user || !session) return;
     setAnalyzing(true);
     try {
-      // 1. Validate image actually shows the requested region
-      setStage("Validating image…");
+      // 1. Extract dermatological color features & run biological tissue gatekeeper
+      setStage("Validating biological tissue…");
+      const colorFeatures = await analyzeImageFile(file);
+      const localCheck = validateTissueFeatures(region, colorFeatures);
+      if (!localCheck.valid) {
+        toast.error(`This doesn't look like a ${region} image. ${localCheck.reason}`);
+        setAnalyzing(false);
+        setStage("");
+        return;
+      }
+
       const dataUrlForCheck = await fileToDataURL(file);
       const { data: vData } = await supabase.functions.invoke("validate-image", {
-        body: { imageBase64: dataUrlForCheck, region },
+        body: { imageBase64: dataUrlForCheck, region, colorFeatures },
       });
       if (vData && vData.valid === false) {
         toast.error(`This doesn't look like a ${region} image. ${vData.reason || ""}`);
@@ -178,9 +187,8 @@ function AnalyzePage() {
         return;
       }
 
-      // 2. Color analysis (client-side)
-      setStage("Extracting color features…");
-      const colorFeatures = await analyzeImageFile(file);
+      // 2. Apply region ML rules
+      setStage("Running ML feature classification…");
       const ruleResult = applyRegionRules(region, colorFeatures);
 
       // 3. Upload image to private storage (cryptographically secure path naming)
