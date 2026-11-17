@@ -216,28 +216,26 @@ export function computeDermatologicalFeatures(data: Uint8ClampedArray | Uint8Arr
       // Normal warm/tan/Indian skin has Hue 18..38° and G/R ~ 0.68..0.80.
       // True yellow/jaundice requires Hue 42..68° AND G/R >= 0.84 (Green nearly equals Red, Blue suppressed).
       const isYellow =
-        hh >= 42 &&
-        hh <= 68 &&
-        grRatio >= 0.84 &&
-        ss >= 22 &&
-        vv >= 40 &&
-        ybDiff >= 30;
+        hh >= 38 &&
+        hh <= 72 &&
+        grRatio >= 0.80 &&
+        ss >= 18 &&
+        vv >= 42 &&
+        ybDiff >= 25;
       if (isYellow) {
         yellow++;
       }
 
       // TRUE Erythema / Rash / Burn / Inflammation:
-      // Normal skin has Hue 15..35° and G/R >= 0.65.
-      // True erythema/burn/rash has Hue <= 14° or >= 340°, S >= 32%, G/R in 0.28..0.62, and R - G >= 45.
       const isRed =
         !isSyntheticDye &&
         (hh <= 14 || hh >= 340) &&
-        ss >= 32 &&
+        ss >= 30 &&
         vv >= 25 &&
         grRatio >= 0.28 &&
-        grRatio <= 0.62 &&
-        rgDiff >= 45 &&
-        r >= 135;
+        grRatio <= 0.64 &&
+        rgDiff >= 42 &&
+        r >= 130;
       if (isRed) {
         red++;
       }
@@ -384,14 +382,19 @@ export interface RuleResult {
 }
 
 export function applyRegionRules(region: "eye" | "skin" | "palm", f: ColorFeatures): RuleResult {
+  // In an eye photo, the sclera occupies ~8-15% of the frame (surrounded by eyelids/skin/iris),
+  // so 6.5%+ yellow pixels across the whole frame means >60% of the sclera is jaundiced.
   const yellowThresh =
     region === "eye"
-      ? { mild: 10, moderate: 22, severe: 35 }
+      ? { mild: 1.8, moderate: 4.0, severe: 6.5 }
       : region === "palm"
-        ? { mild: 14, moderate: 26, severe: 40 }
-        : { mild: 16, moderate: 28, severe: 45 };
+        ? { mild: 4.0, moderate: 9.0, severe: 16.0 }
+        : { mild: 5.0, moderate: 11.0, severe: 20.0 };
 
-  const redThresh = { mild: 18, moderate: 32, severe: 50 };
+  const redThresh =
+    region === "eye"
+      ? { mild: 2.0, moderate: 5.0, severe: 10.0 }
+      : { mild: 2.5, moderate: 7.5, severe: 16.0 };
 
   const y = f.yellowRatio;
   const r = f.redRatio;
@@ -401,29 +404,29 @@ export function applyRegionRules(region: "eye" | "skin" | "palm", f: ColorFeatur
   let ruleConfidence = 88;
 
   if (y >= yellowThresh.severe) {
-    condition = "Possible jaundice (severe)";
+    condition = region === "eye" ? "Possible scleral icterus / jaundice (severe)" : "Possible jaundice (severe)";
     severity = "severe";
-    ruleConfidence = 90;
+    ruleConfidence = 91;
   } else if (y >= yellowThresh.moderate) {
-    condition = "Possible jaundice (moderate)";
+    condition = region === "eye" ? "Possible scleral icterus / jaundice (moderate)" : "Possible jaundice (moderate)";
     severity = "moderate";
-    ruleConfidence = 82;
+    ruleConfidence = 84;
   } else if (y >= yellowThresh.mild) {
-    condition = "Possible jaundice (mild)";
+    condition = region === "eye" ? "Possible scleral icterus / jaundice (mild)" : "Possible jaundice (mild)";
+    severity = "mild";
+    ruleConfidence = 76;
+  } else if (r >= redThresh.severe && f.darkRatio < 25) {
+    condition = region === "eye" ? "Severe conjunctival redness / irritation" : "Possible burn or severe inflammation";
+    severity = "severe";
+    ruleConfidence = 88;
+  } else if (r >= redThresh.moderate) {
+    condition = region === "eye" ? "Moderate conjunctival redness" : "Possible burn, rash, or inflammation";
+    severity = "moderate";
+    ruleConfidence = 80;
+  } else if (r >= redThresh.mild) {
+    condition = region === "eye" ? "Mild eye redness or irritation" : "Mild redness or skin irritation";
     severity = "mild";
     ruleConfidence = 74;
-  } else if (r >= redThresh.severe && f.darkRatio < 20) {
-    condition = "Possible burn or severe inflammation";
-    severity = "severe";
-    ruleConfidence = 86;
-  } else if (r >= redThresh.moderate) {
-    condition = "Possible burn or inflammation";
-    severity = "moderate";
-    ruleConfidence = 78;
-  } else if (r >= redThresh.mild) {
-    condition = "Mild redness or irritation";
-    severity = "mild";
-    ruleConfidence = 72;
   }
 
   return { condition, severity, ruleConfidence };

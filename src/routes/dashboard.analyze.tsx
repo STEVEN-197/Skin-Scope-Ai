@@ -19,6 +19,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { analyzeImageFile, applyRegionRules, validateTissueFeatures } from "@/lib/color-analysis";
+import { analyzeWithOllamaVision } from "@/lib/ollama-vision";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/analyze")({
@@ -201,16 +202,41 @@ function AnalyzePage() {
         .upload(path, file, { contentType: file.type });
       if (upErr) throw new Error(`Upload failed: ${upErr.message}`);
 
-      // 3. Convert to data URL for AI vision
-      setStage("Running AI vision analysis…");
+      // 4. Call ML edge function + optional local Ollama Vision AI ensemble
+      setStage("Running ML + Vision ensemble analysis…");
       const imageBase64 = await fileToDataURL(file);
 
-      // 4. Call edge function
-      const { data: aiData, error: fnErr } = await supabase.functions.invoke("analyze-skin", {
-        body: { imageBase64, region, colorFeatures, ruleResult },
-      });
+      const [edgeRes, ollamaRes] = await Promise.all([
+        supabase.functions.invoke("analyze-skin", {
+          body: { imageBase64, region, colorFeatures, ruleResult },
+        }),
+        analyzeWithOllamaVision(imageBase64, region, colorFeatures, ruleResult),
+      ]);
+
+      const { data: aiData, error: fnErr } = edgeRes;
       if (fnErr) throw new Error(fnErr.message);
       if (aiData?.error) throw new Error(aiData.error);
+
+      if (ollamaRes) {
+        if (!ollamaRes.valid_region) {
+          toast.error(`Ollama Vision rejected image (${ollamaRes.detected_object}): does not appear to be a valid human ${region}.`);
+          setAnalyzing(false);
+          setStage("");
+          return;
+        }
+        // Ensemble fusion: combine Ollama Vision + ML Classifier
+        const sevRank: Record<string, number> = { none: 0, mild: 1, moderate: 2, severe: 3 };
+        const mlRank = sevRank[aiData.severity] ?? 0;
+        const olRank = sevRank[ollamaRes.severity] ?? 0;
+        if (olRank > mlRank) {
+          aiData.severity = ollamaRes.severity;
+          aiData.condition = ollamaRes.condition;
+        }
+        aiData.confidence = Math.round((Number(aiData.confidence) + Number(ollamaRes.confidence)) / 2);
+        if (ollamaRes.observations) {
+          aiData.observations = `${aiData.observations} [Ollama Vision (${ollamaRes.model_used}): ${ollamaRes.observations}]`;
+        }
+      }
 
       // 5. Persist
       setStage("Saving report…");
