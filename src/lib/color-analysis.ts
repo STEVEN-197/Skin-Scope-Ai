@@ -70,8 +70,10 @@ async function detectNonHumanObjectWithCNN(img: HTMLImageElement): Promise<strin
   try {
     if (!_mobilenetPromise) {
       _mobilenetPromise = (async () => {
+        // @ts-expect-error dynamic CDN import
         const tf = await import(/* @vite-ignore */ "https://esm.sh/@tensorflow/tfjs@4.22.0");
         await tf.ready();
+        // @ts-expect-error dynamic CDN import
         const mobilenet = await import(/* @vite-ignore */ "https://esm.sh/@tensorflow-models/mobilenet@2.1.1");
         return mobilenet.load({ version: 2, alpha: 0.5 });
       })();
