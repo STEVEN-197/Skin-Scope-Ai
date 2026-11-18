@@ -17,16 +17,16 @@ import { useAuth } from "@/lib/auth-context";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SkinScope AI — AI-powered wellness skin & eye monitoring" },
+      { title: "SkinScope AI — ML-powered wellness skin & eye monitoring" },
       {
         name: "description",
         content:
-          "Track visible signs of jaundice, burns, and irritation across skin, eyes, and palms. AI-powered, private, and educational.",
+          "Track visible signs of jaundice, burns, and irritation across skin, eyes, and palms. ML-powered, private, and educational.",
       },
       { property: "og:title", content: "SkinScope AI" },
       {
         property: "og:description",
-        content: "AI-powered wellness monitoring for skin, eyes, and palms.",
+        content: "ML-powered wellness monitoring for skin, eyes, and palms.",
       },
     ],
   }),
@@ -95,7 +95,7 @@ function Index() {
             className="mx-auto inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            AI-powered wellness, in your pocket
+            ML-powered wellness, in your pocket
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
@@ -156,7 +156,7 @@ function Index() {
           {[
             {
               icon: ScanEye,
-              title: "Hybrid AI analysis",
+              title: "Hybrid ML analysis",
               body: "A vision model and on-device color extraction (RGB + HSV) work together to evaluate yellowing, redness, and tone shifts.",
             },
             {

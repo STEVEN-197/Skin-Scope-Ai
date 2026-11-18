@@ -282,7 +282,7 @@ function AnalyzePage() {
           Upload an image to analyze
         </h1>
         <p className="mt-1.5 text-muted-foreground">
-          Choose the body region, upload a clear photo in good lighting, and get an AI-powered
+          Choose the body region, upload a clear photo in good lighting, and get an ML-powered
           wellness report.
         </p>
       </div>

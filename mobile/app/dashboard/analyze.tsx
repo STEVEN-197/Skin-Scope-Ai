@@ -221,7 +221,7 @@ export default function AnalyzeScreen() {
         <Text style={[commonStyles.h1, { marginTop: 4 }]}>Upload an image to analyze</Text>
         <Text style={[commonStyles.subtitle, { marginTop: 4 }]}>
           Choose the body region, upload or snap a clear photo in good lighting, and get an
-          AI-powered wellness report.
+          ML-powered wellness report.
         </Text>
       </View>
 

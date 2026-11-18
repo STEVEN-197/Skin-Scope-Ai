@@ -15,7 +15,7 @@ const navItems = [
   { to: "/dashboard/timeline", label: "Health Timeline", icon: Activity },
   { to: "/dashboard/twin", label: "Health Twin", icon: Brain },
   { to: "/dashboard/compare", label: "What Changed", icon: GitCompareArrows },
-  { to: "/dashboard/intelligence", label: "AI Intelligence", icon: Sparkles },
+  { to: "/dashboard/intelligence", label: "ML Intelligence", icon: Sparkles },
   { to: "/dashboard/diary", label: "Symptom Diary", icon: BookOpen },
   { to: "/dashboard/lifestyle", label: "Lifestyle", icon: Heart },
   { to: "/dashboard/family", label: "Family", icon: Users },

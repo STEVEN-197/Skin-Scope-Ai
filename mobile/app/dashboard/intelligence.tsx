@@ -81,7 +81,7 @@ export default function IntelligenceScreen() {
         <View style={{ flex: 1, paddingRight: 10 }}>
           <View style={[commonStyles.row, { gap: 8 }]}>
             <Sparkles size={24} color={colors.primaryGlow} />
-            <Text style={commonStyles.h1}>AI Intelligence</Text>
+            <Text style={commonStyles.h1}>ML Intelligence</Text>
           </View>
           <Text style={[commonStyles.subtitle, { marginTop: 4 }]}>
             Predictive observations correlating your scans, lab reports, and symptom diary.
