@@ -161,9 +161,7 @@ function DashboardOverview() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <QuickCard icon={Upload} title="Scan Analysis" description="ML visual diagnostics" to="/dashboard/analyze" />
-          <QuickCard icon={FlaskConical} title="Medical Reports" description="OCR lab insights" to="/dashboard/medical-reports" />
           <QuickCard icon={Activity} title="Health Timeline" description="Longitudinal view" to="/dashboard/timeline" />
-          <QuickCard icon={Pill} title="Prescriptions" description="Medicine intelligence" to="/dashboard/prescriptions" />
           <QuickCard icon={Users} title="Family Profiles" description="Whole-household care" to="/dashboard/family" />
           <QuickCard icon={CalendarClock} title="Appointments" description="Specialist bookings" to="/dashboard/appointments" />
           <QuickCard icon={Share2} title="Doctor Share" description="Export PDF summary" to="/dashboard/share" />

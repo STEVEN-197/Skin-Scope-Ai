@@ -10,8 +10,6 @@ const navItems = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { to: "/dashboard/analyze", label: "New Analysis", icon: Upload },
   { to: "/dashboard/reports", label: "Scan Reports", icon: FileText },
-  { to: "/dashboard/medical-reports", label: "Medical Reports", icon: FlaskConical },
-  { to: "/dashboard/prescriptions", label: "Prescriptions", icon: Pill },
   { to: "/dashboard/timeline", label: "Health Timeline", icon: Activity },
   { to: "/dashboard/twin", label: "Health Twin", icon: Brain },
   { to: "/dashboard/compare", label: "What Changed", icon: GitCompareArrows },
