@@ -1,5 +1,5 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Link, Navigate, Outlet, useRouterState } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, Upload, FileText, LogOut, Menu, X, BookOpen, Bell, BarChart3, Activity, FlaskConical, Sparkles, Pill, Users, CalendarClock, Heart, Brain, GitCompareArrows, Share2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "@/components/Logo";
@@ -26,24 +26,45 @@ const navItems = [
 export function DashboardLayout({ children }: { children?: ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const { location } = useRouterState();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const redirectedRef = useRef(false);
 
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
   // SECURITY FIX (FINDING-002): Removed mock user authentication bypass.
-  // Only check for a real Supabase auth token (sb-*-auth-token) to determine
-  // if the session is still hydrating, preventing premature redirect to login.
-  // Only treat the CURRENT project's token as a hydrating session. Stale tokens
-  // from an old Supabase project would otherwise cause an infinite spinner.
-  if (typeof window !== "undefined") {
-    Object.keys(localStorage)
-      .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token") && k !== "sb-oiepakmeezaqiorhsbom-auth-token")
-      .forEach((k) => localStorage.removeItem(k));
-  }
+  // Clear any stale sb-*-auth-token entries from older Supabase projects on mount.
+  useEffect(() => {
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token") && k !== "sb-oiepakmeezaqiorhsbom-auth-token")
+        .forEach((k) => localStorage.removeItem(k));
+    } catch {
+      // ignore storage access errors
+    }
+  }, []);
 
-  if (loading) {
+  // Guarded one-shot redirect avoids TanStack Router <Navigate> useLayoutEffect loop
+  // when combined with useRouterState() under React 19 StrictMode.
+  useEffect(() => {
+    if (!loading && !user && !redirectedRef.current) {
+      redirectedRef.current = true;
+      navigate({ to: "/login", replace: true });
+      const fallback = window.setTimeout(() => {
+        if (window.location.pathname.startsWith("/dashboard")) {
+          window.location.replace("/login");
+        }
+      }, 400);
+      return () => window.clearTimeout(fallback);
+    }
+    if (user) {
+      redirectedRef.current = false;
+    }
+  }, [loading, user, navigate]);
+
+  if (loading || !user) {
     return (
       <div className="grid min-h-screen place-items-center bg-gradient-subtle">
         <div className="flex items-center gap-3 text-muted-foreground">
@@ -52,10 +73,6 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
   }
 
   const handleSignOut = async () => {

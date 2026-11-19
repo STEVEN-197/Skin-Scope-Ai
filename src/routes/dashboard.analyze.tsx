@@ -55,6 +55,7 @@ function AnalyzePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [stage, setStage] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [mode, setMode] = useState<"upload" | "camera">("upload");
   const [cameraOn, setCameraOn] = useState(false);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
@@ -70,6 +71,7 @@ function AnalyzePage() {
       toast.error("Image is too large (max 8 MB).");
       return;
     }
+    setErrorMsg(null);
     setFile(f);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(f));
@@ -156,6 +158,7 @@ function AnalyzePage() {
   }, []);
 
   const reset = () => {
+    setErrorMsg(null);
     setFile(null);
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
@@ -164,6 +167,7 @@ function AnalyzePage() {
 
   const runAnalysis = async () => {
     if (!file || !user || !session) return;
+    setErrorMsg(null);
     setAnalyzing(true);
     try {
       // 1. Extract dermatological color features & run biological tissue gatekeeper
@@ -171,7 +175,9 @@ function AnalyzePage() {
       const colorFeatures = await analyzeImageFile(file);
       const localCheck = validateTissueFeatures(region, colorFeatures);
       if (!localCheck.valid) {
-        toast.error(`This doesn't look like a ${region} image. ${localCheck.reason}`);
+        const msg = `This doesn't look like a ${region} image. ${localCheck.reason}`;
+        setErrorMsg(msg);
+        toast.error(msg);
         setAnalyzing(false);
         setStage("");
         return;
@@ -182,7 +188,9 @@ function AnalyzePage() {
         body: { imageBase64: dataUrlForCheck, region, colorFeatures },
       });
       if (vData && vData.valid === false) {
-        toast.error(`This doesn't look like a ${region} image. ${vData.reason || ""}`);
+        const msg = `This doesn't look like a ${region} image. ${vData.reason || ""}`;
+        setErrorMsg(msg);
+        toast.error(msg);
         setAnalyzing(false);
         setStage("");
         return;
@@ -219,7 +227,9 @@ function AnalyzePage() {
 
       if (ollamaRes) {
         if (!ollamaRes.valid_region) {
-          toast.error(`Ollama Vision rejected image (${ollamaRes.detected_object}): does not appear to be a valid human ${region}.`);
+          const msg = `Ollama Vision rejected image (${ollamaRes.detected_object}): does not appear to be a valid human ${region}.`;
+          setErrorMsg(msg);
+          toast.error(msg);
           setAnalyzing(false);
           setStage("");
           return;
@@ -267,7 +277,9 @@ function AnalyzePage() {
       navigate({ to: "/dashboard/reports/$reportId", params: { reportId: inserted.id } });
     } catch (e) {
       console.error(e);
-      toast.error(e instanceof Error ? e.message : "Analysis failed");
+      const msg = e instanceof Error ? e.message : "Analysis failed";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setAnalyzing(false);
       setStage("");
@@ -482,6 +494,16 @@ function AnalyzePage() {
                 onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
               />
             </div>
+
+            {errorMsg && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-xl border border-destructive/40 bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive"
+              >
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
             <Button
               onClick={runAnalysis}

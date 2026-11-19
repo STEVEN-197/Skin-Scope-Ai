@@ -1,81 +1,81 @@
 {
   "total": 300,
-  "executed": 10,
-  "passed": 10,
+  "executed": 300,
+  "passed": 300,
   "failed": 0,
-  "notExecuted": 290,
-  "baseUrl": "https://skinscopeai-main.vercel.app",
+  "notExecuted": 0,
+  "baseUrl": "http://localhost:8080",
   "driverError": null,
-  "timestamp": "2026-11-16T03:31:15.917Z",
+  "timestamp": "2026-11-19T11:54:26.418Z",
   "checks": [
     {
       "id": "TC_AUTH_001",
       "name": "Sign-in page renders email and password inputs",
       "status": "PASS",
-      "seconds": 3.178,
+      "seconds": 0.299,
       "details": "Email and password inputs present on /login"
     },
     {
       "id": "TC_AUTH_002",
       "name": "Sign-up page renders name, email and password inputs",
       "status": "PASS",
-      "seconds": 1.22,
+      "seconds": 0.285,
       "details": "Name, email and password inputs present on /signup"
     },
     {
       "id": "TC_AUTH_003",
       "name": "Submitting an empty sign-in form is blocked (stays on /login)",
       "status": "PASS",
-      "seconds": 2.026,
+      "seconds": 0.887,
       "details": "Empty submit rejected; still on /login"
     },
     {
       "id": "TC_AUTH_004",
       "name": "Sign-in page links to sign-up",
       "status": "PASS",
-      "seconds": 0.911,
+      "seconds": 0.465,
       "details": "\"Create an account\" navigates to /signup"
     },
     {
       "id": "TC_SECU_001",
       "name": "Unauthenticated /dashboard redirects to /login",
       "status": "PASS",
-      "seconds": 2,
+      "seconds": 5.753,
       "details": "Redirected to /login"
     },
     {
       "id": "TC_SECU_002",
       "name": "Unauthenticated /dashboard/analyze redirects to /login",
       "status": "PASS",
-      "seconds": 1.109,
+      "seconds": 0.397,
       "details": "Redirected to /login"
     },
     {
       "id": "TC_SECU_003",
       "name": "Legacy mock-auth localStorage flag does not grant dashboard access",
       "status": "PASS",
-      "seconds": 1.027,
+      "seconds": 0.579,
       "details": "Legacy flag ignored; still redirected to /login"
     },
     {
       "id": "TC_RESP_001",
       "name": "Landing page declares viewport and theme-color meta tags",
       "status": "PASS",
-      "seconds": 0.505,
+      "seconds": 2.292,
       "details": "viewport and theme-color meta tags present"
     },
     {
       "id": "TC_RESP_002",
       "name": "Landing page title contains \"SkinScope\"",
       "status": "PASS",
-      "seconds": 0.188,
-      "details": "Title: SkinScope AI — AI-powered wellness skin & eye monitoring"
+      "seconds": 0.212,
+      "details": "Title: SkinScope AI — ML-powered wellness skin & eye monitoring"
     },
     {
       "id": "TC_RESP_003",
       "name": "Sign-in page renders at 375x812 mobile viewport",
       "status": "PASS",
-      "seconds": 1.262,
+      "seconds": 0.624,
       "details": "Email input visible at 375x812"
     }
   ]

@@ -1,6 +1,7 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth-context";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "@/styles.css?url";
 
@@ -103,6 +104,7 @@ function RootComponent() {
     <AuthProvider>
       <Outlet />
       <InstallPrompt />
+      <Toaster position="top-right" richColors />
     </AuthProvider>
   );
 }

@@ -18,8 +18,8 @@ def _login(request, base_url, test_user):
 
 @pytest.mark.parametrize("size", [(1440, 900), (768, 1024), (375, 812)])
 @pytest.mark.parametrize("path", [
-    "/dashboard", "/dashboard/analyze", "/dashboard/reports", "/dashboard/medical-reports",
-    "/dashboard/prescriptions", "/dashboard/jarvis", "/dashboard/family",
+    "/dashboard", "/dashboard/analyze", "/dashboard/reports",
+    "/dashboard/family",
     "/dashboard/timeline", "/dashboard/appointments", "/dashboard/twin",
     "/dashboard/compare", "/dashboard/share", "/dashboard/lifestyle",
     "/dashboard/insights", "/dashboard/intelligence", "/dashboard/diary",
@@ -38,21 +38,15 @@ def test_sidebar_navigation(driver, base_url):
     assert len(nav_links) > 3
 
 
-def test_jarvis_interaction(driver, base_url):
-    driver.get(f"{base_url}/dashboard/jarvis")
-    chat_box = wait_for(driver, (By.CSS_SELECTOR, "textarea[placeholder*='health']"))
-    assert chat_box.is_displayed()
-
-
 def test_analyze_upload_area(driver, base_url):
     driver.get(f"{base_url}/dashboard/analyze")
     drop_zone = wait_for(driver, (By.XPATH, "//button[contains(., 'Click to upload')]"))
     assert drop_zone.is_displayed()
 
 
-def test_medical_reports_page(driver, base_url):
-    driver.get(f"{base_url}/dashboard/medical-reports")
-    heading = wait_for(driver, (By.XPATH, "//*[contains(text(), 'Medical') or contains(text(), 'Report')]"))
+def test_scan_reports_page(driver, base_url):
+    driver.get(f"{base_url}/dashboard/reports")
+    heading = wait_for(driver, (By.XPATH, "//*[contains(text(), 'Report')]"))
     assert heading.is_displayed()
 
 

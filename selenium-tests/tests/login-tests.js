@@ -41,8 +41,10 @@ function runProgrammaticWebChecks() {
   const signupTsx = read("src/routes/signup.tsx");
   const dashIndexTsx = read("src/routes/dashboard.index.tsx");
   const analyzeTsx = read("src/routes/dashboard.analyze.tsx");
-  const medReportsTsx = read("src/routes/dashboard.medical-reports.tsx");
-  const rxTsx = read("src/routes/dashboard.prescriptions.tsx");
+  const diaryTsx = read("src/routes/dashboard.diary.tsx");
+  const remindersTsx = read("src/routes/dashboard.reminders.tsx");
+  const appointmentsTsx = read("src/routes/dashboard.appointments.tsx");
+  const lifestyleTsx = read("src/routes/dashboard.lifestyle.tsx");
   const timelineTsx = read("src/routes/dashboard.timeline.tsx");
   const shareTsx = read("src/routes/dashboard.share.tsx");
   const familyTsx = read("src/routes/dashboard.family.tsx");
@@ -56,8 +58,8 @@ function runProgrammaticWebChecks() {
     TC_DASH: dashIndexTsx.includes("HealthScoreRing") && dashLayoutTsx.includes("Overview"),
     TC_ANLZ: analyzeTsx.includes("validateTissueFeatures") && colorAnalysisTs.includes("applyRegionRules"),
     TC_JRVS: fs.existsSync(path.join(root, "src/components/JarvisChat.tsx")),
-    TC_MEDR: medReportsTsx.includes("analyze-medical-report"),
-    TC_PRES: rxTsx.includes("analyze-prescription"),
+    TC_DIAR: diaryTsx.length > 100 && remindersTsx.length > 100,
+    TC_APPT: appointmentsTsx.length > 100 && lifestyleTsx.length > 100,
     TC_TIME: timelineTsx.length > 100,
     TC_SHAR: shareTsx.length > 100 && pdfReportTs.length > 100,
     TC_FAML: familyTsx.length > 100,
@@ -192,8 +194,8 @@ const MODULES = [
   { name: "Dashboard & Health Ring", count: 35, prefix: "TC_DASH" },
   { name: "Image Analysis & Vision AI", count: 35, prefix: "TC_ANLZ" },
   { name: "JARVIS Health Assistant", count: 30, prefix: "TC_JRVS" },
-  { name: "Medical Reports & OCR", count: 30, prefix: "TC_MEDR" },
-  { name: "Prescriptions & Reminders", count: 25, prefix: "TC_PRES" },
+  { name: "Symptom Diary & Reminders", count: 30, prefix: "TC_DIAR" },
+  { name: "Appointments & Lifestyle", count: 25, prefix: "TC_APPT" },
   { name: "Longitudinal Timeline", count: 25, prefix: "TC_TIME" },
   { name: "Doctor Sharing & PDF Export", count: 20, prefix: "TC_SHAR" },
   { name: "Family Profiles Management", count: 20, prefix: "TC_FAML" },

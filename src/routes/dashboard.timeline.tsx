@@ -5,13 +5,13 @@ import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Activity, FileText, FlaskConical, BookOpen, Loader2, AlertTriangle } from "lucide-react";
+import { Activity, FileText, BookOpen, Loader2, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/timeline")({
   component: TimelinePage,
 });
 
-type EventKind = "scan" | "medical" | "diary";
+type EventKind = "scan" | "diary";
 interface TimelineEvent {
   id: string;
   kind: EventKind;
@@ -24,7 +24,6 @@ interface TimelineEvent {
 
 const kindMeta: Record<EventKind, { icon: any; tone: string; label: string }> = {
   scan: { icon: FileText, tone: "bg-primary/10 text-primary", label: "Visual scan" },
-  medical: { icon: FlaskConical, tone: "bg-amber-500/10 text-amber-600", label: "Lab report" },
   diary: { icon: BookOpen, tone: "bg-emerald-500/10 text-emerald-600", label: "Diary" },
 };
 
@@ -37,16 +36,10 @@ function TimelinePage() {
     if (!user) return;
     (async () => {
       setLoading(true);
-      const [scans, meds, diary] = await Promise.all([
+      const [scans, diary] = await Promise.all([
         supabase
           .from("reports")
           .select("id, region, condition, severity, confidence, trend, created_at")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(50),
-        supabase
-          .from("medical_reports")
-          .select("id, report_type, summary, ai_analysis, report_date, created_at")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(50),
@@ -68,16 +61,6 @@ function TimelinePage() {
           detail: `Severity: ${s.severity} · Confidence: ${s.confidence}% · Trend: ${s.trend ?? "–"}`,
           severity: s.severity,
           href: `/dashboard/reports/${s.id}`,
-        }),
-      );
-      (meds.data ?? []).forEach((m: any) =>
-        merged.push({
-          id: `med-${m.id}`,
-          kind: "medical",
-          date: (m.report_date as string) || m.created_at,
-          title: `${(m.report_type || "Lab").toUpperCase()} report`,
-          detail: m.summary || m.ai_analysis?.plain_language || "Lab report stored",
-          href: `/dashboard/medical-reports`,
         }),
       );
       (diary.data ?? []).forEach((d: any) => {
@@ -105,7 +88,7 @@ function TimelinePage() {
           <Activity className="h-7 w-7 text-primary" /> Health Timeline
         </h1>
         <p className="mt-1 text-muted-foreground">
-          A unified longitudinal view of every scan, lab report, and diary entry.
+          A unified longitudinal view of every scan and diary entry.
         </p>
       </div>
 
@@ -125,7 +108,7 @@ function TimelinePage() {
           <CardHeader>
             <CardTitle>No events yet</CardTitle>
             <CardDescription>
-              Add a scan, lab report, or diary entry to start building your health timeline.
+              Add a scan or diary entry to start building your health timeline.
             </CardDescription>
           </CardHeader>
         </Card>
