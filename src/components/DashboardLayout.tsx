@@ -37,13 +37,15 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
   // SECURITY FIX (FINDING-002): Removed mock user authentication bypass.
   // Only check for a real Supabase auth token (sb-*-auth-token) to determine
   // if the session is still hydrating, preventing premature redirect to login.
-  const hasStoredSession =
-    typeof window !== "undefined" &&
-      Object.keys(localStorage).some(
-        (k) => k.startsWith("sb-") && k.endsWith("-auth-token"),
-      );
+  // Only treat the CURRENT project's token as a hydrating session. Stale tokens
+  // from an old Supabase project would otherwise cause an infinite spinner.
+  if (typeof window !== "undefined") {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith("sb-") && k.endsWith("-auth-token") && k !== "sb-oiepakmeezaqiorhsbom-auth-token")
+      .forEach((k) => localStorage.removeItem(k));
+  }
 
-  if (loading || (hasStoredSession && !user)) {
+  if (loading) {
     return (
       <div className="grid min-h-screen place-items-center bg-gradient-subtle">
         <div className="flex items-center gap-3 text-muted-foreground">

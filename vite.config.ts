@@ -6,9 +6,9 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 process.env.DANGEROUSLY_DEPLOY_VULNERABLE_TANSTACK_START_XSS = "1";
 
-const LOVABLE_SUPABASE_URL = "https://nrvptzzddpenyvcndcph.supabase.co";
+const LOVABLE_SUPABASE_URL = "https://oiepakmeezaqiorhsbom.supabase.co";
 const LOVABLE_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ydnB0enpkZHBlbnl2Y25kY3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTA3NzgsImV4cCI6MjA5MjI4Njc3OH0.ezxhA48lnXD_wFwyBHbwPCzLhjFPp54TrFGKc51Yf6E";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZXBha21lZXphcWlvcmhzYm9tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4OTczMzAsImV4cCI6MjExMDQ3MzMzMH0.CbiNyOIAI6QMp75caCkdbHntU9N4GksT-SwCSiobfHg";
 
 if (!process.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL.includes("your-project")) {
   process.env.VITE_SUPABASE_URL = LOVABLE_SUPABASE_URL;
@@ -23,7 +23,7 @@ if (!process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KE
   process.env.SUPABASE_PUBLISHABLE_KEY = LOVABLE_SUPABASE_ANON_KEY;
 }
 if (!process.env.VITE_SUPABASE_PROJECT_ID || process.env.VITE_SUPABASE_PROJECT_ID.includes("your-project")) {
-  process.env.VITE_SUPABASE_PROJECT_ID = "nrvptzzddpenyvcndcph";
+  process.env.VITE_SUPABASE_PROJECT_ID = "oiepakmeezaqiorhsbom";
 }
 
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
