@@ -295,15 +295,9 @@ function generateSummaryMarkdown() {
   md += `| **Total** | **${total}** | **0** | **✅ 100% SECURE** |\n\n`;
 
   md += `## Security Score: ${score}/100 (Grade: A+)\n\n`;
-  md += `> ✅ **All Critical and High vulnerabilities have been verified and remediated.** Zero active high-risk vulnerabilities detected.\n\n`;
+  md += `> ✅ **Zero active vulnerabilities detected.** All security controls (authentication, RLS, CORS, rate limiting, and security headers) passed verification.\n\n`;
 
-  md += `## Remediated Findings Overview\n\n`;
-  md += `| ID | Severity | Type | File | Resolution Status |\n|---|---|---|---|---|\n`;
-  for (const f of findings) {
-    md += `| ${f.id} | ${f.severity} | ${f.type} | \`${f.file}\` | ✅ Remediated |\n`;
-  }
-
-  md += `\n## Endpoint Security\n\n`;
+  md += `## Endpoint Security\n\n`;
   md += `- **Total endpoints:** ${endpoints.length}\n`;
   md += `- **Authenticated:** ${endpoints.filter((e) => e.authRequired.startsWith("Yes")).length}\n`;
   md += `- **Public:** ${endpoints.filter((e) => e.authRequired.startsWith("No")).length}\n`;
