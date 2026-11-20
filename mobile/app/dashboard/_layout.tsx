@@ -39,8 +39,6 @@ const navItems = [
   { to: '/dashboard', label: 'Overview', Icon: LayoutDashboard },
   { to: '/dashboard/analyze', label: 'New Analysis', Icon: Upload },
   { to: '/dashboard/reports', label: 'Scan Reports', Icon: FileText },
-  { to: '/dashboard/medical-reports', label: 'Medical Reports', Icon: FlaskConical },
-  { to: '/dashboard/prescriptions', label: 'Prescriptions', Icon: Pill },
   { to: '/dashboard/timeline', label: 'Health Timeline', Icon: Activity },
   { to: '/dashboard/twin', label: 'Health Twin', Icon: Brain },
   { to: '/dashboard/compare', label: 'What Changed', Icon: GitCompareArrows },

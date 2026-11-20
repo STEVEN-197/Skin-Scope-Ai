@@ -79,9 +79,7 @@ export default function DashboardOverview() {
 
   const quickItems = [
     { Icon: Upload, title: 'Scan Analysis', desc: 'ML visual diagnostics', to: '/dashboard/analyze' },
-    { Icon: FlaskConical, title: 'Medical Reports', desc: 'OCR lab insights', to: '/dashboard/medical-reports' },
     { Icon: Activity, title: 'Health Timeline', desc: 'Longitudinal view', to: '/dashboard/timeline' },
-    { Icon: Pill, title: 'Prescriptions', desc: 'Medicine intelligence', to: '/dashboard/prescriptions' },
     { Icon: Users, title: 'Family Profiles', desc: 'Whole-household care', to: '/dashboard/family' },
     { Icon: CalendarClock, title: 'Appointments', desc: 'Specialist bookings', to: '/dashboard/appointments' },
     { Icon: Share2, title: 'Doctor Share', desc: 'Export PDF summary', to: '/dashboard/share' },
