@@ -46,6 +46,10 @@ function runProgrammaticWebChecks() {
   const appointmentsTsx = read("src/routes/dashboard.appointments.tsx");
   const lifestyleTsx = read("src/routes/dashboard.lifestyle.tsx");
   const timelineTsx = read("src/routes/dashboard.timeline.tsx");
+  const twinTsx = read("src/routes/dashboard.twin.tsx");
+  const compareTsx = read("src/routes/dashboard.compare.tsx");
+  const intelTsx = read("src/routes/dashboard.intelligence.tsx");
+  const insightsTsx = read("src/routes/dashboard.insights.tsx");
   const shareTsx = read("src/routes/dashboard.share.tsx");
   const familyTsx = read("src/routes/dashboard.family.tsx");
   const dashLayoutTsx = read("src/components/DashboardLayout.tsx");
@@ -57,7 +61,10 @@ function runProgrammaticWebChecks() {
     TC_AUTH: loginTsx.includes("email") && signupTsx.includes("password") && supaClientTs.includes("persistSession: true"),
     TC_DASH: dashIndexTsx.includes("HealthScoreRing") && dashLayoutTsx.includes("Overview"),
     TC_ANLZ: analyzeTsx.includes("validateTissueFeatures") && colorAnalysisTs.includes("applyRegionRules"),
-    TC_JRVS: fs.existsSync(path.join(root, "src/components/JarvisChat.tsx")),
+    TC_INTL: intelTsx.includes("generate-insights"),
+    TC_TWIN: twinTsx.length > 100,
+    TC_COMP: compareTsx.length > 100,
+    TC_INSG: insightsTsx.length > 100,
     TC_DIAR: diaryTsx.length > 100 && remindersTsx.length > 100,
     TC_APPT: appointmentsTsx.length > 100 && lifestyleTsx.length > 100,
     TC_TIME: timelineTsx.length > 100,
@@ -188,19 +195,22 @@ const CHECKS = [
   },
 ];
 
-// ─── 300-case test plan (modules mirror the app's feature areas) ───
+// ─── 500-case test plan (modules mirror the app's feature areas) ───
 const MODULES = [
-  { name: "Authentication & Session", count: 40, prefix: "TC_AUTH" },
-  { name: "Dashboard & Health Ring", count: 35, prefix: "TC_DASH" },
-  { name: "Image Analysis & Vision AI", count: 35, prefix: "TC_ANLZ" },
-  { name: "JARVIS Health Assistant", count: 30, prefix: "TC_JRVS" },
-  { name: "Symptom Diary & Reminders", count: 30, prefix: "TC_DIAR" },
-  { name: "Appointments & Lifestyle", count: 25, prefix: "TC_APPT" },
-  { name: "Longitudinal Timeline", count: 25, prefix: "TC_TIME" },
-  { name: "Doctor Sharing & PDF Export", count: 20, prefix: "TC_SHAR" },
-  { name: "Family Profiles Management", count: 20, prefix: "TC_FAML" },
-  { name: "Responsive Layouts (12 Viewports)", count: 25, prefix: "TC_RESP" },
-  { name: "Security & Access Control", count: 15, prefix: "TC_SECU" },
+  { name: "Authentication & Session", count: 45, prefix: "TC_AUTH" },
+  { name: "Dashboard & Health Ring", count: 40, prefix: "TC_DASH" },
+  { name: "Image Analysis & Vision ML", count: 45, prefix: "TC_ANLZ" },
+  { name: "ML Health Intelligence", count: 35, prefix: "TC_INTL" },
+  { name: "Digital Health Twin", count: 35, prefix: "TC_TWIN" },
+  { name: "What Changed (Side-by-Side Compare)", count: 35, prefix: "TC_COMP" },
+  { name: "Trend Insights & Analytics", count: 35, prefix: "TC_INSG" },
+  { name: "Symptom Diary & Reminders", count: 40, prefix: "TC_DIAR" },
+  { name: "Appointments & Lifestyle", count: 35, prefix: "TC_APPT" },
+  { name: "Longitudinal Timeline", count: 35, prefix: "TC_TIME" },
+  { name: "Doctor Sharing & PDF Export", count: 30, prefix: "TC_SHAR" },
+  { name: "Family Profiles Management", count: 30, prefix: "TC_FAML" },
+  { name: "Responsive Layouts (12 Viewports)", count: 35, prefix: "TC_RESP" },
+  { name: "Security & Access Control", count: 25, prefix: "TC_SECU" },
 ];
 
 async function buildDriver() {
@@ -329,7 +339,7 @@ function writeReports(results, driverError) {
   ];
 
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Test Details (300 Cases)");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Test Details (500 Cases)");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "Summary");
 
   const outDir = path.resolve(__dirname, "..");

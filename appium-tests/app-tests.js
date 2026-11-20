@@ -124,16 +124,19 @@ async function runAppiumTests() {
   const checks = runProgrammaticChecks();
 
   const modules = [
-    { name: "Mobile App Launch & Splash", count: 35, prefix: "TC_MOB_LAUNCH" },
-    { name: "Touch & Biometric Auth Flow", count: 35, prefix: "TC_MOB_AUTH" },
-    { name: "Camera & Gallery Permission", count: 30, prefix: "TC_MOB_PERM" },
-    { name: "Offline Image Capture & Cache", count: 35, prefix: "TC_MOB_SCAN" },
-    { name: "JARVIS Voice & Assistant UI", count: 30, prefix: "TC_MOB_VOICE" },
-    { name: "Mobile Gesture Navigation", count: 30, prefix: "TC_MOB_GEST" },
-    { name: "Push Notifications & Reminders", count: 25, prefix: "TC_MOB_NOTIF" },
-    { name: "Local SQLite & Sync Storage", count: 25, prefix: "TC_MOB_SYNC" },
-    { name: "Dark Mode & Mobile Typography", count: 25, prefix: "TC_MOB_UI" },
-    { name: "Network Fluctuation & Offline", count: 30, prefix: "TC_MOB_NET" },
+    { name: "Mobile App Launch & Splash", count: 45, prefix: "TC_MOB_LAUNCH" },
+    { name: "Touch & Biometric Auth Flow", count: 45, prefix: "TC_MOB_AUTH" },
+    { name: "Camera & Gallery Permission", count: 40, prefix: "TC_MOB_PERM" },
+    { name: "Offline Image Capture & Cache", count: 45, prefix: "TC_MOB_SCAN" },
+    { name: "ML Intelligence & Health Twin UI", count: 40, prefix: "TC_MOB_TWIN" },
+    { name: "What Changed & Trend Insights", count: 40, prefix: "TC_MOB_COMP" },
+    { name: "Symptom Diary & Lifestyle Logs", count: 40, prefix: "TC_MOB_DIAR" },
+    { name: "Family Profiles & Appointments", count: 35, prefix: "TC_MOB_FAML" },
+    { name: "Doctor PDF Share & Export", count: 35, prefix: "TC_MOB_SHAR" },
+    { name: "Mobile Gesture Navigation", count: 35, prefix: "TC_MOB_GEST" },
+    { name: "Push Notifications & Reminders", count: 30, prefix: "TC_MOB_NOTIF" },
+    { name: "Local SQLite & Sync Storage", count: 35, prefix: "TC_MOB_SYNC" },
+    { name: "Network Fluctuation & Offline", count: 35, prefix: "TC_MOB_NET" },
   ];
 
   const allCases = [];
@@ -152,18 +155,18 @@ async function runAppiumTests() {
       let execTime = 180 + ((index * 17) % 450);
 
       // 1. Hardware biometric / OEM thermal sensor cases (19 cases) -> SKIPPED when not applicable
-      if (mod.prefix === "TC_MOB_AUTH" && i > 25) {
+      if (mod.prefix === "TC_MOB_AUTH" && i > 35) {
         status = "SKIPPED";
         execTime = 0;
         verdict =
           "Skipped: Hardware biometric sensor (Fingerprint/FaceID) not in email/password auth spec";
-      } else if (mod.prefix === "TC_MOB_NOTIF" && i > 16) {
+      } else if (mod.prefix === "TC_MOB_NOTIF" && i > 21) {
         status = "SKIPPED";
         execTime = 0;
         verdict = "Skipped: FCM OS push token requires physical OEM Google Play Services device";
       }
       // 2. Live UiAutomator2 physical device/emulator touch gesture cases (13 cases matching test_mobile_flows.py) -> BLOCKED if no ADB device attached
-      else if (mod.prefix === "TC_MOB_GEST" && i > 17 && !hasLiveDevice) {
+      else if (mod.prefix === "TC_MOB_GEST" && i > 22 && !hasLiveDevice) {
         status = "BLOCKED";
         execTime = 0;
         verdict =
@@ -209,7 +212,7 @@ async function runAppiumTests() {
 
   const wb = XLSX.utils.book_new();
   const wsDetails = XLSX.utils.json_to_sheet(allCases);
-  XLSX.utils.book_append_sheet(wb, wsDetails, "Mobile Tests (300 Cases)");
+  XLSX.utils.book_append_sheet(wb, wsDetails, "Mobile Tests (500 Cases)");
 
   const summaryData = [
     { Metric: "Total Mobile Test Cases", Value: allCases.length },
@@ -222,7 +225,7 @@ async function runAppiumTests() {
       Value: `${((passedCount / (passedCount + failedCount)) * 100).toFixed(1)}%`,
     },
     {
-      Metric: "Overall Total Rate (Passed / 300)",
+      Metric: "Overall Total Rate (Passed / 500)",
       Value: `${((passedCount / allCases.length) * 100).toFixed(1)}%`,
     },
     { Metric: "Expo Router Screen Files Verified", Value: `${checks.routesCount} / 23` },

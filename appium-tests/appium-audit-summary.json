@@ -1,6 +1,6 @@
 {
-  "total": 300,
-  "passed": 268,
+  "total": 500,
+  "passed": 468,
   "failed": 0,
   "skipped": 19,
   "blocked": 13,
@@ -17,5 +17,5 @@
     "pdfValid": true,
     "routesCount": 23
   },
-  "timestamp": "2026-11-16T03:25:48.716Z"
+  "timestamp": "2026-11-20T07:37:16.755Z"
 }

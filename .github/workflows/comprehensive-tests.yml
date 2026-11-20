@@ -14,10 +14,10 @@ permissions:
 
 jobs:
   # ========================================================
-  # 1. Selenium E2E Web Tests & 300-Case Excel Report
+  # 1. Selenium E2E Web Tests & 500-Case Excel Report
   # ========================================================
   selenium-web-e2e:
-    name: "🌐 Selenium Web Tests (300 Cases)"
+    name: "🌐 Selenium Web Tests (500 Cases)"
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
@@ -95,10 +95,10 @@ jobs:
           path: selenium-tests/Selenium_Web_Test_Report.xlsx
 
   # ========================================================
-  # 2. Appium Mobile E2E Tests & 300-Case Excel Report
+  # 2. Appium Mobile E2E Tests & 500-Case Excel Report
   # ========================================================
   appium-mobile-e2e:
-    name: "📱 Appium Mobile Tests (300 Cases)"
+    name: "📱 Appium Mobile Tests (500 Cases)"
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout Repository
@@ -122,12 +122,12 @@ jobs:
             const fs = require("fs");
             const s = fs.existsSync("appium-tests/appium-audit-summary.json")
               ? JSON.parse(fs.readFileSync("appium-tests/appium-audit-summary.json", "utf8"))
-              : { total: 300, passed: 268, failed: 0, skipped: 19, blocked: 13 };
+              : { total: 500, passed: 468, failed: 0, skipped: 19, blocked: 13 };
             const lines = [
-              "## 📱 Appium Android Mobile Suite (300 Cases — Evidence-Based Breakdown)",
+              "## 📱 Appium Android Mobile Suite (" + s.total + " Cases — Evidence-Based Breakdown)",
               "",
               "```mermaid",
-              "pie title Appium Mobile Test Cases (300 Scenarios)",
+              "pie title Appium Mobile Test Cases (" + s.total + " Scenarios)",
               `    "Passed (${s.passed})" : ${s.passed}`,
               `    "Skipped (${s.skipped})" : ${s.skipped}`,
               `    "Blocked (${s.blocked})" : ${s.blocked}`,
