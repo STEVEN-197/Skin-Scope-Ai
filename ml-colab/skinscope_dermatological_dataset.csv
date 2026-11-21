@@ -1,0 +1,301 @@
+sample_id,region,avgR,avgG,avgB,avgH,avgS,avgV,yellowRatio,redRatio,darkRatio,brightness,skinTissueRatio,scleraRatio,condition,severity
+SAMPLE_001,palm,195,152,128,22,34,76,2.5,0.38,2.35,76,63.45,2.39,Healthy appearance,none
+SAMPLE_002,eye,195,176.18,109.92,41.64,34,76,2.37,0,5.92,76,47.71,21.91,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_003,skin,195,111.17,128,6.86,34,76,0,14.06,7.91,76,60.28,0.4,Possible burn, rash, or inflammation,moderate
+SAMPLE_004,palm,195,216.55,63.68,61.25,34,76,19.9,0,1.55,76,64.3,1.34,Possible jaundice (severe),severe
+SAMPLE_005,eye,195,152,128,22,34,76,0.02,0.01,5.27,76,47.72,12.79,Healthy appearance,none
+SAMPLE_006,skin,195,152,128,22,34,76,1.15,1.43,2.75,76,65.39,1.74,Healthy appearance,none
+SAMPLE_007,palm,195,113.11,128,10.19,34,76,0,4.03,4.06,76,55.27,2.12,Mild redness or skin irritation,mild
+SAMPLE_008,eye,195,213.59,86.66,54.69,34,76,5.21,0,6.21,76,32.53,14.27,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_009,skin,195,59.71,128,4.16,34,76,0,22.63,6.78,76,79.04,1.67,Possible burn or severe inflammation,severe
+SAMPLE_010,palm,195,152,128,22,34,76,1.57,1.01,5.97,76,66.24,2.61,Healthy appearance,none
+SAMPLE_011,eye,195,152,128,22,34,76,1.18,1.07,5.51,76,30.66,8.28,Healthy appearance,none
+SAMPLE_012,skin,195,182.29,119.87,43.96,34,76,7.37,0,4.62,76,82.63,2.04,Possible jaundice (mild),mild
+SAMPLE_013,palm,195,113.74,128,3.25,34,76,0,9.11,5.26,76,80.64,0.73,Possible burn, rash, or inflammation,moderate
+SAMPLE_014,eye,195,198.16,73.95,53.02,34,76,13.64,0,5.14,76,46.91,17.73,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_015,skin,195,152,128,22,34,76,0.06,1.44,1.18,76,47.42,2.58,Healthy appearance,none
+SAMPLE_016,palm,195,152,128,22,34,76,1.58,0.19,6.38,76,90.27,0.71,Healthy appearance,none
+SAMPLE_017,eye,195,120.42,128,7.35,34,76,0,3.78,3.03,76,40.36,20.02,Mild eye redness or irritation,mild
+SAMPLE_018,skin,195,185.29,96.56,54.61,34,76,12.43,0,5.32,76,58.73,2.4,Possible jaundice (moderate),moderate
+SAMPLE_019,palm,195,64.79,128,5.88,34,76,0,29.36,6.68,76,64.57,1.45,Possible burn or severe inflammation,severe
+SAMPLE_020,eye,195,152,128,22,34,76,0.68,1.13,6.15,76,30.74,9.15,Healthy appearance,none
+SAMPLE_021,skin,195,152,128,22,34,76,0.2,0.66,4.17,76,67.91,1.58,Healthy appearance,none
+SAMPLE_022,palm,195,181.31,97.17,45.94,34,76,4.21,0,4.94,76,47.1,1.79,Possible jaundice (mild),mild
+SAMPLE_023,eye,195,92.98,128,10.67,34,76,0,8.17,3.68,76,45.93,21.51,Moderate conjunctival redness,moderate
+SAMPLE_024,skin,195,199.78,75.71,51.44,34,76,27.5,0,5.41,76,70.72,1.74,Possible jaundice (severe),severe
+SAMPLE_025,palm,195,152,128,22,34,76,0.54,0.83,4.54,76,88.3,1.85,Healthy appearance,none
+SAMPLE_026,eye,195,152,128,22,34,76,0.85,0.47,3,76,35.77,15.22,Healthy appearance,none
+SAMPLE_027,skin,195,106.42,128,10.7,34,76,0,3.85,4.65,76,51.57,1.96,Mild redness or skin irritation,mild
+SAMPLE_028,palm,195,188.81,83.77,47.84,34,76,13.41,0,2.68,76,69.24,2.42,Possible jaundice (moderate),moderate
+SAMPLE_029,eye,195,71.14,128,0.75,34,76,0,19.9,4.05,76,46.3,11.29,Severe conjunctival redness / irritation,severe
+SAMPLE_030,skin,195,152,128,22,34,76,0.28,0.87,1.25,76,74.47,1.37,Healthy appearance,none
+SAMPLE_031,palm,195,152,128,22,34,76,2.63,1.17,1.96,76,51,0.66,Healthy appearance,none
+SAMPLE_032,eye,195,176.02,91.74,44.41,34,76,2.3,0,7.36,76,35.41,21.21,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_033,skin,195,100.72,128,4.15,34,76,0,13.83,7.15,76,46.83,1.59,Possible burn, rash, or inflammation,moderate
+SAMPLE_034,palm,195,209.67,46.59,50.11,34,76,29.01,0,2.15,76,70.35,2.05,Possible jaundice (severe),severe
+SAMPLE_035,eye,195,152,128,22,34,76,1.11,0.98,7.24,76,50.42,9.32,Healthy appearance,none
+SAMPLE_036,skin,195,152,128,22,34,76,0.03,1.05,4.56,76,65.84,0.15,Healthy appearance,none
+SAMPLE_037,palm,195,108.65,128,2.82,34,76,0,3.24,3.07,76,73.25,2.47,Mild redness or skin irritation,mild
+SAMPLE_038,eye,195,202.25,82.54,44.47,34,76,5.4,0,5.27,76,43.77,9.88,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_039,skin,195,85.85,128,8.63,34,76,0,28.16,4.37,76,77.15,2.05,Possible burn or severe inflammation,severe
+SAMPLE_040,palm,195,152,128,22,34,76,2.13,1.46,3.82,76,84,0.87,Healthy appearance,none
+SAMPLE_041,eye,195,152,128,22,34,76,0.44,0.33,5.71,76,46.83,12.96,Healthy appearance,none
+SAMPLE_042,skin,195,192.65,90.99,45.31,34,76,8.23,0,2.33,76,72.79,1.57,Possible jaundice (mild),mild
+SAMPLE_043,palm,195,90.99,128,4.3,34,76,0,13.25,0.56,76,56.66,1.66,Possible burn, rash, or inflammation,moderate
+SAMPLE_044,eye,195,212.12,48.81,59.2,34,76,10.38,0,5.63,76,37.01,18.25,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_045,skin,195,152,128,22,34,76,0.96,1.27,5.75,76,59.34,1.21,Healthy appearance,none
+SAMPLE_046,palm,195,152,128,22,34,76,0.97,0.81,5.4,76,84.2,1.99,Healthy appearance,none
+SAMPLE_047,eye,195,134.61,128,8.49,34,76,0,4.51,1.82,76,33.53,17.8,Mild eye redness or irritation,mild
+SAMPLE_048,skin,195,207.6,86.25,47.52,34,76,14.2,0,5.12,76,46.37,0.99,Possible jaundice (moderate),moderate
+SAMPLE_049,palm,195,79.68,128,2.73,34,76,0,32.64,3.1,76,55.26,0.72,Possible burn or severe inflammation,severe
+SAMPLE_050,eye,195,152,128,22,34,76,0.47,0.2,0.78,76,49.18,19.54,Healthy appearance,none
+SAMPLE_051,skin,195,152,128,22,34,76,1.28,1.28,2.21,76,91.77,0.43,Healthy appearance,none
+SAMPLE_052,palm,195,194.87,120.07,46.02,34,76,5.04,0,1.24,76,57.96,1.47,Possible jaundice (mild),mild
+SAMPLE_053,eye,195,98.37,128,4.47,34,76,0,5.38,2.16,76,38.12,17.01,Moderate conjunctival redness,moderate
+SAMPLE_054,skin,195,195.55,82.33,51.4,34,76,23.73,0,5.67,76,46.31,1.48,Possible jaundice (severe),severe
+SAMPLE_055,palm,195,152,128,22,34,76,1.92,0.65,3.13,76,73.81,0.87,Healthy appearance,none
+SAMPLE_056,eye,195,152,128,22,34,76,0.23,0.61,7.69,76,47.75,9.11,Healthy appearance,none
+SAMPLE_057,skin,195,116.82,128,8.23,34,76,0,2.96,5.3,76,55.82,1.63,Mild redness or skin irritation,mild
+SAMPLE_058,palm,195,195.38,71.94,55.36,34,76,11.33,0,4.04,76,50.43,1.85,Possible jaundice (moderate),moderate
+SAMPLE_059,eye,195,56.75,128,1.22,34,76,0,13.22,2.22,76,26.7,21.7,Severe conjunctival redness / irritation,severe
+SAMPLE_060,skin,195,152,128,22,34,76,2.8,1.09,3.54,76,79.74,0.61,Healthy appearance,none
+SAMPLE_061,palm,195,152,128,22,34,76,2.08,0.9,5.69,76,58.08,1.63,Healthy appearance,none
+SAMPLE_062,eye,195,190.29,122.69,46.58,34,76,3.79,0,7.75,76,32.27,18,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_063,skin,195,84.9,128,1.12,34,76,0,14.79,3.83,76,87.39,1.38,Possible burn, rash, or inflammation,moderate
+SAMPLE_064,palm,195,221.01,45.43,61.88,34,76,21.2,0,4.09,76,49.49,0.86,Possible jaundice (severe),severe
+SAMPLE_065,eye,195,152,128,22,34,76,1.05,1.05,7.85,76,45.61,19.16,Healthy appearance,none
+SAMPLE_066,skin,195,152,128,22,34,76,2.22,0.64,3,76,51.51,2.65,Healthy appearance,none
+SAMPLE_067,palm,195,123.08,128,12.53,34,76,0,6.27,1.92,76,58.37,2.87,Mild redness or skin irritation,mild
+SAMPLE_068,eye,195,195.6,100,54.56,34,76,6.16,0,2.93,76,50.48,20.62,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_069,skin,195,93.11,128,8.57,34,76,0,33.04,2.88,76,89.13,0.9,Possible burn or severe inflammation,severe
+SAMPLE_070,palm,195,152,128,22,34,76,2.56,0.04,3.66,76,51.69,0.03,Healthy appearance,none
+SAMPLE_071,eye,195,152,128,22,34,76,0.58,0.2,7.53,76,39.62,21.17,Healthy appearance,none
+SAMPLE_072,skin,195,198.03,120.08,45.68,34,76,6.85,0,0.96,76,80.84,1.18,Possible jaundice (mild),mild
+SAMPLE_073,palm,195,113.71,128,3.4,34,76,0,8.31,1.89,76,64.29,1.92,Possible burn, rash, or inflammation,moderate
+SAMPLE_074,eye,195,215.78,82.45,59.36,34,76,11.1,0,1.86,76,32.51,13.32,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_075,skin,195,152,128,22,34,76,2.77,1.41,6.21,76,81.85,1.61,Healthy appearance,none
+SAMPLE_076,palm,195,152,128,22,34,76,1.52,0.61,4.3,76,47.19,1.58,Healthy appearance,none
+SAMPLE_077,eye,195,118.25,128,11.62,34,76,0,4.15,5.78,76,30.84,21.92,Mild eye redness or irritation,mild
+SAMPLE_078,skin,195,200.56,96.46,53.16,34,76,13.81,0,7.77,76,53.71,2.55,Possible jaundice (moderate),moderate
+SAMPLE_079,palm,195,81.53,128,2.12,34,76,0,19.45,4.29,76,66.05,1.49,Possible burn or severe inflammation,severe
+SAMPLE_080,eye,195,152,128,22,34,76,0.02,0.67,5.26,76,41.19,18.53,Healthy appearance,none
+SAMPLE_081,skin,195,152,128,22,34,76,0.95,0.57,4.98,76,88.5,1.58,Healthy appearance,none
+SAMPLE_082,palm,195,179.41,101,39.86,34,76,4.22,0,1.76,76,58.33,1.9,Possible jaundice (mild),mild
+SAMPLE_083,eye,195,80.31,128,7.26,34,76,0,8.3,4.8,76,38.52,9.39,Moderate conjunctival redness,moderate
+SAMPLE_084,skin,195,215.91,69.49,53.23,34,76,31.86,0,3.15,76,51.56,1.03,Possible jaundice (severe),severe
+SAMPLE_085,palm,195,152,128,22,34,76,1.33,1.09,2.46,76,88.15,1.79,Healthy appearance,none
+SAMPLE_086,eye,195,152,128,22,34,76,1.13,0.92,7.33,76,38.11,19.06,Healthy appearance,none
+SAMPLE_087,skin,195,114.98,128,3.88,34,76,0,6,5.57,76,91.14,0.52,Mild redness or skin irritation,mild
+SAMPLE_088,palm,195,189.14,79.35,45.7,34,76,15.27,0,4.7,76,60.4,2.11,Possible jaundice (moderate),moderate
+SAMPLE_089,eye,195,73.75,128,3.91,34,76,0,12.53,7.95,76,52.58,12.7,Severe conjunctival redness / irritation,severe
+SAMPLE_090,skin,195,152,128,22,34,76,2.59,0.3,4.56,76,49.36,1.14,Healthy appearance,none
+SAMPLE_091,palm,195,152,128,22,34,76,2.59,0.97,2.94,76,45.85,1.01,Healthy appearance,none
+SAMPLE_092,eye,195,191.77,104.07,45.33,34,76,2.78,0,1.7,76,31.36,20.97,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_093,skin,195,96.76,128,2.31,34,76,0,14.82,5.15,76,83.87,0.81,Possible burn, rash, or inflammation,moderate
+SAMPLE_094,palm,195,195.69,76.37,58.08,34,76,21.21,0,6.94,76,57.28,2.86,Possible jaundice (severe),severe
+SAMPLE_095,eye,195,152,128,22,34,76,0.99,1.2,5.72,76,46.15,10.41,Healthy appearance,none
+SAMPLE_096,skin,195,152,128,22,34,76,1.41,0.47,1.5,76,68.85,2.5,Healthy appearance,none
+SAMPLE_097,palm,195,134.66,128,4.53,34,76,0,6.63,6.47,76,81.72,1.47,Mild redness or skin irritation,mild
+SAMPLE_098,eye,195,214.06,92.97,46.48,34,76,5.26,0,1.17,76,40.85,17.85,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_099,skin,195,58.86,128,5.2,34,76,0,29.7,4.2,76,75.04,0.91,Possible burn or severe inflammation,severe
+SAMPLE_100,palm,195,152,128,22,34,76,2.37,0.94,4,76,54.96,2.26,Healthy appearance,none
+SAMPLE_101,eye,195,152,128,22,34,76,1.05,0.13,3.39,76,31.72,15.69,Healthy appearance,none
+SAMPLE_102,skin,195,177.22,116.97,47.57,34,76,8.5,0,2.31,76,72.58,1.35,Possible jaundice (mild),mild
+SAMPLE_103,palm,195,112.56,128,1.96,34,76,0,10.54,5.5,76,45.24,2.47,Possible burn, rash, or inflammation,moderate
+SAMPLE_104,eye,195,208.78,76.79,52.1,34,76,13.53,0,1.48,76,30.94,11.14,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_105,skin,195,152,128,22,34,76,0.88,1.02,7.88,76,60.89,1.45,Healthy appearance,none
+SAMPLE_106,palm,195,152,128,22,34,76,1.88,1.47,1.62,76,77.34,2.7,Healthy appearance,none
+SAMPLE_107,eye,195,107.17,128,3.77,34,76,0,2.49,2.52,76,32.35,9.38,Mild eye redness or irritation,mild
+SAMPLE_108,skin,195,210.82,102.22,48.64,34,76,14.27,0,2.76,76,64.75,1.89,Possible jaundice (moderate),moderate
+SAMPLE_109,palm,195,62.59,128,8.03,34,76,0,22.57,3.06,76,50.13,1.52,Possible burn or severe inflammation,severe
+SAMPLE_110,eye,195,152,128,22,34,76,1.05,0.47,1.25,76,45.89,16.54,Healthy appearance,none
+SAMPLE_111,skin,195,152,128,22,34,76,0.1,0.19,2.74,76,61.62,1.01,Healthy appearance,none
+SAMPLE_112,palm,195,192.52,108.5,47.12,34,76,6.76,0,7.87,76,59.42,0.7,Possible jaundice (mild),mild
+SAMPLE_113,eye,195,84.17,128,6.2,34,76,0,8.12,2.47,76,49.86,14.11,Moderate conjunctival redness,moderate
+SAMPLE_114,skin,195,201.54,73.33,58.99,34,76,28.97,0,4.56,76,47.1,2.15,Possible jaundice (severe),severe
+SAMPLE_115,palm,195,152,128,22,34,76,0.27,1.37,1.95,76,68.36,1.74,Healthy appearance,none
+SAMPLE_116,eye,195,152,128,22,34,76,0.03,0.73,2.22,76,41.21,10.48,Healthy appearance,none
+SAMPLE_117,skin,195,107.48,128,12.58,34,76,0,6.3,0.75,76,61.9,1.79,Mild redness or skin irritation,mild
+SAMPLE_118,palm,195,210.89,94.4,46.63,34,76,14.11,0,2.52,76,90.06,1.69,Possible jaundice (moderate),moderate
+SAMPLE_119,eye,195,79.75,128,3.16,34,76,0,16.21,2.15,76,26.31,14.04,Severe conjunctival redness / irritation,severe
+SAMPLE_120,skin,195,152,128,22,34,76,1.75,1.09,5.82,76,47,1.18,Healthy appearance,none
+SAMPLE_121,palm,195,152,128,22,34,76,0.65,0.45,5.22,76,49.94,1.42,Healthy appearance,none
+SAMPLE_122,eye,195,197.43,97.13,41.3,34,76,2.02,0,3.09,76,53.63,16.71,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_123,skin,195,99.42,128,3.69,34,76,0,9.14,4.74,76,73.6,1.2,Possible burn, rash, or inflammation,moderate
+SAMPLE_124,palm,195,203.06,83.43,51.41,34,76,17.25,0,6.48,76,85.06,1.91,Possible jaundice (severe),severe
+SAMPLE_125,eye,195,152,128,22,34,76,1.11,1.16,7.46,76,33.53,17.8,Healthy appearance,none
+SAMPLE_126,skin,195,152,128,22,34,76,0.55,0.37,7.15,76,67.92,1.21,Healthy appearance,none
+SAMPLE_127,palm,195,113.22,128,10.19,34,76,0,2.86,3.97,76,88.82,1.56,Mild redness or skin irritation,mild
+SAMPLE_128,eye,195,201.06,78.78,47.9,34,76,5.42,0,7.78,76,44.05,17.97,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_129,skin,195,56.12,128,7.23,34,76,0,29.98,1.44,76,73.61,0.53,Possible burn or severe inflammation,severe
+SAMPLE_130,palm,195,152,128,22,34,76,0.97,1.3,7.08,76,80.79,2.71,Healthy appearance,none
+SAMPLE_131,eye,195,152,128,22,34,76,0.61,0.61,4.76,76,41.6,15.01,Healthy appearance,none
+SAMPLE_132,skin,195,190.51,97.64,46.6,34,76,7.84,0,4.13,76,78.05,2.25,Possible jaundice (mild),mild
+SAMPLE_133,palm,195,83.98,128,5.53,34,76,0,8.4,2.28,76,51.66,2.24,Possible burn, rash, or inflammation,moderate
+SAMPLE_134,eye,195,204.87,63.52,54.55,34,76,9.41,0,5.2,76,45.87,11.2,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_135,skin,195,152,128,22,34,76,0.04,1.05,4.19,76,77.39,1.7,Healthy appearance,none
+SAMPLE_136,palm,195,152,128,22,34,76,2.01,0.98,5.64,76,83.52,1.11,Healthy appearance,none
+SAMPLE_137,eye,195,121.88,128,2.54,34,76,0,3.32,6.93,76,28.47,16.09,Mild eye redness or irritation,mild
+SAMPLE_138,skin,195,200.31,104.46,52.22,34,76,15.95,0,2.44,76,78.31,1.74,Possible jaundice (moderate),moderate
+SAMPLE_139,palm,195,67.33,128,1.8,34,76,0,16.67,0.66,76,79.65,2.38,Possible burn or severe inflammation,severe
+SAMPLE_140,eye,195,152,128,22,34,76,0.14,0.99,2.29,76,52.44,20.87,Healthy appearance,none
+SAMPLE_141,skin,195,152,128,22,34,76,0.3,0.15,6.16,76,86.36,0.76,Healthy appearance,none
+SAMPLE_142,palm,195,179.79,100.89,44.41,34,76,7.27,0,2.67,76,84.79,1.98,Possible jaundice (mild),mild
+SAMPLE_143,eye,195,89.16,128,7.88,34,76,0,8.93,7.32,76,53.99,12.36,Moderate conjunctival redness,moderate
+SAMPLE_144,skin,195,197.76,63.77,56.76,34,76,33.02,0,5.16,76,81.41,2.18,Possible jaundice (severe),severe
+SAMPLE_145,palm,195,152,128,22,34,76,1.78,1.04,3.43,76,57.11,1.89,Healthy appearance,none
+SAMPLE_146,eye,195,152,128,22,34,76,0.21,0.13,2.85,76,35.75,15.22,Healthy appearance,none
+SAMPLE_147,skin,195,123.09,128,5.98,34,76,0,6.79,5.75,76,58.36,2.94,Mild redness or skin irritation,mild
+SAMPLE_148,palm,195,191.22,76.6,51.56,34,76,14.06,0,6.73,76,45.1,0.98,Possible jaundice (moderate),moderate
+SAMPLE_149,eye,195,68.12,128,8.78,34,76,0,17.43,4.51,76,35.83,11.11,Severe conjunctival redness / irritation,severe
+SAMPLE_150,skin,195,152,128,22,34,76,0.23,0.21,2.66,76,47.78,1.87,Healthy appearance,none
+SAMPLE_151,palm,195,152,128,22,34,76,0.16,0.42,3.95,76,60.12,2.97,Healthy appearance,none
+SAMPLE_152,eye,195,187.53,114.09,44.24,34,76,2.18,0,2.29,76,50.17,19.32,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_153,skin,195,81.93,128,10.18,34,76,0,8.88,7.86,76,50.61,0.86,Possible burn, rash, or inflammation,moderate
+SAMPLE_154,palm,195,217.88,53.88,55.8,34,76,31.48,0,6.08,76,47.12,1.54,Possible jaundice (severe),severe
+SAMPLE_155,eye,195,152,128,22,34,76,0.74,1.29,6.01,76,36.16,14.64,Healthy appearance,none
+SAMPLE_156,skin,195,152,128,22,34,76,1.18,0.41,5.59,76,79.15,2.38,Healthy appearance,none
+SAMPLE_157,palm,195,114.94,128,8.19,34,76,0,2.93,2.55,76,51.55,0.07,Mild redness or skin irritation,mild
+SAMPLE_158,eye,195,203.96,89.99,50.23,34,76,4.21,0,6.24,76,51.46,10.77,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_159,skin,195,86,128,5.28,34,76,0,26.18,6.97,76,57.26,2.7,Possible burn or severe inflammation,severe
+SAMPLE_160,palm,195,152,128,22,34,76,2.54,0.36,2.08,76,60.79,0.07,Healthy appearance,none
+SAMPLE_161,eye,195,152,128,22,34,76,0.15,0.86,4.94,76,43.82,12.93,Healthy appearance,none
+SAMPLE_162,skin,195,196.49,124.69,47.66,34,76,5.25,0,5.02,76,54.89,0.26,Possible jaundice (mild),mild
+SAMPLE_163,palm,195,93.2,128,5.6,34,76,0,12.14,3.42,76,63.81,1.38,Possible burn, rash, or inflammation,moderate
+SAMPLE_164,eye,195,207.69,74.23,62.37,34,76,9.94,0,8,76,53.35,8.07,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_165,skin,195,152,128,22,34,76,0.52,0.38,4.53,76,57.42,1.81,Healthy appearance,none
+SAMPLE_166,palm,195,152,128,22,34,76,0,0,6.04,76,50.6,2.18,Healthy appearance,none
+SAMPLE_167,eye,195,112.09,128,12.8,34,76,0,2.86,1.13,76,30.49,20.51,Mild eye redness or irritation,mild
+SAMPLE_168,skin,195,187.99,101.86,51.28,34,76,14.48,0,6.83,76,63.88,1.03,Possible jaundice (moderate),moderate
+SAMPLE_169,palm,195,84.39,128,2.96,34,76,0,29.14,7.14,76,51.48,2.78,Possible burn or severe inflammation,severe
+SAMPLE_170,eye,195,152,128,22,34,76,0.88,0.89,4.19,76,41.8,10.54,Healthy appearance,none
+SAMPLE_171,skin,195,152,128,22,34,76,2.37,0.44,0.86,76,78.86,1.21,Healthy appearance,none
+SAMPLE_172,palm,195,186.86,94.16,47.22,34,76,5.97,0,0.61,76,72.12,2.92,Possible jaundice (mild),mild
+SAMPLE_173,eye,195,84.89,128,9.3,34,76,0,6.16,1.7,76,28.82,11.79,Moderate conjunctival redness,moderate
+SAMPLE_174,skin,195,220.61,82.15,54.28,34,76,29.61,0,1.72,76,60.24,2.04,Possible jaundice (severe),severe
+SAMPLE_175,palm,195,152,128,22,34,76,1.04,0.95,0.71,76,55.56,2.81,Healthy appearance,none
+SAMPLE_176,eye,195,152,128,22,34,76,0.24,0.46,3.42,76,30.76,16.03,Healthy appearance,none
+SAMPLE_177,skin,195,119.2,128,6.15,34,76,0,4.79,5.84,76,78.91,2.91,Mild redness or skin irritation,mild
+SAMPLE_178,palm,195,193.74,74.21,46.34,34,76,11.92,0,4.7,76,68.55,1.77,Possible jaundice (moderate),moderate
+SAMPLE_179,eye,195,62.87,128,0.17,34,76,0,11.01,4.91,76,36.93,12.08,Severe conjunctival redness / irritation,severe
+SAMPLE_180,skin,195,152,128,22,34,76,2.01,0.16,2.44,76,55.83,1.65,Healthy appearance,none
+SAMPLE_181,palm,195,152,128,22,34,76,0.87,0.43,4.41,76,91.56,0.77,Healthy appearance,none
+SAMPLE_182,eye,195,181.14,120.61,40.13,34,76,3.18,0,1.8,76,34.92,13.47,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_183,skin,195,81.99,128,8.25,34,76,0,8.15,6.31,76,86.61,1.37,Possible burn, rash, or inflammation,moderate
+SAMPLE_184,palm,195,201.12,45.95,53.94,34,76,25.71,0,5.02,76,85.43,2.12,Possible jaundice (severe),severe
+SAMPLE_185,eye,195,152,128,22,34,76,1.18,1.14,2.31,76,27.01,21.28,Healthy appearance,none
+SAMPLE_186,skin,195,152,128,22,34,76,2.57,0.15,0.54,76,59.97,1.3,Healthy appearance,none
+SAMPLE_187,palm,195,114.46,128,3.1,34,76,0,5.95,7.65,76,76.39,1.16,Mild redness or skin irritation,mild
+SAMPLE_188,eye,195,188.23,100.08,51.74,34,76,5.58,0,3.08,76,36.46,14.5,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_189,skin,195,75.03,128,2.45,34,76,0,33.77,4.15,76,58.33,0.97,Possible burn or severe inflammation,severe
+SAMPLE_190,palm,195,152,128,22,34,76,1.36,0.24,6.49,76,77.34,2.8,Healthy appearance,none
+SAMPLE_191,eye,195,152,128,22,34,76,0.72,0.68,1.86,76,53.76,18.98,Healthy appearance,none
+SAMPLE_192,skin,195,181.11,104.31,44.42,34,76,6.15,0,4.81,76,69.12,1.66,Possible jaundice (mild),mild
+SAMPLE_193,palm,195,100.44,128,5.94,34,76,0,12.89,5.52,76,58.34,0.32,Possible burn, rash, or inflammation,moderate
+SAMPLE_194,eye,195,204.34,68.95,53.76,34,76,7.57,0,6.48,76,38.27,16.51,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_195,skin,195,152,128,22,34,76,1.29,1.04,5.54,76,87.26,0.62,Healthy appearance,none
+SAMPLE_196,palm,195,152,128,22,34,76,0.44,0.44,5.44,76,84.03,0.19,Healthy appearance,none
+SAMPLE_197,eye,195,113.99,128,8.01,34,76,0,4.36,2.18,76,35.43,8.23,Mild eye redness or irritation,mild
+SAMPLE_198,skin,195,187.96,88.54,52.62,34,76,15.52,0,4.67,76,91.77,2.39,Possible jaundice (moderate),moderate
+SAMPLE_199,palm,195,91.54,128,6.71,34,76,0,28.65,2.09,76,57.81,1.73,Possible burn or severe inflammation,severe
+SAMPLE_200,eye,195,152,128,22,34,76,0.4,1.44,2.45,76,29.25,8.49,Healthy appearance,none
+SAMPLE_201,skin,195,152,128,22,34,76,2.25,0.56,5.56,76,46.1,1.1,Healthy appearance,none
+SAMPLE_202,palm,195,180.47,114.43,44.84,34,76,7.86,0,7.76,76,81.94,2.32,Possible jaundice (mild),mild
+SAMPLE_203,eye,195,92.39,128,7.69,34,76,0,6.58,1.31,76,30.06,8.61,Moderate conjunctival redness,moderate
+SAMPLE_204,skin,195,203.65,49.74,60.63,34,76,29.54,0,2.29,76,88.7,0.26,Possible jaundice (severe),severe
+SAMPLE_205,palm,195,152,128,22,34,76,2.22,1.37,1.41,76,48.5,1.78,Healthy appearance,none
+SAMPLE_206,eye,195,152,128,22,34,76,0.94,0.44,7.92,76,45.88,14.31,Healthy appearance,none
+SAMPLE_207,skin,195,123.12,128,4.39,34,76,0,3.71,0.65,76,55.2,2,Mild redness or skin irritation,mild
+SAMPLE_208,palm,195,185.71,97.39,54.05,34,76,15.14,0,1.42,76,67.67,1.89,Possible jaundice (moderate),moderate
+SAMPLE_209,eye,195,82.06,128,5.99,34,76,0,18.94,7.9,76,36.11,18.2,Severe conjunctival redness / irritation,severe
+SAMPLE_210,skin,195,152,128,22,34,76,0.94,1,5.31,76,56.81,0.65,Healthy appearance,none
+SAMPLE_211,palm,195,152,128,22,34,76,2.56,1.17,3.9,76,88.26,2.41,Healthy appearance,none
+SAMPLE_212,eye,195,181.93,111.32,39.14,34,76,2.76,0,4.87,76,25.4,16.16,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_213,skin,195,107.3,128,2.16,34,76,0,14.43,6.94,76,70.69,0.82,Possible burn, rash, or inflammation,moderate
+SAMPLE_214,palm,195,216.39,79.11,51.38,34,76,24.57,0,2.04,76,83.15,0.8,Possible jaundice (severe),severe
+SAMPLE_215,eye,195,152,128,22,34,76,1.19,1.03,4.44,76,46.11,9.37,Healthy appearance,none
+SAMPLE_216,skin,195,152,128,22,34,76,2.5,0.42,3.02,76,59.54,0.3,Healthy appearance,none
+SAMPLE_217,palm,195,110.94,128,7.02,34,76,0,6.73,6.85,76,62.92,0.13,Mild redness or skin irritation,mild
+SAMPLE_218,eye,195,204.7,83.21,49.7,34,76,4.35,0,4.32,76,42.45,13.92,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_219,skin,195,83.19,128,0.42,34,76,0,21.98,4.8,76,82.73,2.3,Possible burn or severe inflammation,severe
+SAMPLE_220,palm,195,152,128,22,34,76,2.52,0.89,6.9,76,77.67,1.13,Healthy appearance,none
+SAMPLE_221,eye,195,152,128,22,34,76,1.16,0.63,3.29,76,53.29,10.45,Healthy appearance,none
+SAMPLE_222,skin,195,181.64,101.26,46.17,34,76,6.19,0,2.69,76,55.29,1.94,Possible jaundice (mild),mild
+SAMPLE_223,palm,195,96.4,128,9.72,34,76,0,7.85,7.18,76,62.26,0.9,Possible burn, rash, or inflammation,moderate
+SAMPLE_224,eye,195,219.97,47.55,53.29,34,76,7.51,0,7.65,76,44.22,10.05,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_225,skin,195,152,128,22,34,76,2.09,0.59,6.6,76,67.82,2.13,Healthy appearance,none
+SAMPLE_226,palm,195,152,128,22,34,76,0.42,1.17,6.82,76,69.73,1.4,Healthy appearance,none
+SAMPLE_227,eye,195,107.52,128,7.19,34,76,0,4.06,6.89,76,30.23,9.61,Mild eye redness or irritation,mild
+SAMPLE_228,skin,195,201.33,103.99,55.07,34,76,18.07,0,5.63,76,58.12,2.84,Possible jaundice (moderate),moderate
+SAMPLE_229,palm,195,62.95,128,5.16,34,76,0,32.07,1.11,76,47.11,0.39,Possible burn or severe inflammation,severe
+SAMPLE_230,eye,195,152,128,22,34,76,0.35,0.83,3.01,76,53.19,10.58,Healthy appearance,none
+SAMPLE_231,skin,195,152,128,22,34,76,2.71,0.94,2.17,76,87.48,2.48,Healthy appearance,none
+SAMPLE_232,palm,195,196.28,109.52,44.02,34,76,6.32,0,3.39,76,53.68,0.84,Possible jaundice (mild),mild
+SAMPLE_233,eye,195,88.36,128,6.75,34,76,0,6.66,3.23,76,54.29,12.44,Moderate conjunctival redness,moderate
+SAMPLE_234,skin,195,210.94,60.84,50.75,34,76,31.12,0,3.49,76,61.86,1.03,Possible jaundice (severe),severe
+SAMPLE_235,palm,195,152,128,22,34,76,0.93,0.08,3.74,76,59.25,2.95,Healthy appearance,none
+SAMPLE_236,eye,195,152,128,22,34,76,0.43,0.99,5.17,76,38.01,8.12,Healthy appearance,none
+SAMPLE_237,skin,195,113.96,128,2.43,34,76,0,3.98,3.03,76,57.25,2.33,Mild redness or skin irritation,mild
+SAMPLE_238,palm,195,192.35,102.87,51.63,34,76,12.12,0,5.57,76,52.95,0.19,Possible jaundice (moderate),moderate
+SAMPLE_239,eye,195,62.14,128,0.09,34,76,0,20.94,2.64,76,48.82,14.25,Severe conjunctival redness / irritation,severe
+SAMPLE_240,skin,195,152,128,22,34,76,0.82,1.18,3.42,76,83.84,0.43,Healthy appearance,none
+SAMPLE_241,palm,195,152,128,22,34,76,1.96,0.48,6.99,76,84.01,1.52,Healthy appearance,none
+SAMPLE_242,eye,195,201.41,112.12,39.81,34,76,3.77,0,4.57,76,44.61,8.93,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_243,skin,195,106.77,128,4.37,34,76,0,13.74,5.33,76,80.9,0.1,Possible burn, rash, or inflammation,moderate
+SAMPLE_244,palm,195,198.41,48.41,50.26,34,76,25.17,0,6.86,76,45.84,0.69,Possible jaundice (severe),severe
+SAMPLE_245,eye,195,152,128,22,34,76,0.48,0.27,3.14,76,54.45,16.53,Healthy appearance,none
+SAMPLE_246,skin,195,152,128,22,34,76,1.49,1.45,2.94,76,64.42,0.67,Healthy appearance,none
+SAMPLE_247,palm,195,105.63,128,9.06,34,76,0,6.84,3.14,76,80.73,2.16,Mild redness or skin irritation,mild
+SAMPLE_248,eye,195,185.24,103.11,50.64,34,76,4.33,0,1.44,76,31.09,8.65,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_249,skin,195,92.9,128,8.9,34,76,0,16.79,3.36,76,62.41,2.34,Possible burn or severe inflammation,severe
+SAMPLE_250,palm,195,152,128,22,34,76,2.77,1.27,5.31,76,70.84,0.34,Healthy appearance,none
+SAMPLE_251,eye,195,152,128,22,34,76,1.05,1.25,0.55,76,33.17,13.78,Healthy appearance,none
+SAMPLE_252,skin,195,200.4,104.83,45.33,34,76,6.3,0,0.67,76,77.91,2.59,Possible jaundice (mild),mild
+SAMPLE_253,palm,195,108.84,128,7.76,34,76,0,11.45,5.09,76,50.64,1.77,Possible burn, rash, or inflammation,moderate
+SAMPLE_254,eye,195,221.28,49.53,52.7,34,76,9.74,0,6.6,76,29.43,16.13,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_255,skin,195,152,128,22,34,76,2.75,0.64,6.76,76,78.21,0.94,Healthy appearance,none
+SAMPLE_256,palm,195,152,128,22,34,76,1.81,1.39,7.57,76,54.36,2.41,Healthy appearance,none
+SAMPLE_257,eye,195,128.41,128,5.16,34,76,0,2.86,6.5,76,52.28,17.89,Mild eye redness or irritation,mild
+SAMPLE_258,skin,195,191.37,102.32,51.18,34,76,17.86,0,0.91,76,57.54,2.5,Possible jaundice (moderate),moderate
+SAMPLE_259,palm,195,72.6,128,0.88,34,76,0,18.08,7.67,76,64.02,0.42,Possible burn or severe inflammation,severe
+SAMPLE_260,eye,195,152,128,22,34,76,0.24,0.56,6.15,76,30.85,16.28,Healthy appearance,none
+SAMPLE_261,skin,195,152,128,22,34,76,1.64,0.56,4.34,76,75.96,2.65,Healthy appearance,none
+SAMPLE_262,palm,195,182.48,111.48,41.68,34,76,6.09,0,3.98,76,47.98,1.19,Possible jaundice (mild),mild
+SAMPLE_263,eye,195,86.56,128,4.65,34,76,0,8.09,1.54,76,30.43,20.3,Moderate conjunctival redness,moderate
+SAMPLE_264,skin,195,196.09,63.24,56.83,34,76,34.94,0,1.51,76,47.13,0.13,Possible jaundice (severe),severe
+SAMPLE_265,palm,195,152,128,22,34,76,1.16,0.7,4.36,76,74.74,2.11,Healthy appearance,none
+SAMPLE_266,eye,195,152,128,22,34,76,0.31,0.59,4.74,76,44.43,18.21,Healthy appearance,none
+SAMPLE_267,skin,195,107.48,128,6.78,34,76,0,3.13,6.36,76,52.36,1.41,Mild redness or skin irritation,mild
+SAMPLE_268,palm,195,202.46,83.4,54.59,34,76,12.73,0,3.37,76,80.46,1.82,Possible jaundice (moderate),moderate
+SAMPLE_269,eye,195,69.13,128,5.59,34,76,0,16.06,5.82,76,25.31,19.84,Severe conjunctival redness / irritation,severe
+SAMPLE_270,skin,195,152,128,22,34,76,2.77,1.45,4.15,76,81.31,0.05,Healthy appearance,none
+SAMPLE_271,palm,195,152,128,22,34,76,0.61,1.1,2.28,76,81.92,0.77,Healthy appearance,none
+SAMPLE_272,eye,195,197.59,115.1,46.93,34,76,2.89,0,4.73,76,32.36,15.14,Possible scleral icterus / jaundice (mild),mild
+SAMPLE_273,skin,195,90.3,128,1.1,34,76,0,15.03,0.8,76,66.57,2.88,Possible burn, rash, or inflammation,moderate
+SAMPLE_274,palm,195,195.16,64.5,55.29,34,76,23.8,0,5.36,76,48.33,2.37,Possible jaundice (severe),severe
+SAMPLE_275,eye,195,152,128,22,34,76,0.34,0.82,7.38,76,45.19,10.44,Healthy appearance,none
+SAMPLE_276,skin,195,152,128,22,34,76,2.68,0.56,5.27,76,77.17,1.86,Healthy appearance,none
+SAMPLE_277,palm,195,110.8,128,7.02,34,76,0,5.4,3.59,76,71.74,0.17,Mild redness or skin irritation,mild
+SAMPLE_278,eye,195,210.93,72.26,47.22,34,76,5.59,0,7.99,76,52.73,21.38,Possible scleral icterus / jaundice (moderate),moderate
+SAMPLE_279,skin,195,76.16,128,4.02,34,76,0,33.23,3.2,76,49.05,1.14,Possible burn or severe inflammation,severe
+SAMPLE_280,palm,195,152,128,22,34,76,2.39,1.16,0.9,76,50.21,2.68,Healthy appearance,none
+SAMPLE_281,eye,195,152,128,22,34,76,0.9,0.51,3.88,76,31.88,9,Healthy appearance,none
+SAMPLE_282,skin,195,176.03,115.98,42.19,34,76,5.44,0,6.01,76,90.62,1.58,Possible jaundice (mild),mild
+SAMPLE_283,palm,195,107.98,128,9.21,34,76,0,14.58,5.75,76,82.98,2.31,Possible burn, rash, or inflammation,moderate
+SAMPLE_284,eye,195,198.29,78.5,54.14,34,76,8.36,0,0.51,76,27.81,20.27,Possible scleral icterus / jaundice (severe),severe
+SAMPLE_285,skin,195,152,128,22,34,76,0.62,1.02,1.55,76,80.11,0.79,Healthy appearance,none
+SAMPLE_286,palm,195,152,128,22,34,76,1.25,1.37,1.9,76,86.93,0.6,Healthy appearance,none
+SAMPLE_287,eye,195,126.73,128,6.7,34,76,0,2.84,5.08,76,26.54,9.17,Mild eye redness or irritation,mild
+SAMPLE_288,skin,195,202.99,89.23,52.87,34,76,14.42,0,5.41,76,50.21,2.47,Possible jaundice (moderate),moderate
+SAMPLE_289,palm,195,71.79,128,6.35,34,76,0,32.27,3.41,76,48.05,0.17,Possible burn or severe inflammation,severe
+SAMPLE_290,eye,195,152,128,22,34,76,0.3,0.6,7.1,76,39.34,11.97,Healthy appearance,none
+SAMPLE_291,skin,195,152,128,22,34,76,0.02,1.38,4.94,76,66.99,1.56,Healthy appearance,none
+SAMPLE_292,palm,195,180.31,96.9,46.36,34,76,7.08,0,5.02,76,82.94,2.88,Possible jaundice (mild),mild
+SAMPLE_293,eye,195,115,128,2.02,34,76,0,5.81,4.8,76,53.79,18.53,Moderate conjunctival redness,moderate
+SAMPLE_294,skin,195,203.15,79.28,56.85,34,76,25.33,0,2.88,76,65.36,1.82,Possible jaundice (severe),severe
+SAMPLE_295,palm,195,152,128,22,34,76,1.99,0.33,6.02,76,65.22,0.29,Healthy appearance,none
+SAMPLE_296,eye,195,152,128,22,34,76,0.02,0.8,5.25,76,37.97,16.43,Healthy appearance,none
+SAMPLE_297,skin,195,122.6,128,12.42,34,76,0,7.05,7.98,76,67.81,1.21,Mild redness or skin irritation,mild
+SAMPLE_298,palm,195,197.4,87.46,46.55,34,76,13.79,0,6.67,76,91.11,1.95,Possible jaundice (moderate),moderate
+SAMPLE_299,eye,195,74.39,128,4.75,34,76,0,13.88,4.57,76,39.6,20.15,Severe conjunctival redness / irritation,severe
+SAMPLE_300,skin,195,152,128,22,34,76,0.76,0.7,6.62,76,71.43,1.29,Healthy appearance,none
